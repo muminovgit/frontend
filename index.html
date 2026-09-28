@@ -1,26 +1,1114 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello</title>
+  <title>ABC Car Wash | Luxury Touchless Car Wash &amp; Detailing</title>
+  <meta name="description" content="Premium car wash and detailing for the rugged luxury lifestyle. Never stop playing in mud.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://framerusercontent.com">
+  <link href="https://fonts.googleapis.com/css2?family=Imperial+Script&family=Rubik+Dirt&family=Inter:wght@400;500;600;700;900&family=Hanken+Grotesk:wght@400;600;700;800&family=Bai+Jamjuree:wght@400;600&family=Host+Grotesk:wght@400;500&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --navy: #1b2b3b;
+      --ink: #05111e;
+      --muted: #818d9f;
+      --mud: #61451b;
+      --mud-light: #705c24;
+      --soft: #f5f7fb;
+      --line: #e5e8ef;
+      --white: #ffffff;
+      --radius: 20px;
+      --ease: cubic-bezier(.22, 1, .36, 1);
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
       margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #f5f5f5;
-      color: #222;
+      background: var(--white);
+      color: var(--navy);
+      font-family: "Inter", system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-    h1 {
-      font-size: 4rem;
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+    .container { width: min(1200px, 100% - 32px); margin-inline: auto; }
+    .h-section {
+      font-family: "Inter", sans-serif;
+      font-weight: 900;
+      font-size: clamp(34px, 5vw, 56px);
+      line-height: 1.15;
+      margin: 0;
+      color: var(--navy);
+      text-align: center;
+      letter-spacing: -0.01em;
+    }
+    .sub {
+      font-size: 14px;
+      color: #5b6676;
+      text-align: center;
+      margin: 14px auto 0;
+      max-width: 560px;
+      line-height: 1.6;
+    }
+
+    /* ---------- Reveal primitives ---------- */
+    .reveal { opacity: 0; transform: translateY(40px); transition: opacity 1s var(--ease), transform 1s var(--ease); transition-delay: var(--d, 0s); }
+    .reveal.in { opacity: 1; transform: none; }
+    .split .ch { display: inline-block; opacity: 0; transform: translateY(0.6em) rotateX(-80deg); transform-origin: 50% 100%; transition: opacity .8s var(--ease), transform .8s var(--ease); }
+    .split.in .ch { opacity: 1; transform: none; }
+    .split .w { display: inline-block; white-space: nowrap; perspective: 600px; }
+
+    /* ---------- Loader ---------- */
+    .loader {
+      position: fixed; inset: 0; z-index: 200; background: var(--ink); color: #fff;
+      display: grid; place-items: center; transition: clip-path 1.1s var(--ease);
+      clip-path: inset(0 0 0 0);
+    }
+    .loader.done { clip-path: inset(0 0 100% 0); }
+    .loader-inner { text-align: center; }
+    .loader-word { font-family: "Imperial Script", cursive; font-size: clamp(48px, 9vw, 96px); line-height: 1; }
+    .loader-bar { width: 180px; height: 2px; background: #ffffff22; margin: 22px auto 0; overflow: hidden; border-radius: 2px; }
+    .loader-bar span { display: block; height: 100%; width: 0; background: #fff; transition: width .3s linear; }
+
+    /* ---------- Navigation ---------- */
+    .logo { position: fixed; top: 20px; left: 20px; z-index: 60; width: 83px; height: 66px; transition: transform .5s var(--ease), opacity .5s; }
+    .logo img { width: 100%; height: 100%; object-fit: cover; filter: drop-shadow(0 2px 6px #0003); }
+    .nav {
+      position: fixed; top: 12px; right: 12px; z-index: 60;
+      display: flex; align-items: center; gap: 10px;
+      transition: transform .6s var(--ease);
+    }
+    .nav.hide, .logo.hide { transform: translateY(calc(-100% - 30px)); }
+    .nav-pill {
+      position: relative; display: flex; align-items: center; gap: 2px;
+      background: #ffffffd9; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      padding: 5px; border-radius: 999px; box-shadow: 0 6px 24px #1b2b3b1f;
+    }
+    .nav-indicator {
+      position: absolute; top: 5px; bottom: 5px; left: 5px; border-radius: 999px; background: var(--navy);
+      transition: transform .5s var(--ease), width .5s var(--ease); z-index: 0;
+    }
+    .nav-link {
+      position: relative; z-index: 1; font-family: "Bai Jamjuree", sans-serif; font-size: 13px;
+      padding: 9px 16px; border-radius: 999px; color: var(--navy); transition: color .35s;
+    }
+    .nav-link.active { color: #fff; }
+    .nav-contact {
+      display: flex; align-items: center; gap: 10px; background: var(--navy); color: #fff;
+      padding: 5px 20px 5px 5px; border-radius: 999px; font-family: "Bai Jamjuree", sans-serif;
+      font-size: 13px; letter-spacing: .16em; text-transform: uppercase; box-shadow: 0 6px 24px #1b2b3b40;
+    }
+    .nav-contact .ic { width: 34px; height: 34px; border-radius: 50%; background: #fff; color: var(--navy); display: grid; place-items: center; transition: transform .5s var(--ease); }
+    .nav-contact:hover .ic { transform: rotate(45deg); }
+    .burger { display: none; width: 46px; height: 46px; border-radius: 50%; border: 0; background: var(--navy); cursor: pointer; position: relative; }
+    .burger span { position: absolute; left: 14px; right: 14px; height: 2px; background: #fff; border-radius: 2px; transition: transform .4s var(--ease), opacity .3s; }
+    .burger span:nth-child(1) { top: 16px; } .burger span:nth-child(2) { top: 22px; } .burger span:nth-child(3) { top: 28px; }
+    .menu-open .burger span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .menu-open .burger span:nth-child(2) { opacity: 0; }
+    .menu-open .burger span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    .mobile-menu {
+      position: fixed; inset: 0; z-index: 55; background: var(--ink); color: #fff;
+      display: flex; flex-direction: column; justify-content: center; padding: 0 28px; gap: 8px;
+      clip-path: circle(0 at calc(100% - 35px) 35px); transition: clip-path .8s var(--ease);
+    }
+    .menu-open .mobile-menu { clip-path: circle(150% at calc(100% - 35px) 35px); }
+    .mobile-menu a { font-family: "Hanken Grotesk", sans-serif; font-weight: 800; font-size: 40px; opacity: 0; transform: translateY(30px); transition: opacity .6s, transform .6s var(--ease); }
+    .menu-open .mobile-menu a { opacity: 1; transform: none; }
+    .menu-open .mobile-menu a:nth-child(2) { transition-delay: .05s; } .menu-open .mobile-menu a:nth-child(3) { transition-delay: .1s; }
+    .menu-open .mobile-menu a:nth-child(4) { transition-delay: .15s; } .menu-open .mobile-menu a:nth-child(5) { transition-delay: .2s; }
+
+    /* ---------- Hero ---------- */
+    .hero { position: relative; height: 100svh; min-height: 600px; padding: 10px; }
+    .hero-card {
+      position: relative; height: 100%; border-radius: var(--radius); overflow: hidden;
+      transform-origin: 50% 0; will-change: transform; background: #cfc6b8;
+      cursor: none;
+    }
+    .hero-card img.bg, .hero-card canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .hero-card img.bg { transform: scale(1.08); transition: transform 2.2s var(--ease); }
+    .loaded .hero-card img.bg { transform: scale(1); }
+    .hero-card canvas { pointer-events: none; }
+    .hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, #ffffff55 0%, #ffffff00 45%), linear-gradient(0deg, #00000026, #0000 30%); pointer-events: none; }
+    .hero-layer { position: absolute; inset: 0; pointer-events: none; transform-style: preserve-3d; }
+    .hero-layer > * { pointer-events: auto; }
+    .tagline {
+      position: absolute; top: 88px; left: 0; right: 0; margin: 0;
+      display: flex; justify-content: center; align-items: center; gap: 8px; white-space: nowrap;
+      font-family: "Rubik Dirt", sans-serif; font-size: 20px; color: var(--mud);
+    }
+    .tagline svg { animation: spin 6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hero-title {
+      position: absolute; left: 44px; top: 28%; max-width: 420px; margin: 0;
+      font-family: "Imperial Script", cursive; font-weight: 400; font-size: clamp(56px, 6vw, 88px); line-height: 1.05;
+      color: transparent; -webkit-text-stroke: 1.2px var(--navy); text-shadow: 0 5px 3px #00000040;
+    }
+    .hero-title .ch { transition-duration: 1.2s; }
+    .social-box { position: absolute; right: 44px; top: 21%; display: flex; flex-direction: column; align-items: flex-end; gap: 16px; }
+    .customers {
+      display: flex; align-items: center; gap: 14px; padding: 7px 16px 7px 7px; border-radius: 999px;
+      background: #ffffff66; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid #ffffff80; box-shadow: 0 8px 30px #0000001a;
+    }
+    .avatars { display: flex; }
+    .avatars img { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; margin-left: -10px; transition: transform .4s var(--ease); }
+    .avatars img:first-child { margin-left: 0; }
+    .customers:hover .avatars img { transform: translateY(-4px); }
+    .customers:hover .avatars img:nth-child(2) { transition-delay: .05s; }
+    .customers:hover .avatars img:nth-child(3) { transition-delay: .1s; }
+    .customers:hover .avatars img:nth-child(4) { transition-delay: .15s; }
+    .customers small { font-family: "Host Grotesk", sans-serif; font-size: 14px; letter-spacing: -.03em; color: var(--navy); }
+    .customers strong { font-family: "Hanken Grotesk", sans-serif; font-size: 22px; font-weight: 800; color: var(--navy); letter-spacing: -.02em; }
+    .socials { display: flex; gap: 10px; }
+    .socials a {
+      width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--navy);
+      background: #ffffff80; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background .3s, color .3s, transform .4s var(--ease);
+    }
+    .socials a:hover { background: var(--navy); color: #fff; transform: translateY(-3px); }
+    .book-btn {
+      position: absolute; right: 26px; bottom: 26px; display: flex; align-items: center; gap: 8px;
+      font-family: "Bai Jamjuree", sans-serif; font-weight: 600; font-size: 15px; color: var(--navy);
+    }
+    .book-btn .label { background: #fff; padding: 16px 22px; border-radius: 999px; box-shadow: 0 10px 30px #00000026; transition: background .4s, color .4s; }
+    .book-btn .arrow { width: 44px; height: 44px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; transition: transform .5s var(--ease); box-shadow: 0 10px 30px #1b2b3b55; }
+    .book-btn:hover .label { background: var(--navy); color: #fff; }
+    .book-btn:hover .arrow { transform: rotate(45deg) scale(1.08); }
+    .hero-hint {
+      position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%); font-family: "Bai Jamjuree", sans-serif;
+      font-size: 12px; letter-spacing: .2em; text-transform: uppercase; color: #fff; text-shadow: 0 1px 6px #0008;
+      display: flex; align-items: center; gap: 10px; transition: opacity .6s;
+    }
+    .hero-hint i { width: 22px; height: 34px; border: 1.5px solid #fff; border-radius: 12px; position: relative; }
+    .hero-hint i::after { content: ""; position: absolute; left: 50%; top: 6px; width: 3px; height: 7px; margin-left: -1.5px; border-radius: 2px; background: #fff; animation: wheel 1.6s var(--ease) infinite; }
+    @keyframes wheel { 0% { opacity: 0; transform: translateY(0); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(10px); } }
+    .wash-cursor {
+      position: fixed; left: 0; top: 0; z-index: 70; width: 92px; height: 92px; margin: -46px 0 0 -46px; border-radius: 50%;
+      border: 1.5px solid #ffffffcc; background: #ffffff1f; backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+      display: grid; place-items: center; color: #fff; font-family: "Bai Jamjuree", sans-serif; font-size: 11px; letter-spacing: .18em;
+      text-transform: uppercase; pointer-events: none; opacity: 0; transform: scale(.4); transition: opacity .3s, transform .4s var(--ease);
+      text-shadow: 0 1px 4px #0007;
+    }
+    .wash-cursor.on { opacity: 1; transform: scale(1); }
+
+    /* ---------- Highlighted services ---------- */
+    .services { position: relative; height: 320vh; }
+    .services-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; display: grid; place-items: center; }
+    .road { position: absolute; left: 50%; top: 0; bottom: 0; width: min(400px, 60vw); transform: translateX(-50%); opacity: .5; }
+    .road img { width: 100%; height: 100%; object-fit: cover; }
+    .car-stage { position: absolute; left: 50%; top: 50%; width: min(300px, 44vw); aspect-ratio: 1536 / 2752; transform: translate(-50%, -50%); perspective: 1200px; z-index: 2; }
+    .car { position: absolute; inset: 0; transform-style: preserve-3d; will-change: transform; filter: drop-shadow(0 40px 40px #0000004d); }
+    .car img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+    .car .clean { clip-path: inset(100% 0 0 0); }
+    .foam { position: absolute; left: -12%; right: -12%; height: 60px; top: 100%; transform: translateY(-50%); pointer-events: none;
+      background: radial-gradient(closest-side, #ffffffee, #bfe3ff99 55%, #0000); filter: blur(4px); opacity: 0; mix-blend-mode: screen; }
+    .bubbles { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+    .bubble { position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fff, #cfe8ff66 45%, #9cc9ff22 70%); border: 1px solid #ffffff99; opacity: 0; }
+    .svc-list { position: absolute; left: max(24px, calc(50% - 600px)); top: 50%; transform: translateY(-50%); width: min(380px, 34vw); display: flex; flex-direction: column; gap: 22px; z-index: 3; }
+    .svc {
+      display: flex; gap: 16px; align-items: center; padding: 12px; border-radius: 18px; background: #ffffffe6;
+      border: 1px solid var(--line); box-shadow: 0 12px 40px #1b2b3b14; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      opacity: .0; transform: translateX(-60px) rotateY(18deg); transform-origin: 0 50%; transition: opacity .8s var(--ease), transform .8s var(--ease), box-shadow .4s;
+    }
+    .svc.on { opacity: 1; transform: none; }
+    .svc img { width: 84px; height: 84px; border-radius: 12px; object-fit: cover; flex: none; }
+    .svc h3 { margin: 0 0 6px; font-family: "Hanken Grotesk", sans-serif; font-size: 17px; font-weight: 800; color: var(--navy); }
+    .svc p { margin: 0; font-size: 12.5px; line-height: 1.55; color: #5b6676; }
+    .fast { position: absolute; right: max(24px, calc(50% - 600px)); top: 50%; transform: translateY(-50%); width: min(300px, 26vw); text-align: center; z-index: 3; }
+    .fast .watch { width: 110px; height: 110px; margin: 0 auto 18px; position: relative; }
+    .fast .watch .hand { transform-origin: 50% 56%; animation: tick 2.4s steps(12) infinite; }
+    @keyframes tick { to { transform: rotate(360deg); } }
+    .fast .speed-lines line { stroke-dasharray: 22; stroke-dashoffset: 22; animation: dash 1.2s var(--ease) infinite; }
+    .fast .speed-lines line:nth-child(2) { animation-delay: .15s; } .fast .speed-lines line:nth-child(3) { animation-delay: .3s; }
+    @keyframes dash { 50% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -22; } }
+    .fast h3 { font-family: "Inter", sans-serif; font-weight: 900; font-size: 27px; line-height: 1.15; margin: 0; color: var(--navy); }
+    .progress-rail { position: absolute; right: 22px; top: 50%; transform: translateY(-50%); width: 3px; height: 140px; background: var(--line); border-radius: 3px; overflow: hidden; z-index: 3; }
+    .progress-rail span { display: block; width: 100%; height: 0; background: var(--navy); }
+
+    /* ---------- Pricing ---------- */
+    .pricing { padding: 120px 0 110px; }
+    .plans { display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; margin-top: 56px; perspective: 1400px; max-width: 1000px; margin-inline: auto; }
+    .plan {
+      position: relative; display: block; padding: 34px 30px; background: #fff; border: 1px solid var(--line); border-radius: 22px;
+      transform-style: preserve-3d; transition: transform .6s var(--ease), box-shadow .6s var(--ease); will-change: transform;
+      box-shadow: 0 10px 40px #1b2b3b0d;
+    }
+    .plan:nth-child(1) { border-radius: 22px 0 0 22px; border-right: 0; }
+    .plan:nth-child(3) { border-radius: 0 22px 22px 0; border-left: 0; }
+    .plan.popular { background: var(--navy); color: #fff; padding: 46px 30px; border-radius: 22px; z-index: 2; box-shadow: 0 30px 70px #1b2b3b59; border-color: #ffffff30; margin: 0 -8px; }
+    .plan h3 { font-family: "Hanken Grotesk", sans-serif; font-weight: 700; font-size: 22px; margin: 0 0 16px; }
+    .plan .price { font-family: "Hanken Grotesk", sans-serif; font-size: 34px; font-weight: 800; letter-spacing: -.02em; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+    .plan.popular .price { border-color: #ffffff22; }
+    .plan ul { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 14px; }
+    .plan li { display: flex; gap: 10px; align-items: center; font-family: "Hanken Grotesk", sans-serif; font-size: 15px; color: #44474c; }
+    .plan.popular li { color: #dbe4f0; }
+    .plan li svg { flex: none; }
+    .plan .badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%) translateZ(40px); background: #d7e3f7; color: var(--navy); font-family: "Hanken Grotesk", sans-serif; font-weight: 700; font-size: 12px; letter-spacing: .04em; padding: 6px 16px; border-radius: 999px; white-space: nowrap; }
+    .plan .glare { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .4s; background: radial-gradient(400px circle at var(--gx, 50%) var(--gy, 50%), #ffffff40, #0000 45%); }
+    .plan:hover .glare { opacity: 1; }
+    .plan > * { transform: translateZ(30px); }
+    .plan .glare { transform: none; }
+    .plans .plan { opacity: 0; transform: rotateX(35deg) translateY(80px); }
+    .plans.in .plan { opacity: 1; transform: none; transition: transform 1.1s var(--ease), opacity 1.1s var(--ease), box-shadow .6s; }
+    .plans.in .plan:nth-child(2) { transition-delay: .12s; } .plans.in .plan:nth-child(3) { transition-delay: .24s; }
+    .more { text-align: center; margin-top: 56px; }
+    .more h4 { font-family: "Hanken Grotesk", sans-serif; font-weight: 800; font-size: 26px; margin: 0 0 12px; }
+    .more p { font-size: 13px; color: #44474c; max-width: 540px; margin: 0 auto 22px; line-height: 1.6; }
+    .btn-dark {
+      position: relative; display: inline-flex; align-items: center; gap: 10px; overflow: hidden; background: var(--navy); color: #fff;
+      padding: 13px 28px; border-radius: 999px; font-family: "Hanken Grotesk", sans-serif; font-weight: 700; font-size: 15px; border: 0; cursor: pointer;
+    }
+    .btn-dark::before { content: ""; position: absolute; inset: 0; background: #0099ff; transform: translateY(101%); border-radius: inherit; transition: transform .5s var(--ease); }
+    .btn-dark:hover::before { transform: none; }
+    .btn-dark > * { position: relative; }
+    .btn-dark svg { transition: transform .5s var(--ease); }
+    .btn-dark:hover svg { transform: translateX(4px); }
+
+    /* ---------- Why choose ---------- */
+    .why { padding: 90px 0 40px; overflow: hidden; }
+    .why-stage { position: relative; height: min(1100px, 150vw); max-height: 1100px; margin-top: 30px; perspective: 1600px; }
+    .porsche { position: absolute; left: 50%; top: 0; width: min(520px, 60vw); aspect-ratio: 1536 / 2752; transform: translateX(-50%); transform-style: preserve-3d; will-change: transform; }
+    .porsche img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 50px 50px #00000040); }
+    .feat { position: absolute; width: 230px; text-align: center; opacity: 0; transition: opacity 1s var(--ease), transform 1s var(--ease); }
+    .feat.l { left: max(0px, calc(50% - 520px)); transform: translateX(-80px); }
+    .feat.r { right: max(0px, calc(50% - 520px)); transform: translateX(80px); }
+    .feat.in { opacity: 1; transform: none; }
+    .feat .ic { width: 58px; height: 58px; margin: 0 auto 12px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; box-shadow: 0 12px 28px #1b2b3b40; transition: transform .6s var(--ease); }
+    .feat:hover .ic { transform: rotateY(180deg); }
+    .feat h4 { margin: 0 0 8px; font-family: "Inter", sans-serif; font-weight: 700; font-size: 16px; color: #000; }
+    .feat p { margin: 0; font-size: 12px; font-weight: 600; color: #828282; line-height: 1.5; }
+    .feat.f1 { top: 34%; } .feat.f2 { top: 56%; } .feat.f3 { top: 32%; } .feat.f4 { top: 54%; }
+
+    /* ---------- Testimonials ---------- */
+    .testi { padding: 90px 0 110px; overflow: hidden; }
+    .carousel { position: relative; height: 300px; margin-top: 48px; perspective: 1400px; }
+    .t-card {
+      position: absolute; left: 50%; top: 0; width: min(420px, 84vw); margin-left: calc(min(420px, 84vw) / -2); padding: 28px; border-radius: 24px;
+      background: #fff; border: 1px solid var(--line); box-shadow: 0 20px 60px #1b2b3b14; transition: transform .9s var(--ease), opacity .9s var(--ease), filter .9s;
+      cursor: grab; user-select: none;
+    }
+    .t-card .stars { display: flex; gap: 2px; color: var(--navy); margin-bottom: 18px; }
+    .t-card blockquote { margin: 0 0 24px; font-style: italic; font-size: 15px; line-height: 1.6; color: #37404d; font-family: "Hanken Grotesk", sans-serif; }
+    .t-card .who { display: flex; align-items: center; gap: 12px; font-family: "Hanken Grotesk", sans-serif; font-weight: 700; font-size: 15px; }
+    .t-card .who i { width: 36px; height: 36px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-style: normal; font-size: 13px; }
+    .dots { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+    .dots button { width: 8px; height: 8px; border-radius: 8px; border: 0; background: #cdd3dc; padding: 0; cursor: pointer; transition: width .5s var(--ease), background .4s; }
+    .dots button.on { width: 26px; background: var(--navy); }
+
+    /* ---------- About ---------- */
+    .about { position: relative; min-height: 780px; margin: 0 10px; border-radius: var(--radius); overflow: hidden; display: flex; align-items: center; }
+    .about .bg { position: absolute; inset: -12% 0; width: 100%; height: 124%; object-fit: cover; object-position: left center; will-change: transform; }
+    .about-card {
+      position: relative; margin-left: max(24px, calc(50% - 600px)); width: min(600px, 100% - 48px); padding: 44px;
+      background: #f8f9ffcc; border: 1px solid #ffffffb0; border-radius: 28px; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      box-shadow: 0 30px 80px #0000002e; transform-style: preserve-3d; transition: transform .6s var(--ease);
+    }
+    .about-card .h-section { text-align: left; font-size: clamp(34px, 4.5vw, 52px); }
+    .about-card h5 { font-family: "Inter", sans-serif; font-weight: 700; font-size: 16px; margin: 18px 0 16px; color: var(--ink); }
+    .about-card p { font-size: 14.5px; line-height: 1.75; color: #2d3847; margin: 0 0 16px; }
+    .btn-light { display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; background: #fff; color: var(--navy); padding: 12px 22px; border-radius: 999px; font-weight: 700; font-size: 14px; font-family: "Hanken Grotesk", sans-serif; box-shadow: 0 8px 24px #1b2b3b1a; transition: background .4s, color .4s; }
+    .btn-light svg { transition: transform .5s var(--ease); }
+    .btn-light:hover { background: var(--navy); color: #fff; }
+    .btn-light:hover svg { transform: translateX(4px); }
+
+    /* ---------- Contact ---------- */
+    .contact { padding: 120px 0 60px; }
+    .contact-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 28px; margin-top: 50px; }
+    .form { padding: 34px; border-radius: 24px; background: var(--soft); border: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .field { position: relative; }
+    .field.full { grid-column: 1 / -1; }
+    .field input, .field textarea {
+      width: 100%; padding: 22px 16px 10px; border: 1px solid #dde2ea; border-radius: 14px; background: #fff; font: 15px "Hanken Grotesk", sans-serif; color: var(--navy);
+      outline: none; transition: border-color .3s, box-shadow .3s; resize: vertical;
+    }
+    .field textarea { min-height: 150px; }
+    .field label { position: absolute; left: 16px; top: 16px; font: 15px "Hanken Grotesk", sans-serif; color: var(--muted); pointer-events: none; transition: transform .3s var(--ease), font-size .3s, color .3s; transform-origin: 0 0; }
+    .field input:focus, .field textarea:focus { border-color: var(--navy); box-shadow: 0 0 0 4px #1b2b3b14; }
+    .field input:focus + label, .field input:not(:placeholder-shown) + label,
+    .field textarea:focus + label, .field textarea:not(:placeholder-shown) + label { transform: translateY(-9px) scale(.78); color: var(--navy); }
+    .form .btn-dark { grid-column: 1 / -1; justify-content: center; padding: 16px; }
+    .form-note { grid-column: 1 / -1; font-size: 13px; text-align: center; color: #1a7f37; min-height: 18px; margin: 0; }
+    .info { display: grid; gap: 14px; align-content: start; }
+    .info-card { display: flex; gap: 16px; align-items: flex-start; padding: 20px; border-radius: 18px; background: #fff; border: 1px solid var(--line); transition: transform .5s var(--ease), box-shadow .5s, border-color .4s; }
+    .info-card:hover { transform: translateY(-4px); box-shadow: 0 18px 40px #1b2b3b14; border-color: #cfd6e0; }
+    .info-card .ic { width: 46px; height: 46px; flex: none; border-radius: 14px; background: var(--navy); color: #fff; display: grid; place-items: center; }
+    .info-card h4 { margin: 2px 0 6px; font-family: "Hanken Grotesk", sans-serif; font-weight: 700; font-size: 16px; }
+    .info-card p { margin: 0; font-size: 14px; color: #5b6676; line-height: 1.55; }
+
+    /* ---------- FAQ ---------- */
+    .faq { padding: 90px 0 120px; }
+    .faq-list { max-width: 900px; margin: 44px auto 0; display: grid; gap: 12px; }
+    .qa { background: var(--soft); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; transition: background .4s, border-color .4s; }
+    .qa.open { background: #fff; border-color: #d3d9e2; box-shadow: 0 14px 40px #1b2b3b10; }
+    .qa button { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 16px; background: none; border: 0; padding: 22px 24px; cursor: pointer; text-align: left; font-family: "Inter", sans-serif; font-weight: 600; font-size: 16px; color: var(--navy); }
+    .qa button svg { flex: none; transition: transform .5s var(--ease); }
+    .qa.open button svg { transform: rotate(135deg); }
+    .qa .ans { height: 0; overflow: hidden; transition: height .5s var(--ease); }
+    .qa .ans p { margin: 0; padding: 0 24px 22px; font-size: 14.5px; line-height: 1.7; color: #5b6676; }
+
+    /* ---------- Footer ---------- */
+    footer { background: var(--ink); color: #c4c6cc; padding: 80px 0 30px; position: relative; overflow: hidden; }
+    .foot-grid { display: grid; grid-template-columns: 1.3fr 1fr 1.3fr; gap: 40px; }
+    .foot-logo { width: 90px; height: 82px; object-fit: cover; margin-bottom: 20px; }
+    footer p { font-size: 14px; line-height: 1.6; margin: 0; }
+    footer h5 { color: #fff; font-family: "Hanken Grotesk", sans-serif; font-size: 15px; font-weight: 700; margin: 0 0 20px; }
+    footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+    footer li a, footer li span { font-size: 14px; display: inline-flex; gap: 10px; align-items: center; transition: color .3s; }
+    footer li a:hover { color: #fff; }
+    .foot-bottom { margin-top: 60px; padding-top: 26px; border-top: 1px solid #ffffff1c; text-align: center; font-size: 13px; }
+    .foot-bottom a { color: #fff; font-weight: 600; }
+    .foot-big { font-family: "Imperial Script", cursive; font-size: clamp(80px, 16vw, 230px); line-height: .9; text-align: center; color: transparent; -webkit-text-stroke: 1px #ffffff26; margin: 40px 0 0; user-select: none; white-space: nowrap; }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 1080px) {
+      .nav-pill, .nav-contact { display: none; }
+      .burger { display: block; }
+      .svc-list { left: 16px; width: min(360px, 44vw); }
+      .fast { display: none; }
+    }
+    @media (max-width: 809px) {
+      .logo { width: 64px; height: 51px; top: 18px; left: 16px; }
+      .hero-title { left: 22px; right: 22px; top: auto; bottom: 150px; font-size: 58px; max-width: none; }
+      .tagline { top: 86px; font-size: 15px; }
+      .social-box { right: 0; left: 0; top: 128px; align-items: center; }
+      .customers { white-space: nowrap; }
+      .socials { display: none; }
+      .book-btn { right: 16px; bottom: 30px; }
+      .book-btn .label { padding: 14px 16px; font-size: 13px; }
+      .hero-hint { display: none; }
+      .hero-card { cursor: auto; }
+      .services { height: auto; padding: 80px 0 40px; }
+      .services-sticky { position: relative; height: auto; overflow: visible; display: block; }
+      .road { height: 100%; }
+      .car-stage { position: relative; left: auto; top: auto; transform: none; margin: 0 auto 40px; width: min(220px, 56vw); }
+      .svc-list { position: relative; left: auto; top: auto; transform: none; width: auto; padding: 0 16px; }
+      .progress-rail { display: none; }
+      .plans { grid-template-columns: 1fr; gap: 18px; padding: 0 4px; }
+      .plan, .plan:nth-child(1), .plan:nth-child(3) { border-radius: 22px; border: 1px solid var(--line); }
+      .plan.popular { margin: 10px 0; }
+      .why-stage { height: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 28px 12px; padding-top: 20px; }
+      .porsche { position: relative; left: auto; transform: none; grid-column: 1 / -1; margin: 0 auto; width: min(260px, 64vw); }
+      .feat, .feat.l, .feat.r { position: relative; left: auto; right: auto; top: auto !important; width: auto; transform: translateY(30px); }
+      .feat.in { transform: none; }
+      .carousel { height: 330px; }
+      .about { min-height: 0; padding: 260px 0 16px; }
+      .about-card { margin: 0 12px; width: auto; padding: 28px 22px; }
+      .contact-grid { grid-template-columns: 1fr; }
+      .form { grid-template-columns: 1fr; padding: 22px; }
+      .foot-grid { grid-template-columns: 1fr; gap: 34px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition-duration: .01s !important; }
+      html { scroll-behavior: auto; }
     }
   </style>
 </head>
 <body>
-  <h1>Hello</h1>
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader-inner">
+      <div class="loader-word">ABC Car Wash</div>
+      <div class="loader-bar"><span id="loaderBar"></span></div>
+    </div>
+  </div>
+
+  <a href="#hero" class="logo" id="logo" aria-label="ABC Car Wash home">
+    <img src="https://framerusercontent.com/images/pm2G2p1o7bh5aylsFL5OQVcIHFg.png?scale-down-to=512" alt="Logo of the brand.">
+  </a>
+
+  <nav class="nav" id="nav" aria-label="Primary">
+    <div class="nav-pill" id="navPill">
+      <span class="nav-indicator" id="navIndicator"></span>
+      <a class="nav-link active" href="#hero" data-sec="hero">Home</a>
+      <a class="nav-link" href="#services" data-sec="services">Services</a>
+      <a class="nav-link" href="#about" data-sec="about">About Us</a>
+      <a class="nav-link" href="#pricing" data-sec="pricing">Wash Menu</a>
+    </div>
+    <a class="nav-contact" href="#contact">
+      <span class="ic"><svg width="16" height="16" viewBox="0 0 256 256" fill="currentColor"><path d="M227.32 28.68a16 16 0 0 0-15.66-4.08h-.15L19.57 82.84a16 16 0 0 0-2.49 29.8L102 154l41.3 84.87a15.86 15.86 0 0 0 14.44 9.13q.69 0 1.38-.06a15.88 15.88 0 0 0 14-11.51l58.2-191.94v-.15a16 16 0 0 0-4-15.66ZM157.83 232l-.05.14L117.61 150l48.24-48.24a8 8 0 0 0-11.31-11.31L106.3 138.69 24 98.49h.14L216 40Z"/></svg></span>
+      Contact
+    </a>
+    <button class="burger" id="burger" aria-label="Open menu"><span></span><span></span><span></span></button>
+  </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#hero">Home</a>
+    <a href="#services">Services</a>
+    <a href="#about">About Us</a>
+    <a href="#pricing">Wash Menu</a>
+    <a href="#contact">Contact</a>
+  </div>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero-card" id="heroCard">
+        <picture>
+          <source media="(max-width: 809px)" srcset="https://framerusercontent.com/images/FNZc1vrPkQVZPa6lrbVeQH9xhQ.jpeg?scale-down-to=1024">
+          <source media="(max-width: 1199px)" srcset="https://framerusercontent.com/images/GJZzoqe6RtK0DygbwnhlK5dFQs.jpeg?scale-down-to=1024">
+          <img class="bg" id="heroDirty" src="https://framerusercontent.com/images/vlzl5SC9ytkj03bSXoz2uYw4k.jpeg?scale-down-to=2048" alt="An image of a dirty mustang.">
+        </picture>
+        <canvas id="washCanvas" aria-hidden="true"></canvas>
+        <div class="hero-shade"></div>
+
+        <div class="hero-layer" id="heroLayer">
+          <p class="tagline reveal" style="--d:.9s" data-depth="10">
+            Never stop playing in mud.
+            <svg width="20" height="20" viewBox="0 0 20 20"><path fill="#61451b" d="M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm0 10.2a2.2 2.2 0 1 1 0-4.4 2.2 2.2 0 0 1 0 4.4Zm5.95-2.95h-3.05a3 3 0 0 0-.8-1.39l1.52-2.64a6.3 6.3 0 0 1 2.33 4.03ZM12.33 4.47 10.8 7.1a3 3 0 0 0-1.6 0L7.67 4.47a6.4 6.4 0 0 1 4.66 0ZM6.37 5.22l1.53 2.64a3 3 0 0 0-.8 1.39H4.05a6.3 6.3 0 0 1 2.32-4.03Zm-2.32 5.53H7.1c.14.53.42 1 .8 1.39l-1.53 2.64a6.3 6.3 0 0 1-2.32-4.03Zm3.62 4.78 1.53-2.64a3 3 0 0 0 1.6 0l1.53 2.64a6.4 6.4 0 0 1-4.66 0Zm5.96-.75-1.52-2.64c.38-.38.66-.86.8-1.39h3.04a6.3 6.3 0 0 1-2.32 4.03Z"/></svg>
+          </p>
+
+          <h1 class="hero-title split" data-split data-depth="30">Premium Car Wash &amp; Detailing</h1>
+
+          <div class="social-box reveal" style="--d:1.1s" data-depth="18">
+            <div class="customers">
+              <div class="avatars">
+                <img src="https://framerusercontent.com/images/gfzoATyY6lZ07yWGmRxN88ks.jpg?width=400&height=400" alt="Avatar of a person">
+                <img src="https://framerusercontent.com/images/SgvFGLvHqynTvKe3aSCczc2xfI.jpg?width=400&height=400" alt="Avatar of a person">
+                <img src="https://framerusercontent.com/images/LGN1Q4mlpaVuoAzszIXo7MR3BA.jpg?width=400&height=400" alt="Avatar of a person">
+                <img src="https://framerusercontent.com/images/jJa6UPsA4CmCNUdVprQCfLIyhw.jpg?width=400&height=400" alt="Avatar of a person">
+              </div>
+              <small>Regular customers</small>
+              <strong data-count="323">+0</strong>
+            </div>
+            <div class="socials">
+              <a href="https://instagram.com/" target="_blank" rel="noopener" aria-label="Instagram"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg></a>
+              <a href="https://x.com/" target="_blank" rel="noopener" aria-label="X"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.2 8.2L23 22h-6.6l-5.2-6.8L5.3 22H2.2l7.7-8.8L1.8 2h6.8l4.7 6.2L18.9 2Zm-1.1 18h1.7L7.3 3.9H5.5L17.8 20Z"/></svg></a>
+              <a href="tel:+15551234567" aria-label="Phone"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></a>
+              <a href="mailto:booking@abccarwash.com" aria-label="Email"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></a>
+            </div>
+          </div>
+
+          <a href="#contact" class="book-btn magnetic reveal" style="--d:1.3s">
+            <span class="label">Book appointment</span>
+            <span class="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
+          </a>
+          <div class="hero-hint" id="heroHint"><i></i>Move to wash · Scroll</div>
+        </div>
+      </div>
+    </section>
+    <div class="wash-cursor" id="washCursor">Wash</div>
+
+    <!-- HIGHLIGHTED SERVICES (scroll-driven car wash) -->
+    <section class="services" id="services">
+      <div class="services-sticky">
+        <div class="road"><img src="https://framerusercontent.com/images/9Mc6Rw9a1zAPu56BHPGrMmmNUJ4.png?scale-down-to=1024" alt="tyre marks of a car" loading="lazy"></div>
+
+        <div class="car-stage">
+          <div class="car" id="car">
+            <img class="dirty" src="https://framerusercontent.com/images/CdWTN7tnBUdvtMn9Wqi3MPOImi8.png?scale-down-to=1024" alt="A dirty mustang, top view" loading="lazy">
+            <img class="clean" id="carClean" src="https://framerusercontent.com/images/6JZ2D6lRV8M4bMwXYGJ2GdzqR0.png?scale-down-to=1024" alt="A clean, polished mustang, top view" loading="lazy">
+            <div class="foam" id="foam"></div>
+          </div>
+        </div>
+        <div class="bubbles" id="bubbles"></div>
+
+        <div class="svc-list" id="svcList">
+          <article class="svc tilt">
+            <img src="https://framerusercontent.com/images/30uQuZGCNDGXWHlFZQuI9J6eoI.jpeg?scale-down-to=512" alt="Clean, polished open hood of a mustang car" loading="lazy">
+            <div><h3>Engine Bay Wash</h3><p>Safely removes grease, oil, and dirt from your engine compartment, leaving it clean while helping maintain its appearance and performance.</p></div>
+          </article>
+          <article class="svc tilt">
+            <img src="https://framerusercontent.com/images/dJsjEopFbtuf6vgNXMaGu8GODS0.jpeg?scale-down-to=512" alt="Clean, polished interior of a mustang car." loading="lazy">
+            <div><h3>Dashboard Cleaning &amp; Polishing</h3><p>Removes dust and stains while restoring a clean, natural shine and helping protect your dashboard from fading and cracking.</p></div>
+          </article>
+          <article class="svc tilt">
+            <img src="https://framerusercontent.com/images/3WFwXcgRlWCBL1HxVOjwU2EXOtY.jpg?scale-down-to=512" alt="Clean, polished underbody of a mustang car." loading="lazy">
+            <div><h3>Underbody Wash</h3><p>Removes mud, salt, and road grime from the underside of your vehicle, helping prevent rust and corrosion while keeping it clean.</p></div>
+          </article>
+          <article class="svc tilt">
+            <img src="https://framerusercontent.com/images/Bd7kw2prqTBx1EfeuYuW9a2UENw.jpeg?scale-down-to=512" alt="Clean and polished wheel with silver colored alloy." loading="lazy">
+            <div><h3>Wheel &amp; Tire Cleaning</h3><p>Removes brake dust, dirt, and grime to restore a clean, polished finish while protecting your wheels and tires.</p></div>
+          </article>
+        </div>
+
+        <div class="fast" id="fast">
+          <div class="watch">
+            <svg viewBox="0 0 110 110" width="110" height="110" fill="none">
+              <g class="speed-lines" stroke="#1b2b3b" stroke-width="5" stroke-linecap="round">
+                <line x1="4" y1="50" x2="26" y2="50"/><line x1="10" y1="64" x2="28" y2="64"/><line x1="14" y1="78" x2="32" y2="78"/>
+              </g>
+              <circle cx="66" cy="62" r="34" fill="#e8483b"/>
+              <circle cx="66" cy="62" r="26" fill="#1b2b3b"/>
+              <rect x="59" y="16" width="14" height="9" rx="3" fill="#1b2b3b"/>
+              <rect x="90" y="30" width="10" height="7" rx="2" transform="rotate(40 95 33)" fill="#1b2b3b"/>
+              <g class="hand"><path d="M66 62 66 42" stroke="#fff" stroke-width="5" stroke-linecap="round" transform="translate(0 0)"/></g>
+              <circle cx="66" cy="62" r="4" fill="#fff"/>
+            </svg>
+          </div>
+          <h3>Fast &amp;<br>Reliable<br>Service</h3>
+        </div>
+        <div class="progress-rail"><span id="svcProgress"></span></div>
+      </div>
+    </section>
+
+    <!-- SIGNATURE WASHES -->
+    <section class="pricing" id="pricing">
+      <div class="container">
+        <h2 class="h-section split" data-split>Signature Washes</h2>
+        <p class="sub reveal">Our curated packages designed for optimal results at every level of care.</p>
+
+        <div class="plans" id="plans">
+          <a class="plan tilt3d" href="#contact">
+            <span class="glare"></span>
+            <h3>Standard Wash</h3>
+            <div class="price" data-price="45">$45</div>
+            <ul>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Hand wash &amp; dry</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Wheel &amp; tire cleaning</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Interior vacuum</li>
+            </ul>
+          </a>
+          <a class="plan popular tilt3d" href="#contact">
+            <span class="glare"></span>
+            <span class="badge">Most Popular</span>
+            <h3>Premium Polish</h3>
+            <div class="price" data-price="125">$125</div>
+            <ul>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Everything in Standard</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Clay bar treatment</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Machine wax application</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Window water spot removal</li>
+            </ul>
+          </a>
+          <a class="plan tilt3d" href="#contact">
+            <span class="glare"></span>
+            <h3>The Mud-Slayer</h3>
+            <div class="price" data-price="295">$295</div>
+            <ul>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Everything in Premium</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Undercarriage deep clean</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Engine bay detailing</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/></svg>Interior steam extraction</li>
+            </ul>
+          </a>
+        </div>
+
+        <div class="more reveal">
+          <h4>Need more options?</h4>
+          <p>Beyond our standard tiers, we offer specialized treatments, fleet accounts, and custom detailing packages tailored to your vehicle's specific needs.</p>
+          <a class="btn-dark magnetic" href="#contact"><span>View full menu</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHY CHOOSE US -->
+    <section class="why" id="why">
+      <div class="container">
+        <h2 class="h-section split" data-split>Why Choose ABC Car Wash?</h2>
+        <p class="sub reveal">Setting the gold standard in automotive restoration and care.</p>
+      </div>
+      <div class="why-stage" id="whyStage">
+        <div class="porsche" id="porsche">
+          <img src="https://framerusercontent.com/images/Lg5e6vlL78ZryBdIHdmXfIbN0.png?scale-down-to=1024" alt="Top view of a clean and polished blue porsche car" loading="lazy">
+        </div>
+        <div class="feat l f1">
+          <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M7 8h10M7 12h5"/><circle cx="8" cy="18" r="2.5"/></svg></div>
+          <h4>Certified Technicians</h4>
+          <p>ASE-certified professionals with years of experience.</p>
+        </div>
+        <div class="feat l f2">
+          <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v20M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+          <h4>Affordable Pricing</h4>
+          <p>Transparent rates with no hidden fees.</p>
+        </div>
+        <div class="feat r f3">
+          <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.8"/><path d="M2 19c0-3.3 3.1-5.5 7-5.5s7 2.2 7 5.5v1H2v-1Zm15.5 1v-1c0-1.7-.6-3.2-1.7-4.3 3.2.2 6.2 1.8 6.2 4.3v1h-4.5Z"/></svg></div>
+          <h4>Trusted by 1000+</h4>
+          <p>Join thousands of satisfied customers.</p>
+        </div>
+        <div class="feat r f4">
+          <div class="ic"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 10.4 3.3 3.3-1.4 1.4-3.9-3.9V6h2v6.4Z"/></svg></div>
+          <h4>Quick Services</h4>
+          <p>Most work completed within minutes, not hours.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TESTIMONIALS -->
+    <section class="testi" id="testimonials">
+      <div class="container">
+        <h2 class="h-section split" data-split>What Our Enthusiasts Say</h2>
+        <p class="sub reveal" style="font-weight:600;color:var(--navy)">Real stories from drivers who trust us with their machines.</p>
+        <div class="carousel" id="carousel">
+          <div class="t-card">
+            <div class="stars">★★★★★</div>
+            <blockquote>"The attention to detail is unmatched. My Mustang looks better than the day I bought it."</blockquote>
+            <div class="who"><i>JR</i>James R.</div>
+          </div>
+          <div class="t-card">
+            <div class="stars">★★★★★</div>
+            <blockquote>"Best ceramic coating in the city. The water just beads right off. Worth every penny for the protection."</blockquote>
+            <div class="who"><i>SM</i>Sarah M.</div>
+          </div>
+          <div class="t-card">
+            <div class="stars">★★★★★</div>
+            <blockquote>"They handled my vintage restoration with such care. Truly premium service for those who love their cars."</blockquote>
+            <div class="who"><i>MK</i>Michael K.</div>
+          </div>
+        </div>
+        <div class="dots" id="dots"></div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="about" id="about">
+      <img class="bg" id="aboutBg" src="https://framerusercontent.com/images/iVpQq9i3UD6tRNQqMF5B0E5vyeA.png?scale-down-to=2048" alt="A clean and polished grey bmw car." loading="lazy">
+      <div class="about-card tilt-soft reveal">
+        <h2 class="h-section split" data-split>OUR PHILOSOPHY</h2>
+        <h5>Engineered for the Enthusiast</h5>
+        <p>At ABC Car Wash, we understand that a vehicle is more than just transportation. It's an expression of spirit. Born from a passion for classic restorations and off-road adventures, our detailing studio bridges the gap between rugged utility and immaculate luxury.</p>
+        <p>We don't just clean cars; we preserve automotive heritage. Using state-of-the-art compounds, ceramic tech, and old-fashioned elbow grease, we ensure your machine looks pristine on the boulevard.</p>
+        <a class="btn-light" href="#contact">Read Our Story <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact" id="contact">
+      <div class="container">
+        <h2 class="h-section split" data-split>Get in Touch</h2>
+        <p class="sub reveal">Reach out for custom quotes, fleet bookings, or any questions about our rugged luxury detailing services.</p>
+        <div class="contact-grid">
+          <form class="form reveal" id="form" novalidate>
+            <div class="field"><input id="f-name" name="name" placeholder=" " required><label for="f-name">Name</label></div>
+            <div class="field"><input id="f-email" name="email" type="email" placeholder=" " required><label for="f-email">Email</label></div>
+            <div class="field full"><input id="f-subject" name="subject" placeholder=" "><label for="f-subject">Subject</label></div>
+            <div class="field full"><textarea id="f-msg" name="message" placeholder=" " required></textarea><label for="f-msg">Message</label></div>
+            <button class="btn-dark" type="submit"><span>Send Message</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+            <p class="form-note" id="formNote" role="status"></p>
+          </form>
+          <div class="info">
+            <a class="info-card reveal" style="--d:.05s" href="https://maps.google.com/?q=123+Industrial+Parkway+Motor+City" target="_blank" rel="noopener">
+              <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+              <div><h4>Our Studio</h4><p>123 Industrial Parkway<br>Motor City, MC 90210</p></div>
+            </a>
+            <a class="info-card reveal" style="--d:.1s" href="tel:+15551234567">
+              <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span>
+              <div><h4>Call Us</h4><p>(555) 123-4567</p></div>
+            </a>
+            <a class="info-card reveal" style="--d:.15s" href="mailto:booking@abccarwash.com">
+              <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></span>
+              <div><h4>Email Us</h4><p>booking@abccarwash.com</p></div>
+            </a>
+            <div class="info-card reveal" style="--d:.2s">
+              <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
+              <div><h4>Business Hours</h4><p>Mon-Sat: 8am - 7pm<br>Sun: 10am - 4pm</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="faq" id="faq">
+      <div class="container">
+        <h2 class="h-section split" data-split>FAQ</h2>
+        <p class="sub reveal">Everything you need to know about our services.</p>
+        <div class="faq-list" id="faqList">
+          <div class="qa reveal">
+            <button aria-expanded="false">How long does a full detail take?<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></button>
+            <div class="ans"><p>A Standard Wash takes about 30–45 minutes. Premium Polish usually takes 2–3 hours, and The Mud-Slayer full detail can take 4–6 hours depending on the vehicle's size and condition.</p></div>
+          </div>
+          <div class="qa reveal" style="--d:.05s">
+            <button aria-expanded="false">Do I need to book an appointment?<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></button>
+            <div class="ans"><p>Walk-ins are welcome for standard washes, but we recommend booking for detailing packages so we can reserve a bay and the right technician for your vehicle.</p></div>
+          </div>
+          <div class="qa reveal" style="--d:.1s">
+            <button aria-expanded="false">What products do you use?<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></button>
+            <div class="ans"><p>We use pH-balanced, biodegradable soaps, professional-grade clay, carnauba waxes and ceramic coatings that are safe for every paint, trim and interior surface.</p></div>
+          </div>
+          <div class="qa reveal" style="--d:.15s">
+            <button aria-expanded="false">Is mobile detailing available?<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg></button>
+            <div class="ans"><p>Yes. Our mobile unit covers the greater Motor City area for select packages. Contact us with your location and we'll confirm availability.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="foot-grid">
+        <div>
+          <img class="foot-logo" src="https://framerusercontent.com/images/pNZCSEUIgdH6cGcK92gdQ0x1rP8.png?scale-down-to=512" alt="ABC Car Wash" loading="lazy">
+          <p>Premium detailing for the rugged luxury<br>lifestyle. Never stop playing in mud.</p>
+        </div>
+        <div>
+          <h5>Quick Links</h5>
+          <ul>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#pricing">Wash Menu</a></li>
+            <li><a href="#about">About Us</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li><a href="#faq">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5>Visit Us</h5>
+          <ul>
+            <li><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>123 Industrial Parkway, Motor City, MC 90210</span></li>
+            <li><a href="tel:+15551234567"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>(555) 123-4567</a></li>
+            <li><a href="mailto:booking@abccarwash.com"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>booking@abccarwash.com</a></li>
+            <li><a href="https://instagram.com/" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></svg>@abccarwash</a></li>
+            <li><a href="https://x.com/" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.2 8.2L23 22h-6.6l-5.2-6.8L5.3 22H2.2l7.7-8.8L1.8 2h6.8l4.7 6.2L18.9 2Zm-1.1 18h1.7L7.3 3.9H5.5L17.8 20Z"/></svg>@abccarwash</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="foot-big" aria-hidden="true">ABC Car Wash</div>
+      <div class="foot-bottom">
+        © 2026 ABC Car Wash. All rights reserved.<br>
+        designed by <a href="https://www.instagram.com/automatewithanugrah" target="_blank" rel="noopener">automatewithanugrah</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  (() => {
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const $ = (s, r = document) => r.querySelector(s);
+    const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+    const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+    const lerp = (a, b, t) => a + (b - a) * t;
+
+    /* ---------- Split text into characters ---------- */
+    $$('[data-split]').forEach(el => {
+      const words = el.textContent.trim().split(/\s+/);
+      el.innerHTML = '';
+      let i = 0;
+      words.forEach((w, wi) => {
+        const ws = document.createElement('span');
+        ws.className = 'w';
+        [...w].forEach(c => {
+          const s = document.createElement('span');
+          s.className = 'ch';
+          s.textContent = c;
+          s.style.transitionDelay = (i++ * 0.025) + 's';
+          ws.appendChild(s);
+        });
+        el.appendChild(ws);
+        if (wi < words.length - 1) el.appendChild(document.createTextNode(' '));
+      });
+      el.setAttribute('aria-label', words.join(' '));
+    });
+
+    /* ---------- Loader ---------- */
+    const bar = $('#loaderBar');
+    const heroImgs = $$('.hero img');
+    let loaded = 0;
+    const step = () => { loaded++; bar.style.width = (loaded / heroImgs.length * 100) + '%'; };
+    const heroReady = Promise.all(heroImgs.map(img => img.complete ? (step(), 1) : new Promise(r => { img.addEventListener('load', () => { step(); r(); }, { once: true }); img.addEventListener('error', () => { step(); r(); }, { once: true }); })));
+    const finish = () => {
+      $('#loader').classList.add('done');
+      document.body.classList.add('loaded');
+      $$('.hero .reveal, .hero .split').forEach(el => el.classList.add('in'));
+      countUp($('[data-count]'));
+    };
+    Promise.race([heroReady, new Promise(r => setTimeout(r, 2500))]).then(() => setTimeout(finish, 350));
+
+    function countUp(el) {
+      const to = +el.dataset.count, t0 = performance.now(), d = 1800;
+      const tick = t => { const p = clamp((t - t0) / d); el.textContent = '+' + Math.round(to * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(tick); };
+      requestAnimationFrame(tick);
+    }
+
+    /* ---------- Reveal on view ---------- */
+    const io = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+    $$('.reveal, .split, .plans, .feat').forEach(el => { if (!el.closest('.hero')) io.observe(el); });
+
+    /* ---------- Navigation ---------- */
+    const nav = $('#nav'), logo = $('#logo'), indicator = $('#navIndicator'), links = $$('.nav-link');
+    const moveIndicator = a => {
+      if (!a || !a.offsetWidth) return;
+      indicator.style.width = a.offsetWidth + 'px';
+      indicator.style.transform = `translateX(${a.offsetLeft - 5}px)`;
+      links.forEach(l => l.classList.toggle('active', l === a));
+    };
+    moveIndicator($('.nav-link.active'));
+    addEventListener('resize', () => moveIndicator($('.nav-link.active')));
+    links.forEach(a => a.addEventListener('mouseenter', () => { indicator.style.width = a.offsetWidth + 'px'; indicator.style.transform = `translateX(${a.offsetLeft - 5}px)`; }));
+    $('#navPill').addEventListener('mouseleave', () => moveIndicator($('.nav-link.active')));
+    const secObs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { const a = links.find(l => l.dataset.sec === e.target.id); if (a) moveIndicator(a); } });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    ['hero', 'services', 'pricing', 'about'].forEach(id => secObs.observe(document.getElementById(id)));
+
+    const burger = $('#burger');
+    burger.addEventListener('click', () => document.body.classList.toggle('menu-open'));
+    $$('#mobileMenu a').forEach(a => a.addEventListener('click', () => document.body.classList.remove('menu-open')));
+
+    /* ---------- Hero: wash-away canvas (clean car revealed under cursor) ---------- */
+    const heroCard = $('#heroCard'), canvas = $('#washCanvas'), ctx = canvas.getContext('2d');
+    const mask = document.createElement('canvas'), mctx = mask.getContext('2d');
+    const clean = new Image();
+    clean.src = 'https://framerusercontent.com/images/l2LMOU5E66bPJFLZoiqzUpyCX14.jpeg?scale-down-to=2048';
+    const dirtyEl = $('#heroDirty');
+    let W = 0, H = 0, dpr = 1, brush = 120;
+    const pts = [];
+    function sizeCanvas() {
+      dpr = Math.min(devicePixelRatio || 1, 2);
+      W = heroCard.clientWidth; H = heroCard.clientHeight;
+      [canvas, mask].forEach(c => { c.width = W * dpr; c.height = H * dpr; });
+      brush = Math.max(80, Math.min(W, H) * 0.14);
+    }
+    sizeCanvas(); addEventListener('resize', sizeCanvas);
+    // object-fit: cover math — match the dirty image's framing so the swap lines up
+    function coverRect(img) {
+      const iw = img.naturalWidth || 16, ih = img.naturalHeight || 9;
+      const s = Math.max(W / iw, H / ih);
+      const pos = getComputedStyle(dirtyEl).objectPosition.startsWith('0%') ? 0 : 0.5;
+      return [(W - iw * s) * pos, (H - ih * s) / 2, iw * s, ih * s];
+    }
+    const addPoint = (x, y) => pts.push({ x, y, life: 1 });
+    heroCard.addEventListener('pointermove', e => {
+      const r = heroCard.getBoundingClientRect();
+      addPoint(e.clientX - r.left, e.clientY - r.top);
+    });
+    // intro sweep so visitors discover the effect
+    function introSweep() {
+      if (reduce) return;
+      const t0 = performance.now(), d = 2200;
+      const run = t => {
+        const p = clamp((t - t0) / d);
+        const x = lerp(W * 0.15, W * 0.85, p), y = H * 0.55 + Math.sin(p * Math.PI * 3) * H * 0.12;
+        addPoint(x, y);
+        if (p < 1) requestAnimationFrame(run);
+      };
+      requestAnimationFrame(run);
+    }
+    heroReady.then(() => setTimeout(introSweep, 900));
+    function drawWash() {
+      mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      // fade older strokes so the mud slowly "returns"
+      mctx.globalCompositeOperation = 'destination-out';
+      mctx.fillStyle = 'rgba(0,0,0,0.035)';
+      mctx.fillRect(0, 0, W, H);
+      mctx.globalCompositeOperation = 'source-over';
+      for (let i = pts.length - 1; i >= 0; i--) {
+        const p = pts[i];
+        const g = mctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, brush);
+        g.addColorStop(0, 'rgba(0,0,0,.9)');
+        g.addColorStop(0.55, 'rgba(0,0,0,.55)');
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        mctx.fillStyle = g;
+        mctx.beginPath(); mctx.arc(p.x, p.y, brush, 0, Math.PI * 2); mctx.fill();
+        pts.splice(i, 1);
+      }
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (clean.complete && clean.naturalWidth) {
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const [x, y, w, h] = coverRect(clean);
+        ctx.drawImage(clean, x, y, w, h);
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.globalCompositeOperation = 'destination-in';
+        ctx.drawImage(mask, 0, 0);
+        ctx.globalCompositeOperation = 'source-over';
+      }
+    }
+
+    /* ---------- Hero: custom cursor + 3D parallax ---------- */
+    const cursor = $('#washCursor'), layer = $('#heroLayer');
+    const depthEls = $$('[data-depth]', layer);
+    let mx = 0, my = 0, cx = 0, cy = 0, px = 0, py = 0, tpx = 0, tpy = 0;
+    addEventListener('pointermove', e => { mx = e.clientX; my = e.clientY; });
+    if (fine) {
+      heroCard.addEventListener('pointerenter', () => cursor.classList.add('on'));
+      heroCard.addEventListener('pointerleave', () => cursor.classList.remove('on'));
+      $$('a, button', heroCard).forEach(el => {
+        el.addEventListener('pointerenter', () => cursor.classList.remove('on'));
+        el.addEventListener('pointerleave', () => cursor.classList.add('on'));
+      });
+      heroCard.addEventListener('pointermove', e => {
+        const r = heroCard.getBoundingClientRect();
+        tpx = (e.clientX - r.left) / r.width - 0.5;
+        tpy = (e.clientY - r.top) / r.height - 0.5;
+      });
+    }
+
+    /* ---------- Magnetic buttons ---------- */
+    if (fine && !reduce) $$('.magnetic').forEach(el => {
+      el.addEventListener('pointermove', e => {
+        const r = el.getBoundingClientRect();
+        el.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.25}px, ${(e.clientY - r.top - r.height / 2) * 0.35}px)`;
+      });
+      el.addEventListener('pointerleave', () => { el.style.transition = 'transform .6s cubic-bezier(.22,1,.36,1)'; el.style.transform = ''; setTimeout(() => el.style.transition = '', 600); });
+    });
+
+    /* ---------- 3D tilt cards ---------- */
+    if (fine && !reduce) {
+      $$('.tilt3d').forEach(el => {
+        el.addEventListener('pointermove', e => {
+          const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+          el.style.transition = 'transform .15s ease-out, box-shadow .6s';
+          el.style.transform = `perspective(1000px) rotateY(${(x - 0.5) * 16}deg) rotateX(${(0.5 - y) * 14}deg) translateZ(20px)`;
+          el.style.setProperty('--gx', x * 100 + '%'); el.style.setProperty('--gy', y * 100 + '%');
+        });
+        el.addEventListener('pointerleave', () => { el.style.transition = 'transform .8s cubic-bezier(.22,1,.36,1), box-shadow .6s'; el.style.transform = ''; });
+      });
+      $$('.tilt, .tilt-soft').forEach(el => {
+        const k = el.classList.contains('tilt-soft') ? 4 : 10;
+        el.addEventListener('pointermove', e => {
+          const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+          el.style.transform = `perspective(900px) rotateY(${x * k}deg) rotateX(${-y * k}deg)`;
+        });
+        el.addEventListener('pointerleave', () => el.style.transform = '');
+      });
+    }
+
+    /* ---------- Services: scroll-driven wash ---------- */
+    const services = $('#services'), car = $('#car'), carClean = $('#carClean'), foam = $('#foam');
+    const svcs = $$('.svc'), svcProgress = $('#svcProgress'), bubbles = $('#bubbles'), fast = $('#fast');
+    const isDesktop = () => innerWidth > 809;
+    function spawnBubble() {
+      if (reduce || bubbles.childElementCount > 26) return;
+      const b = document.createElement('span');
+      b.className = 'bubble';
+      const s = 6 + Math.random() * 22;
+      const cr = car.getBoundingClientRect(), sr = bubbles.getBoundingClientRect();
+      b.style.cssText = `width:${s}px;height:${s}px;left:${cr.left - sr.left + Math.random() * cr.width}px;top:${cr.top - sr.top + cr.height * (0.2 + Math.random() * 0.6)}px`;
+      bubbles.appendChild(b);
+      b.animate([{ opacity: 0, transform: 'translateY(0) scale(.4)' }, { opacity: .9, offset: .2 }, { opacity: 0, transform: `translate(${(Math.random() - .5) * 120}px, ${-80 - Math.random() * 160}px) scale(1.1)` }],
+        { duration: 1600 + Math.random() * 1200, easing: 'cubic-bezier(.22,1,.36,1)' }).onfinish = () => b.remove();
+    }
+    let lastSvcP = -1;
+    function updateServices() {
+      const r = services.getBoundingClientRect();
+      let p;
+      if (isDesktop()) p = clamp(-r.top / (r.height - innerHeight));
+      else p = clamp((innerHeight - r.top) / (r.height + innerHeight * 0.2));
+      // car drives in (0 → .25), gets washed (.2 → .8), then drives off slightly (.85 → 1)
+      const drive = clamp(p / 0.25), wash = clamp((p - 0.2) / 0.6), exit = clamp((p - 0.85) / 0.15);
+      if (isDesktop()) {
+        const ty = lerp(70, 0, 1 - Math.pow(1 - drive, 3)) - exit * 25;
+        const rx = lerp(35, 12, drive) - exit * 12;
+        car.style.transform = `translateY(${ty}vh) rotateX(${rx}deg) rotateZ(${Math.sin(p * Math.PI * 2) * 1.5}deg)`;
+      } else {
+        car.style.transform = `rotateX(${lerp(20, 0, drive)}deg)`;
+      }
+      carClean.style.clipPath = `inset(${(1 - wash) * 100}% 0 0 0)`;
+      foam.style.top = (1 - wash) * 100 + '%';
+      foam.style.opacity = wash > 0 && wash < 1 ? 1 : 0;
+      svcProgress.style.height = p * 100 + '%';
+      svcs.forEach((s, i) => s.classList.toggle('on', isDesktop() ? p > 0.12 + i * 0.16 : s.getBoundingClientRect().top < innerHeight * 0.9));
+      if (fast) {
+        const f = clamp((p - 0.1) / 0.2);
+        fast.style.opacity = f;
+        fast.style.transform = `translateY(calc(-50% + ${(1 - f) * 60}px)) perspective(800px) rotateY(${(1 - f) * -40}deg)`;
+      }
+      if (wash > 0 && wash < 1 && Math.abs(p - lastSvcP) > 0.004) { spawnBubble(); spawnBubble(); }
+      lastSvcP = p;
+    }
+
+    /* ---------- Why choose: 3D porsche on scroll ---------- */
+    const whyStage = $('#whyStage'), porsche = $('#porsche');
+    function updateWhy() {
+      const r = whyStage.getBoundingClientRect();
+      const p = clamp((innerHeight - r.top) / (innerHeight + r.height));
+      if (isDesktop()) {
+        porsche.style.transform = `translateX(-50%) translateY(${lerp(120, -40, p)}px) rotateX(${lerp(40, -10, p)}deg) rotateZ(${lerp(-8, 6, p)}deg) scale(${lerp(.85, 1.02, p)})`;
+      } else {
+        porsche.style.transform = `rotateX(${lerp(30, -5, p)}deg) rotateZ(${lerp(-6, 4, p)}deg)`;
+      }
+    }
+
+    /* ---------- About: parallax bg ---------- */
+    const about = $('#about'), aboutBg = $('#aboutBg');
+    function updateAbout() {
+      const r = about.getBoundingClientRect();
+      const p = clamp((innerHeight - r.top) / (innerHeight + r.height));
+      aboutBg.style.transform = `translateY(${lerp(-8, 8, p)}%) scale(1.05)`;
+    }
+
+    /* ---------- Hero scroll-out (card recedes in 3D) ---------- */
+    const heroHint = $('#heroHint');
+    let lastY = scrollY;
+    function updateHero() {
+      const p = clamp(scrollY / innerHeight);
+      heroCard.style.transform = `perspective(1400px) rotateX(${p * 12}deg) scale(${1 - p * 0.12})`;
+      heroCard.style.opacity = 1 - p * 0.5;
+      heroHint.style.opacity = scrollY > 40 ? 0 : 1;
+      const down = scrollY > lastY && scrollY > 200;
+      nav.classList.toggle('hide', down && !document.body.classList.contains('menu-open'));
+      logo.classList.toggle('hide', down);
+      lastY = scrollY;
+    }
+
+    /* ---------- Main loop ---------- */
+    function frame() {
+      cx = lerp(cx, mx, 0.2); cy = lerp(cy, my, 0.2);
+      cursor.style.left = cx + 'px'; cursor.style.top = cy + 'px';
+      px = lerp(px, tpx, 0.08); py = lerp(py, tpy, 0.08);
+      if (!reduce && fine && isDesktop()) depthEls.forEach(el => {
+        const d = +el.dataset.depth;
+        el.style.transform = `translate3d(${-px * d}px, ${-py * d}px, 0) rotateY(${px * d * 0.12}deg) rotateX(${-py * d * 0.12}deg)`;
+      });
+      drawWash();
+      requestAnimationFrame(frame);
+    }
+    function onScroll() {
+      updateHero();
+      updateServices();
+      updateWhy();
+      updateAbout();
+    }
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', onScroll);
+    onScroll();
+    requestAnimationFrame(frame);
+
+    /* ---------- Testimonials: 3D coverflow ---------- */
+    const cards = $$('.t-card'), dots = $('#dots');
+    let cur = 1, timer;
+    cards.forEach((_, i) => { const b = document.createElement('button'); b.setAttribute('aria-label', 'Show testimonial ' + (i + 1)); b.onclick = () => go(i); dots.appendChild(b); });
+    function layout() {
+      const n = cards.length;
+      cards.forEach((c, i) => {
+        let off = i - cur;
+        if (off > n / 2) off -= n; if (off < -n / 2) off += n;
+        const a = Math.abs(off);
+        const spread = Math.min(innerWidth * 0.32, 380);
+        c.style.transform = `translateX(${off * spread}px) translateZ(${-a * 220}px) rotateY(${-off * 32}deg)`;
+        c.style.opacity = a > 1 ? 0 : 1 - a * 0.45;
+        c.style.filter = a ? 'blur(1.5px)' : 'none';
+        c.style.zIndex = 10 - a;
+      });
+      [...dots.children].forEach((d, i) => d.classList.toggle('on', i === cur));
+    }
+    function go(i) { cur = (i + cards.length) % cards.length; layout(); restart(); }
+    function restart() { clearInterval(timer); if (!reduce) timer = setInterval(() => go(cur + 1), 4500); }
+    cards.forEach((c, i) => c.addEventListener('click', () => { if (i !== cur) go(i); }));
+    let sx = null;
+    const car3 = $('#carousel');
+    car3.addEventListener('pointerdown', e => { sx = e.clientX; });
+    addEventListener('pointerup', e => { if (sx === null) return; const dx = e.clientX - sx; if (Math.abs(dx) > 40) go(cur + (dx < 0 ? 1 : -1)); sx = null; });
+    addEventListener('resize', layout);
+    layout(); restart();
+
+    /* ---------- FAQ accordion ---------- */
+    $$('.qa').forEach(qa => {
+      const btn = $('button', qa), ans = $('.ans', qa);
+      btn.addEventListener('click', () => {
+        const open = !qa.classList.contains('open');
+        $$('.qa.open').forEach(o => { if (o !== qa) { o.classList.remove('open'); $('.ans', o).style.height = 0; $('button', o).setAttribute('aria-expanded', 'false'); } });
+        qa.classList.toggle('open', open);
+        btn.setAttribute('aria-expanded', open);
+        ans.style.height = open ? ans.scrollHeight + 'px' : 0;
+      });
+    });
+
+    /* ---------- Contact form ---------- */
+    $('#form').addEventListener('submit', e => {
+      e.preventDefault();
+      const f = e.target, note = $('#formNote');
+      if (!f.checkValidity()) { note.style.color = '#c0392b'; note.textContent = 'Please fill in your name, a valid email and a message.'; return; }
+      note.style.color = '#1a7f37';
+      note.textContent = 'Thanks! Your message has been sent — we\'ll get back to you shortly.';
+      f.reset();
+    });
+  })();
+  </script>
 </body>
 </html>
