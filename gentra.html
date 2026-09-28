@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gentra Wash Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Imperial+Script&family=Rubik+Dirt&family=Inter:wght@400;600;900&family=Hanken+Grotesk:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { --navy: #1b2b3b; --mud: #61451b; --line: #e5e8ef; --ease: cubic-bezier(.22, 1, .36, 1); }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #f4f5f7; color: var(--navy); font-family: "Inter", system-ui, sans-serif; }
+    a { color: inherit; }
+    .stage { position: relative; height: 100svh; min-height: 560px; padding: 10px; }
+    .card { position: relative; height: 100%; border-radius: 20px; overflow: hidden; background: #eceae6; box-shadow: 0 20px 60px #1b2b3b1a; }
+    .wash { position: absolute; inset: 0; }
+    .title {
+      position: absolute; left: 40px; top: 90px; margin: 0; pointer-events: none;
+      font-family: "Imperial Script", cursive; font-weight: 400; font-size: clamp(52px, 7vw, 96px); line-height: 1;
+      color: transparent; -webkit-text-stroke: 1.2px var(--navy); text-shadow: 0 5px 3px #00000040;
+    }
+    .tag { position: absolute; top: 30px; left: 0; right: 0; text-align: center; margin: 0; font-family: "Rubik Dirt", sans-serif; font-size: 20px; color: var(--mud); pointer-events: none; }
+    .back { position: absolute; top: 24px; left: 24px; font: 600 13px "Inter", sans-serif; text-decoration: none; background: #fff; padding: 9px 16px; border-radius: 999px; box-shadow: 0 6px 20px #0000001a; }
+    .meter {
+      position: absolute; right: 24px; top: 24px; display: flex; align-items: center; gap: 10px; padding: 9px 16px; border-radius: 999px;
+      background: #ffffffcc; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-size: 13px; box-shadow: 0 6px 20px #0000001a; pointer-events: none;
+    }
+    .meter .bar { width: 90px; height: 6px; border-radius: 6px; background: #1b2b3b1f; overflow: hidden; }
+    .meter .bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #4fb3ff, #1b2b3b); transition: width .25s; }
+    .meter b { font-family: "Hanken Grotesk", sans-serif; min-width: 36px; text-align: right; }
+    .toast {
+      position: absolute; left: 50%; top: 50%; padding: 16px 28px; border-radius: 999px; background: var(--navy); color: #fff; white-space: nowrap;
+      font: 800 20px "Hanken Grotesk", sans-serif; box-shadow: 0 20px 50px #1b2b3b66; pointer-events: none;
+      transform: translate(-50%, -50%) scale(.6); opacity: 0; transition: opacity .5s, transform .7s var(--ease);
+    }
+    .toast.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .drop-hint { position: absolute; inset: 10px; border: 3px dashed #1b2b3b88; border-radius: 20px; display: none; place-items: center; background: #ffffffb3; font: 800 22px "Hanken Grotesk", sans-serif; pointer-events: none; z-index: 5; }
+    .dragging .drop-hint { display: grid; }
+
+    .panel { max-width: 980px; margin: 24px auto 60px; padding: 0 16px; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    .box { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 20px; }
+    .box h2 { margin: 0 0 6px; font: 800 17px "Hanken Grotesk", sans-serif; }
+    .box p { margin: 0 0 14px; font-size: 13.5px; line-height: 1.55; color: #5b6676; }
+    .file { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 13px; }
+    .file label { flex: none; background: var(--navy); color: #fff; padding: 9px 14px; border-radius: 999px; cursor: pointer; font-weight: 600; }
+    .file input { display: none; }
+    .file span { color: #5b6676; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    button { font: 600 13px "Inter", sans-serif; border: 1px solid var(--line); background: #fff; color: var(--navy); padding: 9px 16px; border-radius: 999px; cursor: pointer; }
+    button.dark { background: var(--navy); color: #fff; border-color: var(--navy); }
+    input[type=range] { width: 100%; accent-color: var(--navy); }
+    code { background: #f1f3f7; padding: 1px 6px; border-radius: 6px; font-size: 12.5px; }
+    @media (max-width: 700px) { .title { left: 18px; top: auto; bottom: 40px; } .tag { top: 76px; font-size: 15px; } .meter { top: auto; bottom: 16px; right: 16px; } }
+  </style>
+</head>
+<body>
+  <section class="stage">
+    <div class="card" id="card">
+      <div class="wash" id="wash"></div>
+      <p class="tag">Never stop playing in mud.</p>
+      <h1 class="title">Chevrolet<br>Gentra</h1>
+      <a class="back" href="./">← Home</a>
+      <div class="meter"><span>💧</span><span class="bar"><i id="bar"></i></span><b id="pct">0%</b></div>
+      <div class="toast" id="toast">✨ Sparkling clean!</div>
+      <div class="drop-hint">Rasmni shu yerga tashlang</div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="box">
+      <h2>O'z rasmingiz bilan sinang</h2>
+      <p>Toza mashina rasmini tanlang. Iflos versiyasi bo'lmasa, loy avtomatik chiziladi. Rasmni yuqoridagi maydonga sudrab tashlasa ham bo'ladi.</p>
+      <div class="file"><label for="fClean">Toza rasm</label><input type="file" id="fClean" accept="image/*"><span id="nClean">tanlanmagan</span></div>
+      <div class="file"><label for="fDirty">Iflos rasm (ixtiyoriy)</label><input type="file" id="fDirty" accept="image/*"><span id="nDirty">avtomatik loy</span></div>
+    </div>
+    <div class="box">
+      <h2>Sozlamalar</h2>
+      <p>Cho'tka o'lchami: <b id="brushVal">10%</b></p>
+      <input type="range" id="brush" min="4" max="20" value="10">
+      <div class="row" style="margin-top:14px">
+        <button class="dark" id="sweep">Avto yuvish</button>
+        <button id="reset">Loyni qaytarish</button>
+        <button id="reseed">Boshqa loy</button>
+      </div>
+    </div>
+    <div class="box">
+      <h2>Doimiy rasm qo'yish</h2>
+      <p>Repoga <code>images/gentra-clean.jpg</code> (va ixtiyoriy <code>images/gentra-dirty.jpg</code>) faylini qo'shsangiz, sahifa shularni avtomatik ishlatadi.</p>
+    </div>
+  </section>
+
+  <script src="wash.js"></script>
+  <script>
+    // Built-in fallback so the demo works before a real Gentra photo is added.
+    const FALLBACK = 'data:image/svg+xml;utf8,' + encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3f2ef"/><stop offset="1" stop-color="#e3e1dc"/></linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdfdfd"/><stop offset=".55" stop-color="#e6e9ee"/><stop offset="1" stop-color="#b9c0ca"/></linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2b3947"/><stop offset="1" stop-color="#0d1620"/></linearGradient>
+    <radialGradient id="rim" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#e9edf2"/><stop offset=".7" stop-color="#9aa3ad"/><stop offset="1" stop-color="#58616b"/></radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <ellipse cx="800" cy="705" rx="620" ry="34" fill="#00000030"/>
+  <path d="M230 600 C230 540 260 505 330 492 L520 470 C600 400 680 350 790 338 C900 330 1010 336 1080 360 C1150 385 1210 430 1260 470 L1340 482 C1395 492 1420 525 1420 570 L1420 612 C1420 632 1405 645 1385 645 L1290 645 C1280 575 1225 530 1160 530 C1095 530 1040 575 1030 645 L585 645 C575 575 520 530 455 530 C390 530 335 575 325 645 L262 645 C242 645 230 630 230 612 Z" fill="url(#body)" stroke="#8d96a1" stroke-width="3"/>
+  <path d="M555 468 C630 408 700 372 790 364 L790 470 Z" fill="url(#glass)"/>
+  <path d="M812 363 C900 358 990 364 1050 385 C1110 408 1160 440 1195 470 L812 470 Z" fill="url(#glass)"/>
+  <rect x="796" y="360" width="12" height="112" fill="#c7cdd4"/>
+  <path d="M300 540 L1400 540" stroke="#aeb5bf" stroke-width="3"/>
+  <path d="M560 500 L1220 500" stroke="#d3d8de" stroke-width="2"/>
+  <rect x="690" y="520" width="50" height="10" rx="5" fill="#9aa3ad"/><rect x="960" y="520" width="50" height="10" rx="5" fill="#9aa3ad"/>
+  <path d="M1360 505 C1395 510 1412 530 1415 555 L1370 552 Z" fill="#ffb347"/>
+  <path d="M238 560 C245 530 265 515 300 510 L300 560 Z" fill="#c9302c"/>
+  <g><circle cx="455" cy="645" r="98" fill="#1d232a"/><circle cx="455" cy="645" r="62" fill="url(#rim)"/><circle cx="455" cy="645" r="14" fill="#3a434d"/>
+    <g stroke="#6f7883" stroke-width="10" stroke-linecap="round"><path d="M455 590v30M455 670v30M400 645h30M480 645h30M416 606l20 20M474 664l20 20M416 684l20-20M474 626l20-20"/></g></g>
+  <g><circle cx="1160" cy="645" r="98" fill="#1d232a"/><circle cx="1160" cy="645" r="62" fill="url(#rim)"/><circle cx="1160" cy="645" r="14" fill="#3a434d"/>
+    <g stroke="#6f7883" stroke-width="10" stroke-linecap="round"><path d="M1160 590v30M1160 670v30M1105 645h30M1185 645h30M1121 606l20 20M1179 664l20 20M1121 684l20-20M1179 626l20-20"/></g></g>
+  <text x="1500" y="860" font-family="Inter, sans-serif" font-size="22" fill="#9aa1aa" text-anchor="end">placeholder — add images/gentra-clean.jpg</text>
+</svg>`);
+
+    const $ = s => document.querySelector(s);
+    const pct = $('#pct'), bar = $('#bar'), toast = $('#toast');
+    let seed = 7, current = {};
+    const exists = src => new Promise(r => { const i = new Image(); i.onload = () => r(true); i.onerror = () => r(false); i.src = src; });
+
+    let wash;
+    function mount(images) {
+      current = images;
+      if (wash) wash.destroy();
+      const fresh = document.createElement('div');
+      fresh.className = 'wash'; fresh.id = 'wash';
+      $('#wash').replaceWith(fresh);
+      wash = WashReveal(fresh, {
+        ...images, seed, brush: $('#brush').value / 100, alt: 'Chevrolet Gentra',
+        onProgress: p => { const v = Math.round(p * 100); pct.textContent = v + '%'; bar.style.width = v + '%'; },
+        onClean: () => { toast.classList.add('on'); setTimeout(() => { toast.classList.remove('on'); wash.reset(); }, 2600); },
+      });
+      wash.ready.then(() => setTimeout(() => wash.sweep(), 500));
+    }
+
+    (async () => {
+      const clean = await exists('images/gentra-clean.jpg') ? 'images/gentra-clean.jpg' : FALLBACK;
+      const dirty = await exists('images/gentra-dirty.jpg') ? 'images/gentra-dirty.jpg' : undefined;
+      mount({ clean, dirty });
+    })();
+
+    const pick = (input, name, key) => input.addEventListener('change', () => {
+      const f = input.files[0]; if (!f) return;
+      name.textContent = f.name;
+      mount({ ...current, [key]: URL.createObjectURL(f) });
+    });
+    pick($('#fClean'), $('#nClean'), 'clean');
+    pick($('#fDirty'), $('#nDirty'), 'dirty');
+
+    const card = $('#card');
+    ['dragenter', 'dragover'].forEach(t => card.addEventListener(t, e => { e.preventDefault(); card.classList.add('dragging'); }));
+    ['dragleave', 'drop'].forEach(t => card.addEventListener(t, () => card.classList.remove('dragging')));
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      const f = [...e.dataTransfer.files].find(f => f.type.startsWith('image/'));
+      if (f) { $('#nClean').textContent = f.name; mount({ clean: URL.createObjectURL(f), dirty: undefined }); $('#nDirty').textContent = 'avtomatik loy'; }
+    });
+
+    $('#brush').addEventListener('input', e => { $('#brushVal').textContent = e.target.value + '%'; });
+    $('#brush').addEventListener('change', () => mount(current));
+    $('#sweep').onclick = () => wash.sweep();
+    $('#reset').onclick = () => wash.reset();
+    $('#reseed').onclick = () => { seed = (Math.random() * 1e6) | 0; mount(current); };
+  </script>
+</body>
+</html>

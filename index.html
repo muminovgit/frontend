@@ -128,13 +128,24 @@
       transform-origin: 50% 0; will-change: transform; background: #cfc6b8;
       cursor: none;
     }
-    .hero-card img.bg, .hero-card canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-    .hero-card img.bg { transform: scale(1.08); transition: transform 2.2s var(--ease); }
-    .loaded .hero-card img.bg { transform: scale(1); }
-    .hero-card canvas { pointer-events: none; }
-    .hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, #ffffff55 0%, #ffffff00 45%), linear-gradient(0deg, #00000026, #0000 30%); pointer-events: none; }
+    .wash-area { position: absolute; inset: 0; transform: scale(1.08); transition: transform 2.2s var(--ease); background: #eceae6; }
+    .loaded .wash-area { transform: scale(1); }
+    .wash-meter {
+      position: absolute; left: 44px; bottom: 30px; display: flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px;
+      background: #ffffffb3; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); font-family: "Host Grotesk", sans-serif; font-size: 13px; color: var(--navy);
+      box-shadow: 0 8px 24px #0000001a; opacity: 0; transform: translateY(10px); transition: opacity .5s, transform .5s var(--ease);
+    }
+    .wash-meter.on { opacity: 1; transform: none; }
+    .wash-meter b { font-family: "Hanken Grotesk", sans-serif; font-size: 15px; min-width: 38px; }
+    .wash-toast {
+      position: absolute; left: 50%; top: 50%; padding: 16px 28px; border-radius: 999px; background: var(--navy); color: #fff;
+      font-family: "Hanken Grotesk", sans-serif; font-weight: 800; font-size: 20px; box-shadow: 0 20px 50px #1b2b3b66;
+      transform: translate(-50%, -50%) scale(.6); opacity: 0; transition: opacity .5s, transform .7s var(--ease); pointer-events: none;
+    }
+    .wash-toast.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, #ffffff40 0%, #ffffff00 40%); pointer-events: none; }
     .hero-layer { position: absolute; inset: 0; pointer-events: none; transform-style: preserve-3d; }
-    .hero-layer > * { pointer-events: auto; }
+    .hero-layer a, .hero-layer button { pointer-events: auto; }
     .tagline {
       position: absolute; top: 88px; left: 0; right: 0; margin: 0;
       display: flex; justify-content: center; align-items: center; gap: 8px; white-space: nowrap;
@@ -379,6 +390,8 @@
       .book-btn { right: 16px; bottom: 30px; }
       .book-btn .label { padding: 14px 16px; font-size: 13px; }
       .hero-hint { display: none; }
+      .wash-meter { left: 16px; bottom: 96px; }
+      .wash-toast { font-size: 16px; white-space: nowrap; }
       .hero-card { cursor: auto; }
       .services { height: auto; padding: 80px 0 40px; }
       .services-sticky { position: relative; height: auto; overflow: visible; display: block; }
@@ -444,12 +457,7 @@
     <!-- HERO -->
     <section class="hero" id="hero">
       <div class="hero-card" id="heroCard">
-        <picture>
-          <source media="(max-width: 809px)" srcset="https://framerusercontent.com/images/FNZc1vrPkQVZPa6lrbVeQH9xhQ.jpeg?scale-down-to=1024">
-          <source media="(max-width: 1199px)" srcset="https://framerusercontent.com/images/GJZzoqe6RtK0DygbwnhlK5dFQs.jpeg?scale-down-to=1024">
-          <img class="bg" id="heroDirty" src="https://framerusercontent.com/images/vlzl5SC9ytkj03bSXoz2uYw4k.jpeg?scale-down-to=2048" alt="An image of a dirty mustang.">
-        </picture>
-        <canvas id="washCanvas" aria-hidden="true"></canvas>
+        <div class="wash-area" id="washArea"></div>
         <div class="hero-shade"></div>
 
         <div class="hero-layer" id="heroLayer">
@@ -484,6 +492,8 @@
             <span class="arrow"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 17 17 7M8 7h9v9"/></svg></span>
           </a>
           <div class="hero-hint" id="heroHint"><i></i>Move to wash · Scroll</div>
+          <div class="wash-meter" id="washMeter"><span class="drop">💧</span><b id="washPct">0%</b> mud washed</div>
+          <div class="wash-toast" id="washToast">✨ Sparkling clean!</div>
         </div>
       </div>
     </section>
@@ -762,6 +772,7 @@
     </div>
   </footer>
 
+  <script src="wash.js"></script>
   <script>
   (() => {
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -794,10 +805,21 @@
 
     /* ---------- Loader ---------- */
     const bar = $('#loaderBar');
-    const heroImgs = $$('.hero img');
-    let loaded = 0;
-    const step = () => { loaded++; bar.style.width = (loaded / heroImgs.length * 100) + '%'; };
-    const heroReady = Promise.all(heroImgs.map(img => img.complete ? (step(), 1) : new Promise(r => { img.addEventListener('load', () => { step(); r(); }, { once: true }); img.addEventListener('error', () => { step(); r(); }, { once: true }); })));
+    const FR = 'https://framerusercontent.com/images/';
+    const washMeter = $('#washMeter'), washPct = $('#washPct'), washToast = $('#washToast');
+    const wash = WashReveal($('#washArea'), {
+      clean: FR + 'l2LMOU5E66bPJFLZoiqzUpyCX14.jpeg?scale-down-to=2048',
+      dirty: FR + 'vlzl5SC9ytkj03bSXoz2uYw4k.jpeg?scale-down-to=2048',
+      alt: 'A clean mustang revealed under the mud.',
+      brush: 0.1,
+      onProgress: p => { washPct.textContent = Math.round(p * 100) + '%'; washMeter.classList.toggle('on', p > 0.01); },
+      onClean: () => {
+        washToast.classList.add('on');
+        setTimeout(() => { washToast.classList.remove('on'); wash.reset(); }, 2600);
+      },
+    });
+    bar.style.width = '35%';
+    const heroReady = wash.ready.then(() => { bar.style.width = '100%'; });
     const finish = () => {
       $('#loader').classList.add('done');
       document.body.classList.add('loaded');
@@ -839,75 +861,9 @@
     burger.addEventListener('click', () => document.body.classList.toggle('menu-open'));
     $$('#mobileMenu a').forEach(a => a.addEventListener('click', () => document.body.classList.remove('menu-open')));
 
-    /* ---------- Hero: wash-away canvas (clean car revealed under cursor) ---------- */
-    const heroCard = $('#heroCard'), canvas = $('#washCanvas'), ctx = canvas.getContext('2d');
-    const mask = document.createElement('canvas'), mctx = mask.getContext('2d');
-    const clean = new Image();
-    clean.src = 'https://framerusercontent.com/images/l2LMOU5E66bPJFLZoiqzUpyCX14.jpeg?scale-down-to=2048';
-    const dirtyEl = $('#heroDirty');
-    let W = 0, H = 0, dpr = 1, brush = 120;
-    const pts = [];
-    function sizeCanvas() {
-      dpr = Math.min(devicePixelRatio || 1, 2);
-      W = heroCard.clientWidth; H = heroCard.clientHeight;
-      [canvas, mask].forEach(c => { c.width = W * dpr; c.height = H * dpr; });
-      brush = Math.max(80, Math.min(W, H) * 0.14);
-    }
-    sizeCanvas(); addEventListener('resize', sizeCanvas);
-    // object-fit: cover math — match the dirty image's framing so the swap lines up
-    function coverRect(img) {
-      const iw = img.naturalWidth || 16, ih = img.naturalHeight || 9;
-      const s = Math.max(W / iw, H / ih);
-      const pos = getComputedStyle(dirtyEl).objectPosition.startsWith('0%') ? 0 : 0.5;
-      return [(W - iw * s) * pos, (H - ih * s) / 2, iw * s, ih * s];
-    }
-    const addPoint = (x, y) => pts.push({ x, y, life: 1 });
-    heroCard.addEventListener('pointermove', e => {
-      const r = heroCard.getBoundingClientRect();
-      addPoint(e.clientX - r.left, e.clientY - r.top);
-    });
-    // intro sweep so visitors discover the effect
-    function introSweep() {
-      if (reduce) return;
-      const t0 = performance.now(), d = 2200;
-      const run = t => {
-        const p = clamp((t - t0) / d);
-        const x = lerp(W * 0.15, W * 0.85, p), y = H * 0.55 + Math.sin(p * Math.PI * 3) * H * 0.12;
-        addPoint(x, y);
-        if (p < 1) requestAnimationFrame(run);
-      };
-      requestAnimationFrame(run);
-    }
-    heroReady.then(() => setTimeout(introSweep, 900));
-    function drawWash() {
-      mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      // fade older strokes so the mud slowly "returns"
-      mctx.globalCompositeOperation = 'destination-out';
-      mctx.fillStyle = 'rgba(0,0,0,0.035)';
-      mctx.fillRect(0, 0, W, H);
-      mctx.globalCompositeOperation = 'source-over';
-      for (let i = pts.length - 1; i >= 0; i--) {
-        const p = pts[i];
-        const g = mctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, brush);
-        g.addColorStop(0, 'rgba(0,0,0,.9)');
-        g.addColorStop(0.55, 'rgba(0,0,0,.55)');
-        g.addColorStop(1, 'rgba(0,0,0,0)');
-        mctx.fillStyle = g;
-        mctx.beginPath(); mctx.arc(p.x, p.y, brush, 0, Math.PI * 2); mctx.fill();
-        pts.splice(i, 1);
-      }
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (clean.complete && clean.naturalWidth) {
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const [x, y, w, h] = coverRect(clean);
-        ctx.drawImage(clean, x, y, w, h);
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.globalCompositeOperation = 'destination-in';
-        ctx.drawImage(mask, 0, 0);
-        ctx.globalCompositeOperation = 'source-over';
-      }
-    }
+    /* ---------- Hero: intro sweep so visitors discover the wipe ---------- */
+    const heroCard = $('#heroCard');
+    heroReady.then(() => setTimeout(() => wash.sweep(), 1200));
 
     /* ---------- Hero: custom cursor + 3D parallax ---------- */
     const cursor = $('#washCursor'), layer = $('#heroLayer');
@@ -1045,7 +1001,6 @@
         const d = +el.dataset.depth;
         el.style.transform = `translate3d(${-px * d}px, ${-py * d}px, 0) rotateY(${px * d * 0.12}deg) rotateX(${-py * d * 0.12}deg)`;
       });
-      drawWash();
       requestAnimationFrame(frame);
     }
     function onScroll() {
