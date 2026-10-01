@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CDL-A Driver Application | Infinity Recruiting</title>
+  <meta name="description" content="Apply for CDL-A OTR and owner-operator driving jobs across the USA.">
+  <style>
+    :root { --bg:#f5f6f8; --card:#fff; --text:#1c2230; --muted:#5b6475; --accent:#1f6feb; --border:#d6dae2; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#12151c; --card:#1b202b; --text:#e8ebf2; --muted:#9aa3b5; --accent:#4c8dff; --border:#323a4b; }
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, sans-serif; background:var(--bg); color:var(--text); line-height:1.5; }
+    main { max-width: 640px; margin: 0 auto; padding: 24px 16px 48px; }
+    h1 { font-size: 1.8rem; margin: 8px 0; }
+    .lead { color: var(--muted); margin: 0 0 20px; }
+    form { background: var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; display:grid; gap:14px; }
+    label { display:grid; gap:4px; font-weight:600; font-size:.92rem; }
+    input, select { font: inherit; padding:10px 12px; border:1px solid var(--border); border-radius:8px; background:var(--bg); color:var(--text); }
+    .row { display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+    @media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
+    .check { display:flex; gap:10px; align-items:flex-start; font-weight:400; font-size:.85rem; color:var(--muted); }
+    .check input { margin-top:3px; }
+    button { font: inherit; font-weight:700; padding:12px; border:0; border-radius:8px; background:var(--accent); color:#fff; cursor:pointer; }
+    button:disabled { opacity:.6; cursor:wait; }
+    #msg { min-height:1.4em; font-weight:600; }
+    .ok { color:#1a7f37; } .err { color:#d1242f; }
+    .hp { position:absolute; left:-9999px; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>CDL-A Drivers: Apply in 2 Minutes</h1>
+  <p class="lead">OTR company drivers and owner-operators across the USA. A recruiter will contact you after you apply.</p>
+
+  <form id="f" novalidate>
+    <div class="row">
+      <label>Full name <input name="name" required autocomplete="name"></label>
+      <label>Phone <input name="phone" type="tel" required autocomplete="tel" placeholder="(555) 123-4567"></label>
+    </div>
+    <div class="row">
+      <label>Email <input name="email" type="email" autocomplete="email"></label>
+      <label>State <input name="state" required maxlength="2" placeholder="TX" autocomplete="address-level1"></label>
+    </div>
+    <div class="row">
+      <label>License
+        <select name="license" required>
+          <option value="">Select</option>
+          <option>CDL-A</option><option>CDL-B</option><option>No CDL yet</option>
+        </select>
+      </label>
+      <label>Years of experience
+        <select name="experience" required>
+          <option value="">Select</option>
+          <option>Less than 1</option><option>1-2</option><option>3-5</option><option>5+</option>
+        </select>
+      </label>
+    </div>
+    <div class="row">
+      <label>Do you own a truck?
+        <select name="own_truck" required>
+          <option value="">Select</option>
+          <option>Yes, I have my own authority (MC)</option>
+          <option>Yes, leased to a carrier</option>
+          <option>No, company driver</option>
+        </select>
+      </label>
+      <label>Endorsements
+        <select name="endorsements">
+          <option>None</option><option>Hazmat</option><option>Tanker</option><option>Doubles/Triples</option><option>Several</option>
+        </select>
+      </label>
+    </div>
+    <label>Available to start
+      <select name="start" required>
+        <option value="">Select</option>
+        <option>Immediately</option><option>Within 2 weeks</option><option>Within a month</option>
+      </select>
+    </label>
+
+    <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+    <label class="check">
+      <input type="checkbox" name="consent" required>
+      <span>I agree to be contacted by Infinity Recruiting by phone, text and email about driving jobs. Message and data rates may apply. Reply STOP to opt out at any time.</span>
+    </label>
+
+    <button id="btn" type="submit">Submit application</button>
+    <div id="msg" role="status" aria-live="polite"></div>
+  </form>
+</main>
+
+<script>
+  // Set this to your form backend (e.g. a Formspree/Google Apps Script URL) that accepts a JSON POST
+  // and appends the row to your Google Sheet. Until then, submissions are not sent anywhere.
+  const FORM_ENDPOINT = "";
+
+  const f = document.getElementById("f"), msg = document.getElementById("msg"), btn = document.getElementById("btn");
+  f.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    msg.className = ""; msg.textContent = "";
+    if (!f.checkValidity()) { f.reportValidity(); return; }
+    const data = Object.fromEntries(new FormData(f));
+    if (data.website) return; // honeypot
+    delete data.website;
+    data.submitted_at = new Date().toISOString();
+    if (!FORM_ENDPOINT) { msg.className = "err"; msg.textContent = "Form is not connected yet."; return; }
+    btn.disabled = true;
+    try {
+      const r = await fetch(FORM_ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+      if (!r.ok) throw new Error(r.status);
+      f.reset();
+      msg.className = "ok"; msg.textContent = "Thanks! A recruiter will contact you soon.";
+    } catch (err) {
+      msg.className = "err"; msg.textContent = "Something went wrong. Please try again.";
+    } finally { btn.disabled = false; }
+  });
+</script>
+</body>
+</html>
