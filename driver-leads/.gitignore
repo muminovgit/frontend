@@ -1,0 +1,3 @@
+# Lead files contain personal contact data: never commit them.
+data/
+*.csv
