@@ -5,6 +5,9 @@ from . import phones, sectors
 TEMPLATE = ("{company}: xodimlar keldi-ketdisi, HR va loyihalarni bitta tizimda yuriting. "
             "KPI.com bepul demo: {link}  To'xtatish: STOP")
 
+# Government bodies, banks, chambers, schools: not buyers for this product (or not B2B-reachable by SMS).
+EXCLUDE = re.compile(r"vazirlik|vazirligi|министер|\bbank\b|atb\b|palata|inspeksiy|institut|universitet|mudofaa|ichki ishlar|boshqarma|vakolatxona|akademiya|hokimlik|nazorat|sug'urta|lizing", re.I)
+
 def load_csv(path):
     with open(path, encoding="utf-8-sig", newline="") as f:
         return list(csv.DictReader(f))
@@ -12,6 +15,7 @@ def load_csv(path):
 def enrich(rows):
     seen, out = set(), []
     for r in rows:
+        if EXCLUDE.search(r.get("name", "")): continue
         key = (r.get("stir") or r.get("name", "")).strip().lower()
         if not key or key in seen: continue
         seen.add(key)
