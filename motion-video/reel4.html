@@ -2,7 +2,7 @@
 <html><head><meta charset="UTF-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head>
 <body><canvas id="c" width="1080" height="1920"></canvas>
 <script>
-const W=1080,H=1920,DUR=23.6;
+const W=1080,H=1920,DUR=33.1;
 const cv=document.getElementById('c'),g=cv.getContext('2d');
 const FONT='Inter,"Helvetica Neue",Arial,"DejaVu Sans",sans-serif';
 const SLATE='#2d3a4a', BLUE='#0a5ce0', WHITE='#ffffff';
@@ -73,20 +73,20 @@ function blobs(t,col){
 
 
 const GREEN='#16a34a',ORANGE='#e8920a',RED='#dc2626',INK='#111827',MUTED='#6b7685';
-const A=2.4,B=6.0,C=13.4,D=16.0,E=21.2;
+const A=4.3,B=9.7,C=17.2,D=20.4,E=28.6;
 const bgWipe=(lt,prev,col)=>{g.fillStyle=prev;g.fillRect(0,0,W,H);const r=eInOut(prog(lt,0,.55))*2600;g.fillStyle=col;g.beginPath();g.arc(W/2,H*.78,r,0,7);g.fill()};
 function pill(s,x,y,col,bg,size=26,p=1){g.save();g.translate(x,y);g.scale(p,p);g.font=`700 ${size}px ${FONT}`;const w=g.measureText(s).width+36,h=size+22;g.fillStyle=bg;rr(-w/2,-h/2,w,h,h/2);g.fill();text(s,0,2,size,col,{weight:700});g.restore();return w}
 
 function intro(t){
   g.fillStyle=SLATE;g.fillRect(0,0,W,H);blobs(t,SLATE);
   const rows=[['Xodim ishda',WHITE,.2,150,720],['bo\'ldimi?','#7fb0ff',.55,190,900]];
-  const out=eIn(prog(t,1.55,.25));
+  const out=eIn(prog(t,2.0,.25));
   g.save();g.globalAlpha=1-out;
   rows.forEach(([s,col,d,sz,cy])=>{const q=eOut(prog(t,d,.5)),size=fit(s,W-140,sz),bh=size*1.15;g.save();g.beginPath();g.rect(0,cy-bh/2,W,bh);g.clip();text(s,W/2,cy+(1-q)*bh,size,col);g.restore()});
   g.restore();
-  const q=eBack(prog(t,1.6,.5));
+  const q=eBack(prog(t,2.1,.5));
   if(q>0){g.save();g.translate(W/2,960);g.scale(q,q);text('Endi aniq bilasiz.',0,0,fit('Endi aniq bilasiz.',W-300,110),WHITE);
-    g.fillStyle=GREEN;rr(-240,80,480*eOut(prog(t,1.9,.4)),10,5);g.fill();g.restore()}
+    g.fillStyle=GREEN;rr(-240,80,480*eOut(prog(t,2.4,.4)),10,5);g.fill();g.restore()}
   const k=eOut(prog(t,.9,.4));sparkle(800,520,46*k,k);sparkle(280,1220,32*k,k);
 }
 
@@ -257,7 +257,7 @@ function real(lt,t){
 function kinetic(lt,t){
   g.fillStyle='#1a2330';g.fillRect(0,0,W,H);blobs(t,SLATE);
   const lines=[['NECHADA',WHITE,.0],['KELDI?','#22c55e',.15],['NECHADA',WHITE,.65],['KETDI?',ORANGE,.8]];
-  const out=eIn(prog(lt,2.3,.3));g.save();g.globalAlpha=1-out;
+  const out=eIn(prog(lt,2.9,.3));g.save();g.globalAlpha=1-out;
   lines.forEach(([s,col,d],i)=>{
     const p=eBack(prog(lt,d,.45));if(p<=0)return;const size=fit(s,W-140,230);
     g.save();g.translate(W/2,400+i*210);g.scale(p,p);g.rotate((1-p)*(i%2?.1:-.1));text(s,0,0,size,col);g.restore();
@@ -328,16 +328,16 @@ function dashboard(lt,t){
       g.restore();});
     g.restore();}
   // download button + click
-  const ba=eBack(prog(lt,2.7,.45));
-  if(ba>0){g.save();g.translate(W/2,1820);g.scale(ba,ba);const press=lt>3.55&&lt<3.7?.94:1;g.scale(press,press);
-    const done=lt>3.75;
+  const ba=eBack(prog(lt,5.0,.45));
+  if(ba>0){g.save();g.translate(W/2,1820);g.scale(ba,ba);const press=lt>5.85&&lt<6.0?.94:1;g.scale(press,press);
+    const done=lt>6.05;
     g.shadowColor=done?'rgba(22,163,74,.35)':'rgba(10,92,224,.35)';g.shadowBlur=36;g.shadowOffsetY=14;g.fillStyle=done?GREEN:BLUE;rr(-330,-62,660,124,62);g.fill();g.shadowColor='transparent';
-    if(done){const k=eBack(prog(lt,3.75,.4));g.save();g.translate(-250,0);g.scale(.7*k,.7*k);icon('check',WHITE);g.restore();text('Hisobot tayyor · PDF / Excel',30,2,34,WHITE,{weight:800})}
+    if(done){const k=eBack(prog(lt,6.05,.4));g.save();g.translate(-250,0);g.scale(.7*k,.7*k);icon('check',WHITE);g.restore();text('Hisobot tayyor · PDF / Excel',30,2,34,WHITE,{weight:800})}
     else{g.strokeStyle=WHITE;g.lineWidth=6;g.lineCap='round';g.beginPath();g.moveTo(-230,-20);g.lineTo(-230,14);g.moveTo(-246,0);g.lineTo(-230,16);g.lineTo(-214,0);g.moveTo(-250,26);g.lineTo(-210,26);g.stroke();
     text('Hisobotni yuklab olish',30,2,36,WHITE,{weight:800})}
     g.restore();
-    const rp=prog(lt,3.6,.5);if(rp>0&&rp<1){g.strokeStyle=BLUE;g.lineWidth=8*(1-rp);g.globalAlpha=1-rp;g.beginPath();g.arc(W/2+60,1830,20+rp*120,0,7);g.stroke();g.globalAlpha=1}
-    const cu=eInOut(prog(lt,3.0,.55));if(cu>0&&lt<4.4)cursor(W/2+60+(1-cu)*300,1830+(1-cu)*120,lt>3.55&&lt<3.7?.85:1);
+    const rp=prog(lt,5.9,.5);if(rp>0&&rp<1){g.strokeStyle=BLUE;g.lineWidth=8*(1-rp);g.globalAlpha=1-rp;g.beginPath();g.arc(W/2+60,1830,20+rp*120,0,7);g.stroke();g.globalAlpha=1}
+    const cu=eInOut(prog(lt,5.3,.55));if(cu>0&&lt<6.9)cursor(W/2+60+(1-cu)*300,1830+(1-cu)*120,lt>5.85&&lt<6.0?.85:1);
   }
 }
 

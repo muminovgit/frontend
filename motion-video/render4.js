@@ -1,7 +1,7 @@
 const {chromium}=require('/opt/node-tools/node_modules/playwright');
 const fs=require('fs'),path=require('path'),{execSync}=require('child_process');
 (async()=>{
-  const out=process.argv[2]||'kpi-terminal-reel.mp4', only=process.argv[3], FPS=30, DUR=23.6;
+  const out=process.argv[2]||'kpi-terminal-reel.mp4', only=process.argv[3], FPS=30, DUR=33.1;
   const dir=fs.mkdtempSync(path.join(process.env.TMPDIR||'/tmp','frames-'));
   const b=await chromium.launch({args:['--allow-file-access-from-files']});
   const p=await b.newPage({viewport:{width:1080,height:1920}});
