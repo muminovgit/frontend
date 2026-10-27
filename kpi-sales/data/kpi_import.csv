@@ -1,18 +1,150 @@
 name,stir,sector,score,phone,employees,region,pitch,source
-SBS-SECURITY OOO,,security,63,998990026446,,Toshkent,"postlar, smena grafigi, kelib-ketish nazorati",top.uz/sbs-security-ooo + company site
-Omega Engineering Group,,security,63,998998551855,,Toshkent,"postlar, smena grafigi, kelib-ketish nazorati",top.uz/omega + company site
-Maorif Plus OOO,,education,50,998331854267,,Toshkent,o'qituvchilar davomati/ish haqi,top.uz/maorif-plus-ooo + company site
-SUPER PACK MChJ,,manufacturing,50,,,Toshkent,"ko'p ishchi, smena, jarima/kechikish hisobi",goldenpages.uz/80814
-POYTAXT BETON ZAVODI,,manufacturing,50,,,Toshkent,"ko'p ishchi, smena, jarima/kechikish hisobi",goldenpages.uz/89281
-MEZON PLAST MChJ,,manufacturing,50,,,Toshkent,"ko'p ishchi, smena, jarima/kechikish hisobi",goldenpages.uz/67212
-TECHNO CABLE GROUP ZAVODI,,manufacturing,50,,,Toshkent viloyati,"ko'p ishchi, smena, jarima/kechikish hisobi",goldenpages.uz/80584
-MAVERA PLASTICS MChJ,,manufacturing,50,,,Toshkent,"ko'p ishchi, smena, jarima/kechikish hisobi",goldenpages.uz/86634
-KARTON OSIYO MChJ,,manufacturing,50,,,Toshkent,"ko'p ishchi, smena, jarima/kechikish hisobi",goldenpages.uz/61207
-POLYPACK MChJ,,manufacturing,50,,,Sirdaryo,"ko'p ishchi, smena, jarima/kechikish hisobi",goldenpages.uz/115044
-JIZZAX POLIMER PLAST MChJ,,manufacturing,50,,,Jizzax,"ko'p ishchi, smena, jarima/kechikish hisobi",goldenpages.uz/72509
-TBM STROY ZAVODI,,manufacturing,50,,,Samarqand,"ko'p ishchi, smena, jarima/kechikish hisobi",goldenpages.uz/87066
-ANVAR ZAMON NUR MChJ,,manufacturing,50,,,Samarqand,"ko'p ishchi, smena, jarima/kechikish hisobi",goldenpages.uz/88212
-Lider Team OOO,,security,48,,,Toshkent,"postlar, smena grafigi, kelib-ketish nazorati",top.uz/lider-team-ooo
-VIK OOO,,security,48,,,Toshkent,"postlar, smena grafigi, kelib-ketish nazorati",top.uz/vik-ooo
-Global Security Systems,,security,48,,,Toshkent,"postlar, smena grafigi, kelib-ketish nazorati",top.uz/global-security
-KONTINENT AZIA OOO,,security,48,,,Toshkent,"postlar, smena grafigi, kelib-ketish nazorati",top.uz/kontinent-azia-ooo
+SARDOBA PAXTA TOZALASH ZAVODI ZAVODI,,manufacturing,65,998672431191,,Sardoba,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+MAXSUSTRANS ISHLAB CHIQARISH BEKTEMIR TUMANI,,manufacturing,65,998712929231,,Toshkent,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+MAXSUSTRANS ISHLAB CHIQARISH OLMAZOR TUMANI,,manufacturing,65,998712485170,,Toshkent,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+MAXSUSTRANS ISHLAB CHIQARISH YASHNOBOD TUMANI,,manufacturing,65,998712803752,,Toshkent,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+SAMARQAND AVTOMOBIL ZAVODI QK MChJ,,manufacturing,65,998781408000,,Toshkent viloyati,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+CHIRCHIQ TRAKTOR ZAVODI OTAJ,,manufacturing,65,998707165669,,Chirchiq,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+QUVA PAXTA TOZALASH ZAVODI AJ,,manufacturing,65,998733151431,,Quva,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+UZUN PAXTA TOZALASH ZAVODI,,manufacturing,65,998764432546,,Uzun,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+SHAHRISABZ PAXTA TOZALASH ZAVODI,,manufacturing,65,998755242693,,Shahrisabz,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+AVTOSOZLASH ZAVODI №10 UK,,manufacturing,65,998712487219,,Toshkent viloyati,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+CHIRCHIQ TRANSFORMATOR ZAVODI AJ,,manufacturing,65,998707131774,,Toshkent viloyati,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+QUYUV-MEXANIKA ZAVODI ShK,,manufacturing,65,998712951201,,Toshkent viloyati,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+"TOSHKENT RANGLI METALL PARCHALARI, CHIQINDILARINI TAYYORLASH VA QAYTA ISHLASH ZAVODI AJ BUXORO FILIALI",,manufacturing,65,998652286135,,Buxoro,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+BUXORO ISHLAB CHIQARISH KOMBINATI AJ,,manufacturing,65,998652255093,,Buxoro,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+BORSHAGOV KIMYO-FARM ZAVODI VAKOLATXONA AJ,,manufacturing,65,998781405112,,Toshkent,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+MUBAREK GAZNI QAYTA ISHLASH ZAVODI AJ,,manufacturing,65,998756725060,,Qashqadaryo viloyati,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+BUXORO NEFTNI QAYTA ISHLASH ZAVODI UK,,manufacturing,65,998653644505,,Buxoro viloyati,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+URMB ISHLAB-CHIQARISH UCHASTKASI DUK,,manufacturing,65,998712894212,,Toshkent,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+ENERGETIK ISHLAB CHIQARISH TEXNIK KORXONASI,,manufacturing,65,998781503271,,Toshkent viloyati,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+"RESPUBLIKA ISTE'MOL TOVARLARINI ISHLAB CHIQARISH, SOTISH, TASHQIL QILISH VA XIZMAT KO'RSATISH BO'YICHA XODIMLARNI KASABA UYUSHMASI KENGASHI",,manufacturing,65,998712562384,,Toshkent viloyati,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+O'ZBEKISTON RESPUBLIKASI MUDOFAA VAZIRLIGI AVTOSOZLASH ZAVODI №14,,manufacturing,65,998712360996,,Toshkent viloyati,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+BERUNIY YOG' ZAVODI AJ,,manufacturing,65,998615242815,,Qoraqalpogston Respublikasi,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+TEXTILE LOGISTIC SERVICE MChJ MChJ,,manufacturing,65,998712536470,,Toshkent viloyati,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+TEXTILES SPEKTRUM KOLORS MChJ,,manufacturing,65,998652257517,,Buxoro viloyati,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+NOSTANDART ASBOB-USKUNALAR MALAKALI-TAJRIBA ZAVODI,,manufacturing,65,998981266512,,Toshkent viloyati,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+KOGON YOG' EKSTRAKSIYA ZAVODI AJ,,manufacturing,65,998655222460,,Kogon,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+VIMPEL SECURITY SERVICE,,security,63,998933827667,,Yashnobod tumani,"postlar, smena grafigi, kelib-ketish nazorati",yellowpages.uz
+TEMURBEK SECURITY,,security,63,998900990337,,Toshkent viloyati,"postlar, smena grafigi, kelib-ketish nazorati",yellowpages.uz
+ZAMIN SERVICE SECURITY,,security,63,998940892020,,Navoi viloyati,"postlar, smena grafigi, kelib-ketish nazorati",yellowpages.uz
+BERUNIY QURILISH PROFESSIONAL MAKTAB,,construction,60,998615242489,,Beruniy,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+QISHLOQ QURILISH BANK ATB NAMANGAN VILOYATI FILIALI,,construction,60,998692230435,,Namangan viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+QISHLOQ QURILISH BANK ATB SURXANDARYO MINTAQAVIY FILIALI,,construction,60,998787708374,,Surxandaryo viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+QISHLOQ QURILISH BANK ATB AXANGORON FILIALI,,construction,60,998781504539,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+QISHLOQ QURILISH BANK ATB QORAQOLPOQ MINTAQAVIY FILIALI,,construction,60,998787706228,,Qoraqalpogston Respublikasi,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+QISHLOQ QURILISH BANK *QUVA ATB FILIALI,,construction,60,998782297100,,Farg'ona viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+TOSHKENT ARXITEKTURA-QURILISH INSTITUTI,,construction,60,998712341178,,Toshkent,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+O'ZBEKISTON RESPUBLIKASI QURILISH VAZIRLIGI,,construction,60,998712101104,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+GAZMONTAJQURILISH MChJ,,construction,60,998712500386,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+QASHQADARYO AGROQURILISH MChJ,,construction,60,998752244508,,Qarshi,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+QISHLOQ QURILISH BANK ATB SARIASSIA FILIALI,,construction,60,998787708400,,Surxandaryo viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+TOSHKENT SHAHAR QURILISH SOHASIDA HUDUDIY NAZORAT INSPEKSIYASI,,construction,60,998712332843,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+QISHLOQ QURILISH BANK ATB ANDIJON MINTAQAVIY FILIALI,,construction,60,998782232064,,Andijon viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+O'ZMAXSUSMONTAJQURILISH AK,,construction,60,998712359095,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+ER USTI QURILISH UK AJ BGPS,,construction,60,998652227224,,Buxoro,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+NTMK ZARAFSHAN QURILISH BOSHQARMASI,,construction,60,998795734647,,Navoi viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+SAFFIR QURILISH MONTAJ MChJ,,construction,60,998712794677,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+TOSHKENT ARXITEKTURA-QURILISH INSTITUTI INFORMASIYA RESURS MARKAZI MARKAZI MARKAZI,,construction,60,998712346016,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+O'ZBEKISTON RESPUBLIKASI ICHKI ISHLAR VAZIRLIGI KAPITAL QURILISH BOSH BOSHQARMASI,,construction,60,998712313166,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+UNIVERSAL QURILISH SERVICE MChJ,,construction,60,998712534974,,Toshkent,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+TOSHKENT VILOYATI QURILISH NAZORATI INSPEKSIYASI,,construction,60,998712410264,,Toshkent,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+GULISTON SHAHRI ARXITEKTURA VA QURILISH BOSHQARMASI,,construction,60,998672254952,,Sirdaryo viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+XUMO-FAYZ TA MIR QURILISH UY-JOY MULK SHIRKATI,,construction,60,998712580515,,Toshkent,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+"O'ZBEKISTON TRANSPORT, YO'L VA KAPITAL QURILISH VA QURILISH SANOATI XODIMLARI KASABA UYUSHMASI RESPUBLIKA KENGASHI ",,construction,60,998712568748,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+O'ZBEKISTON RESPUBLIKASI MUDOFAA VAZIRLIGI HARBIY QURILISH BOSHQARMASI,,construction,60,998712916530,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+CHORTOQ SAMO QURILISH TA'MIR MChJ,,construction,60,998694127645,,Chortoq,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+QISHLOQ QURILISH INVEST BUXORO FILIALI,,construction,60,998652233822,,Buxoro,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+ME'MOR QURILISH LOYIHA MChJ,,construction,60,998662229019,,Samarqand viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+MAXSUS MONTAJ QURILISH MChJ,,construction,60,998712909682,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+NAVOISUVQURILISH AJ,,construction,60,998362254801,,Navoiy,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+QURILISH MASHINALARI VA MEXANIZMLARI BOSHQARMASI MChJ NEFTGAZMONTAJ,,construction,60,998781507010,,Toshkent,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+SABOXAT FAYZ QURILISH MChJ,,construction,60,998911362200,,Toshkent,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+CINEMA MARKET MChJ,,retail,60,998712443224,,Toshkent viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+ISHONCH KREDIT SAVDO MChJ,,retail,60,998735152222,,Farg'ona viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+ROSSIYA FEDERASIYASINING SAVDO VAKOLATXONASI,,retail,60,998712552635,,Toshkent viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+SIR-DARYO VILOYATI SAVDO-SANOAT PALATASI,,retail,60,998782211101,,Sirdaryo viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+QASHQADARYO VILOYATI SAVDO-SANOAT PALATASI,,retail,60,998757711101,,Qarshi,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+NEFT SAVDO SERVIS MChJ,,retail,60,998712945881,,Toshkent viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+SURHANDARYOKITOBSAVDO MChJ,,retail,60,998762231104,,Surxandaryo viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+BO'STON ULGURJI-CHAKANI SAVDO KORXONA,,retail,60,998615853081,,Bo'ston,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+NAVOIULGURJISAVDO MChJ,,retail,60,998362255946,,Navoiy,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+QURILISHDA TANLOV SAVDOLARINI TASHKIL ETISH BO'YICHA SAMARQAND VILOYATI KONSALTING MARKAZI,,retail,60,998662311351,,Samarqand viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+SAVDO-IQTISODIYOT MASALALARI BO'YICHA O'ZBEKISTON RESPUBLIKASIDAGI XITOY HALQ RESPUBLIKASI ELCHIHONASI MASLAXATCHISI DEVONXONASI,,retail,60,998712861802,,Toshkent viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+O'ZBEKISTON RESPUBLIKASI QURILISH VAZIRLIGINING TANLOV SAVDOLARINI TASHKIL ETISH TOSHKENT SHAHAR KONSALTING MARKAZI DUK,,retail,60,998712440765,,Toshkent viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+TEXTILE ADVERTISING AND MARKETING AGENCY MChJ,,retail,60,998712022244,,Toshkent viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+NOVBAHOR-SAVDO MChJ,,retail,60,998662349041,,Samarqand,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+FARSAVDOXIZMAT XUSUSIY KORXONASI,,retail,60,998712527271,,Toshkent,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+STROY TORG MARKETING MChJ,,retail,60,998951421111,,Toshkent,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+TURTKUL ASL SAVDO MChJ,,retail,60,998974041885,,To'rtko'l,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+KIT MARKETING AGENCY,,retail,60,998785550802,,Toshkent,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+SHOAFZAL NUR SAVDO MChJ,,retail,60,998712162254,,Toshkent,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+ELECTRO REM STROY MChJ,,retail,60,998909577692,,Toshkent viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+ASNAMTEX SAVDO INFO SERVIS XUSUSIY KORXONASI,,retail,60,998692330651,,Namangan,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+UCH QAHRAMON IXTISOSLANGAN SAVDO MAJMUASI MChJ,,retail,60,998712202315,,Zangiota tumani,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+OBOD-BINO-QURILISH-SAVDO MChJ,,retail,60,998983041616,,Toshkent,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+CHILONZOR BUYUM SAVDO KOMPLEKSI AJ,,retail,60,998712879852,,Toshkent viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+AZR-TEXTILE GROUP MChJ,,retail,60,998903282043,,Toshkent viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+SAMARQAND DARVOZA SAVDO-ISTIROHAT MAJMUASI,,retail,60,998712050055,,Toshkent,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+DILFUZA-BONU-SAVDO XUSUSIY KORXONASI,,retail,60,998936164901,,Olmaliq,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+MILLIY MARKETING MARKAZI,,retail,60,998974022820,,Toshkent viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+TECHNO PROFIL MChJ,,retail,60,998712033203,,Toshkent viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+JAMSHIDJON UNIVERSAL SAVDO XUSUSIY KORXONASI,,retail,60,998901918712,,Ziyovuddin,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+Dream Team Logistics,,logistics,55,998770121414,,Toshkent,"haydovchilar, marshrut/loyiha vaqti",yellowpages.uz
+Cargoline Logist Group,,logistics,55,998877999539,,Chilonzor tumani,"haydovchilar, marshrut/loyiha vaqti",yellowpages.uz
+Best Logistic Solution,,logistics,55,998994609080,,Toshkent viloyati,"haydovchilar, marshrut/loyiha vaqti",yellowpages.uz
+MOVE ONE LOGISTICS XK MChJ,,logistics,55,998712351843,,Toshkent viloyati,"haydovchilar, marshrut/loyiha vaqti",yellowpages.uz
+TRANS TECH LOGISTICS QK MChJ,,logistics,55,998998616371,,Toshkent viloyati,"haydovchilar, marshrut/loyiha vaqti",yellowpages.uz
+ANGREN LOGISTIKA MARKAZI AJ,,logistics,55,998781500006,,Toshkent viloyati,"haydovchilar, marshrut/loyiha vaqti",yellowpages.uz
+UNICO LOGISTIC VAKOLATXONA,,logistics,55,998712527765,,Toshkent viloyati,"haydovchilar, marshrut/loyiha vaqti",yellowpages.uz
+LOGISTIC24 MChJ,,logistics,55,998903320024,,Toshkent viloyati,"haydovchilar, marshrut/loyiha vaqti",yellowpages.uz
+TURON TRANSIT LOGISTICS MChJ,,logistics,55,998712928420,,Toshkent viloyati,"haydovchilar, marshrut/loyiha vaqti",yellowpages.uz
+INTERNATIONAL LOGISTIC SERVICE MChJ,,logistics,55,998712541366,,Toshkent viloyati,"haydovchilar, marshrut/loyiha vaqti",yellowpages.uz
+AGRO SERVIS PLYUS GROUP,,agri,53,998977780924,,O'rtachirchiq tumani,mavsumiy ishchilar hisobi,yellowpages.uz
+ILMIY TADQIQOT INSTITUTI ПОЧВОВЕДЕНИЯ И АГРОХИМИИ,,agri,53,998712460950,,Toshkent viloyati,mavsumiy ishchilar hisobi,yellowpages.uz
+NAMANGAN AGRO SERVIS MASHINA-TRAKTOR PARKI MChJ,,agri,53,998692333421,,Namangan viloyati,mavsumiy ishchilar hisobi,yellowpages.uz
+O'ZGARISH-AGROTA'MINOT MChJ,,agri,53,998974448514,,Toshkent,mavsumiy ishchilar hisobi,yellowpages.uz
+QASHQADARYO AGROPILLA * MChJ,,agri,53,998752234260,,Qarshi,mavsumiy ishchilar hisobi,yellowpages.uz
+QUVA AGRO INVEST MChJ,,agri,53,998946754077,,Toshkent viloyati,mavsumiy ishchilar hisobi,yellowpages.uz
+BIZAGRO,,agri,53,998905985114,,Namangan,mavsumiy ishchilar hisobi,yellowpages.uz
+AGRO FINANS LIZING AJ,,agri,53,998951770216,,Toshkent viloyati,mavsumiy ishchilar hisobi,yellowpages.uz
+O'ZAGROLIZING AJ NAVOI VILOYAT FILIALI,,agri,53,998792242591,,Navoi viloyati,mavsumiy ishchilar hisobi,yellowpages.uz
+MIYONQOL SAXOVATLI BOGLARI MChJ AGROFIRMA,,agri,53,998949336117,,Ishtixon,mavsumiy ishchilar hisobi,yellowpages.uz
+MASAF AGRO FERMER XO'JALIGI,,agri,53,998981271032,,Quyichirchiq tumani,mavsumiy ishchilar hisobi,yellowpages.uz
+AGROOFEED,,agri,53,998982733876,,Samarqand viloyati,mavsumiy ishchilar hisobi,yellowpages.uz
+BERUNIY AGROTEXSERVIS MTP MChJ,,agri,53,998615240085,,Beruniy,mavsumiy ishchilar hisobi,yellowpages.uz
+MO'YINQUM FAYZ AGRO FERMER XO'JALIGI,,agri,53,998949191061,,Bekobod tumani,mavsumiy ishchilar hisobi,yellowpages.uz
+O'ZBEKISTON RESPUBLIKASI ICHKI ISHLAB BOSHQARMASI AKADEMIYASI,,education,50,998712652252,,Toshkent,o'qituvchilar davomati/ish haqi,yellowpages.uz
+"YANGIYOL KITOB FABRIKASI, BOSMAXONA",,manufacturing,50,,,Yangiyo'l,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+AVTOSOZLASH ZAVODI,,manufacturing,50,,,Toshkent viloyati,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+PSKENT PAHTA TOZALASH ZAVODI OTAJ,,manufacturing,50,,,Toshkent viloyati,"ko'p ishchi, smena, jarima/kechikish hisobi",yellowpages.uz
+O'ZAGROSUG'URTA AJ SURXONDARYO FILIALI,,finance,47,998762230014,,Termiz,"filial xodimlari, hisobot",yellowpages.uz
+AGROBANK ATB JIZZAX VILOYATI BOSH BOSHQARMASI,,finance,47,998722263340,,Jizzax viloyati,"filial xodimlari, hisobot",yellowpages.uz
+AGROBANK ATB TOSHKENT SHAHAR BOSHQARMASI,,finance,47,998781505351,,Toshkent viloyati,"filial xodimlari, hisobot",yellowpages.uz
+O'ZAGROSUG'URTA AJ PSKENT FILIALI,,finance,47,998705454195,,Toshkent viloyati,"filial xodimlari, hisobot",yellowpages.uz
+AGROBANK ATB FARG'ONA VILOYATI BOSH BOSHQARMASI,,finance,47,998732247979,,Farg'ona viloyati,"filial xodimlari, hisobot",yellowpages.uz
+Qoraqalpog'iston Respublikasi O'ZSANOATQURILISHBANK ATB ATB FILIALI,,construction,45,,,Qoraqalpogston Respublikasi,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+O'ZSANOATQURILISHBANK ATB AL-XORAZMIY FILIALI,,construction,45,,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+O'ZSANOATQURILISHBANK ATB NAMANGAN VILOYATI FILIALI,,construction,45,,,Namangan viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+O'ZSANOATQURILISHBANK ATB BUXORO VILOYATI FILIALI,,construction,45,,,Buxoro viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+KIBRAY QURILISH MOLLARI KOMBINATI XT,,construction,45,,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+O'ZBEKISTON SANOAT-QURILISH BANK ATB,,construction,45,,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+O'ZSANOATQURILISHBANK ATB QATORTOL FILIALI,,construction,45,,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+O'ZSANOATQURILISHBANK ATB YASHNOBOD FILIALI,,construction,45,,,Toshkent viloyati,obyektlar bo'yicha davomat + loyihalar,yellowpages.uz
+TO'YTEPA ULGURJI-CHAKANA SAVDO KORXONASI,,retail,45,,,Nurafshon,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+BEKOBOD-SAVDO MChJ,,retail,45,,,Toshkent viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+AJ BEKABODTUMANMATLUBOTSAVDO DALVERZIN NONZAVODI,,retail,45,,,Toshkent viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+O.BEKCHUJAEV NOMLI NON ZAVODI YANGIYUL MATLUBOTSAVDO OTAJ,,retail,45,,,Toshkent viloyati,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+BEKOBOD AVTOSAVDO MChJ,,retail,45,,,Bekobod,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+NAMANGAN VILOYATI SAVDO-SANOAT PALATASI,,retail,45,,,Jizzax,smenali xodimlar: keldi-ketdi + jadval,yellowpages.uz
+YUKORICHIRCHIK TUMANI TADBIRQORLAR VA ISHLAB-CHIKARUVCHILAR PALATASI AXBOROT-MASLAHAT MARKAZI ,,logistics,40,,,Yangibozor,"haydovchilar, marshrut/loyiha vaqti",yellowpages.uz
+EKSPERIMENT SKULPTUR-ISHLAB-CHIKARISH KOMBINAT,,other,35,998712551490,,Toshkent viloyati,umumiy HR avtomatlashtirish,yellowpages.uz
+TAVRIDA STROY XUSUSIY KORXONASI,,other,35,998909060868,,Bekobod,umumiy HR avtomatlashtirish,yellowpages.uz
+MODUL STROY PROJECT MChJ,,other,35,998997203999,,Toshkent viloyati,umumiy HR avtomatlashtirish,yellowpages.uz
+NEFTEGAZ KARAT STROY MChJ,,other,35,998936543333,,Jondor,umumiy HR avtomatlashtirish,yellowpages.uz
+ROZSTROY MChJ,,other,35,998983063111,,Toshkent viloyati,umumiy HR avtomatlashtirish,yellowpages.uz
+RASUL GRAND STROY SERVIS XUSUSIY FIRMASI,,other,35,998982737773,,Samarqand,umumiy HR avtomatlashtirish,yellowpages.uz
+ALSTROY.UZ,,other,35,998940602020,,Toshkent,umumiy HR avtomatlashtirish,yellowpages.uz
+KOSON RIVOJ TEKSTIL OILAVIY KORXONASI,,other,35,998906088822,,Koson,umumiy HR avtomatlashtirish,yellowpages.uz
+BAXRUZ STROY TRANS SERVIS MChJ,,other,35,998909060567,,Toshkent,umumiy HR avtomatlashtirish,yellowpages.uz
+TOSHKENT VILOYATI YANGIYO'L TUMANI TADBIQORLAR VA ISHLAB-CHIKARUVCHILAR PALATASI,,other,20,,,Gulbahor,umumiy HR avtomatlashtirish,yellowpages.uz
