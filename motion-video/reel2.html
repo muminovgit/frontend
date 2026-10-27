@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script>
+const W=1080,H=1920,DUR=18.2;
+const cv=document.getElementById('c'),g=cv.getContext('2d');
+const FONT='Inter,"Helvetica Neue",Arial,"DejaVu Sans",sans-serif';
+const SLATE='#2d3a4a', BLUE='#0a5ce0', WHITE='#ffffff';
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const prog=(t,s,d)=>clamp((t-s)/d);
+const eOut=x=>1-Math.pow(1-x,4), eIn=x=>x*x*x;
+const eBack=x=>{const c=2.2;return 1+(c+1)*Math.pow(x-1,3)+c*Math.pow(x-1,2)};
+const eInOut=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
+
+const MODS=[
+ {key:'accounts',ui:0,color:'#2a22a6',name:'Accounting',cap:'Hisob-kitob',sub:'Moliya va hisobotlar bir joyda',chips:[['dollar',-480,-120,.7],['bars',500,40,.85],['check',-430,330,1.0]]},
+ {key:'humans',ui:1,color:'#0a5ce0',name:'HR',cap:'Xodimlar va davomat',sub:'Har bir kun nazoratda',chips:[['user',-490,-60,.7],['clock',510,-130,.85],['check',470,360,1.0]]},
+ {key:'sales',ui:2,color:'#16891f',name:'Sales',cap:'Mijozlar va sotuvlar',sub:'Har bir bitim ko\'z oldingizda',chips:[['chat',-500,-110,.7],['star',495,10,.85],['dollar',-440,350,1.0]]},
+ {key:'projects',ui:3,color:'#e8920a',name:'Projects',cap:'Loyihalar va vazifalar',sub:'Hech narsa e\'tibordan chetda qolmaydi',chips:[['flag',480,-120,.7],['check',-500,0,.85],['clock',450,340,1.0]]},
+ {key:'payroll',ui:4,color:'#2b96cf',name:'Payroll',cap:'Ish haqi bir tugmada',sub:'Hisoblash, soliq, to\'lov',chips:[['dollar',-490,-80,.7],['check',500,-20,.85],['bell',-420,350,1.0]]},
+ {key:'reports',ui:5,color:'#e5457d',name:'Reports',cap:'Real vaqt hisobotlari',sub:'Raqamlar — bir qarashda',chips:[['pie',-480,-100,.7],['trend',490,-40,.85],['bars',440,360,1.0]]},
+ {key:'documents',ui:6,color:'#c20d0d',name:'Documents',cap:'Hujjatlar tartibda',sub:'Qidiring, saqlang, ulashing',chips:[['file',490,-110,.7],['lock',-490,20,.85],['check',420,350,1.0]]},
+];
+const T_INTRO=2.0, T_MOD=1.65, T_PHONE=T_INTRO+MODS.length*T_MOD, T_END=T_PHONE+2.65;
+
+const IMGS={};
+const files={logo:'assets/original-logo.png',accounts:'assets/accounts.png',humans:'assets/humans.png',sales:'assets/sales.png',projects:'assets/projects.png',payroll:'assets/payroll.png',reports:'assets/reports.png',documents:'assets/documents.png'};
+for(let i=0;i<7;i++)files['ui'+i]=`assets/ui/ui${i}.png`;
+window.ready=Promise.all(Object.entries(files).map(([k,s])=>new Promise(r=>{const im=new Image();im.onload=()=>{IMGS[k]=im;r()};im.onerror=()=>r();im.src=s})));
+
+function rr(x,y,w,h,r){g.beginPath();g.roundRect(x,y,w,h,r)}
+function text(s,x,y,size,color,{align='center',weight=800,alpha=1}={}){
+  g.save();g.globalAlpha*=alpha;g.fillStyle=color;g.textAlign=align;g.textBaseline='middle';
+  g.font=`${weight} ${size}px ${FONT}`;g.fillText(s,x,y);g.restore();
+}
+function fit(s,maxW,size,weight=800){g.font=`${weight} ${size}px ${FONT}`;const w=g.measureText(s).width;return Math.min(size,size*maxW/w)}
+
+// ---- vector icons drawn inside a chip, centred at 0,0, ~size 60
+function icon(name,col){
+  g.save();g.strokeStyle=col;g.fillStyle=col;g.lineWidth=7;g.lineCap='round';g.lineJoin='round';
+  switch(name){
+    case 'check':g.beginPath();g.moveTo(-24,2);g.lineTo(-8,18);g.lineTo(26,-18);g.stroke();break;
+    case 'dollar':g.font=`900 70px ${FONT}`;g.textAlign='center';g.textBaseline='middle';g.fillText('$',0,4);break;
+    case 'bars':[[-24,6,16],[-6,-8,30],[12,-22,44]].forEach(([x,y,h])=>{g.fillRect(x,28-h,13,h)});break;
+    case 'user':g.beginPath();g.arc(0,-12,13,0,7);g.fill();g.beginPath();g.arc(0,34,28,Math.PI,0);g.fill();break;
+    case 'clock':g.beginPath();g.arc(0,0,27,0,7);g.stroke();g.beginPath();g.moveTo(0,-14);g.lineTo(0,0);g.lineTo(12,8);g.stroke();break;
+    case 'chat':g.beginPath();g.roundRect(-28,-24,56,40,12);g.fill();g.beginPath();g.moveTo(-12,14);g.lineTo(-16,30);g.lineTo(4,15);g.fill();break;
+    case 'star':g.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?12:29;g.lineTo(Math.cos(a)*r,Math.sin(a)*r)}g.closePath();g.fill();break;
+    case 'flag':g.beginPath();g.moveTo(-18,-28);g.lineTo(-18,30);g.stroke();g.beginPath();g.moveTo(-18,-26);g.lineTo(26,-16);g.lineTo(-18,-2);g.fill();break;
+    case 'bell':g.beginPath();g.moveTo(-24,16);g.quadraticCurveTo(-20,-4,-18,-12);g.arc(0,-12,18,Math.PI,0);g.quadraticCurveTo(20,-4,24,16);g.closePath();g.fill();g.beginPath();g.arc(0,24,7,0,7);g.fill();break;
+    case 'pie':g.beginPath();g.arc(0,0,28,0,7);g.stroke();g.beginPath();g.moveTo(0,0);g.lineTo(0,-28);g.arc(0,0,28,-Math.PI/2,Math.PI*.4);g.closePath();g.fill();break;
+    case 'trend':g.beginPath();g.moveTo(-28,20);g.lineTo(-8,-2);g.lineTo(8,10);g.lineTo(28,-22);g.stroke();g.beginPath();g.moveTo(14,-22);g.lineTo(28,-22);g.lineTo(28,-8);g.stroke();break;
+    case 'file':g.beginPath();g.moveTo(-18,-28);g.lineTo(8,-28);g.lineTo(22,-14);g.lineTo(22,28);g.lineTo(-18,28);g.closePath();g.fill();g.fillStyle='rgba(255,255,255,.55)';g.fillRect(-8,2,20,5);g.fillRect(-8,14,20,5);break;
+    case 'lock':g.beginPath();g.roundRect(-22,-4,44,34,8);g.fill();g.beginPath();g.arc(0,-6,14,Math.PI,0);g.stroke();break;
+  }
+  g.restore();
+}
+function chip(name,x,y,col,p,t,ph){
+  if(p<=0)return;
+  const bob=Math.sin(t*2.4+ph)*10;
+  g.save();g.translate(x,y+bob);g.scale(p,p);g.rotate((1-p)*.6+Math.sin(t*1.6+ph)*.06);
+  g.shadowColor='rgba(0,0,0,.28)';g.shadowBlur=36;g.shadowOffsetY=14;
+  g.fillStyle=WHITE;rr(-62,-62,124,124,38);g.fill();g.shadowColor='transparent';
+  icon(name,col);g.restore();
+}
+function sparkle(x,y,r,a,col=WHITE){
+  if(a<=0)return;g.save();g.translate(x,y);g.globalAlpha=a;g.fillStyle=col;g.rotate(Math.PI/4*(1-a));
+  g.beginPath();for(let i=0;i<8;i++){const ang=i*Math.PI/4,rr_=i%2?r*.22:r;g.lineTo(Math.cos(ang)*rr_,Math.sin(ang)*rr_)}g.fill();g.restore();
+}
+function cursor(x,y,s=1){
+  g.save();g.translate(x,y);g.scale(s,s);g.shadowColor='rgba(0,0,0,.35)';g.shadowBlur=14;g.shadowOffsetY=6;
+  g.fillStyle='#111';g.strokeStyle=WHITE;g.lineWidth=5;g.lineJoin='round';
+  g.beginPath();g.moveTo(0,0);g.lineTo(0,62);g.lineTo(16,48);g.lineTo(28,74);g.lineTo(42,68);g.lineTo(30,43);g.lineTo(52,42);g.closePath();g.stroke();g.fill();g.restore();
+}
+
+function blobs(t,col){
+  const w=2*Math.PI/DUR;
+  g.save();g.globalAlpha=.10;g.fillStyle=WHITE;
+  [[.15,.2,420,0],[.9,.55,360,2],[.3,.95,300,4]].forEach(([bx,by,r,ph])=>{
+    g.beginPath();g.arc(W*bx+Math.cos(w*t+ph)*90,H*by+Math.sin(w*t+ph)*140,r,0,7);g.fill();
+  });
+  g.restore();
+}
+
+// ---------- scenes
+function intro(t){
+  g.fillStyle=SLATE;g.fillRect(0,0,W,H);blobs(t,SLATE);
+  const p=eBack(prog(t,.1,.6));
+  g.save();g.translate(W/2,700);g.scale(p,p);g.rotate((1-p)*-.4);
+  const im=IMGS.logo;if(im)g.drawImage(im,-190,-190,380,380);g.restore();
+  [['BUTUN BIZNES',.7],['BITTA PLATFORMADA',1.05]].forEach(([s,d],i)=>{
+    const q=eOut(prog(t,d,.5)),size=fit(s,W-140,i?110:150);const cy=1010+i*150,bh=size*1.1;
+    g.save();g.beginPath();g.rect(0,cy-bh/2,W,bh);g.clip();text(s,W/2,cy+(1-q)*bh,size,i?'#7fb0ff':WHITE);g.restore();
+  });
+  const k=eOut(prog(t,1.5,.4));
+  sparkle(780,520,50*k,k);sparkle(300,880,34*k,k);
+}
+
+function moduleScene(i,lt,t){
+  const m=MODS[i];
+  // colour wipe
+  const prev=i===0?SLATE:MODS[i-1].color;
+  g.fillStyle=prev;g.fillRect(0,0,W,H);
+  const wr=eInOut(prog(lt,0,.55))*2600;
+  g.fillStyle=m.color;g.beginPath();g.arc(W/2,H*.78,wr,0,7);g.fill();
+  blobs(t,m.color);
+  // progress dots
+  for(let d=0;d<MODS.length;d++){
+    const on=d===i;g.fillStyle=on?WHITE:'rgba(255,255,255,.35)';rr(W/2-7*22+d*44+(on?-10:0),118,on?44:24,24,12);g.fill();
+  }
+  // icon + title
+  const p=eBack(prog(lt,.3,.5));
+  if(p>0){
+    const size=fit(m.name,520,128);g.font=`800 ${size}px ${FONT}`;const tw=g.measureText(m.name).width;
+    const ih=150,iw=ih*200/247,gap=34,total=iw+gap+tw,x0=W/2-total/2;
+    g.save();g.translate(W/2,330);g.scale(p,p);g.translate(-W/2,-330);
+    const im=IMGS[m.key];if(im)g.drawImage(im,x0,330-ih/2,iw,ih);
+    text(m.name,x0+iw+gap,330,size,WHITE,{align:'left'});g.restore();
+  }
+  // card
+  const cp=eOut(prog(lt,.35,.65));
+  const cw=980,ch=cw*508/1076,cy=980;
+  const push=1+lt*.025;
+  g.save();g.translate(W/2,cy+(1-cp)*(H-cy+300));g.rotate((1-cp)*-.06);g.scale(push,push);
+  g.shadowColor='rgba(0,0,0,.38)';g.shadowBlur=70;g.shadowOffsetY=34;
+  g.fillStyle=WHITE;rr(-cw/2-10,-ch/2-10,cw+20,ch+20,34);g.fill();g.shadowColor='transparent';
+  g.save();rr(-cw/2,-ch/2,cw,ch,26);g.clip();const ui=IMGS['ui'+m.ui];if(ui)g.drawImage(ui,-cw/2,-ch/2,cw,ch);g.restore();
+  // click ripple + highlight on card
+  const rp=prog(lt,1.1,.5);
+  if(rp>0&&rp<1){g.strokeStyle=m.color;g.lineWidth=8*(1-rp);g.globalAlpha=1-rp;g.beginPath();g.arc(160,-30,20+rp*90,0,7);g.stroke();g.globalAlpha=1}
+  g.restore();
+  // caption
+  const q=eOut(prog(lt,.6,.5));
+  g.save();g.globalAlpha=q;g.translate(0,(1-q)*60);
+  text(m.cap,W/2,1500,fit(m.cap,W-120,92),WHITE);
+  text(m.sub,W/2,1595,44,'rgba(255,255,255,.82)',{weight:500});
+  g.restore();
+  // chips
+  m.chips.forEach(([n,dx,dy,d],k)=>{
+    const cp2=eBack(prog(lt,d,.45));
+    chip(n,W/2+dx*.8,cy+dy*.8,m.color,cp2,t,k*2);
+  });
+  // sparkles
+  const sp=eOut(prog(lt,.9,.3))*(1-prog(lt,1.4,.25));
+  sparkle(W/2+360,cy-300,46,sp);sparkle(W/2-380,cy+260,30,sp);
+  // cursor
+  const cu=eInOut(prog(lt,.75,.45));
+  if(cu>0&&lt<1.55){
+    const cx=W/2+160+(1-cu)*420,cyy=cy-30+(1-cu)*260;
+    const press=lt>1.08&&lt<1.2?.85:1;cursor(cx,cyy+0,press);
+  }
+}
+
+function phone(lt,t){
+  g.fillStyle=SLATE;g.fillRect(0,0,W,H);
+  const wr=eInOut(prog(lt,0,.55))*2600;g.fillStyle='#1a2330';g.beginPath();g.arc(W/2,H*.78,wr,0,7);g.fill();
+  blobs(t,SLATE);
+  const q=eOut(prog(lt,.15,.5));
+  g.save();g.globalAlpha=q;g.translate(0,(1-q)*50);
+  text('Mobil ilova',W/2,250,112,WHITE);
+  text('Hammasi cho\'ntagingizda',W/2,355,52,'rgba(255,255,255,.78)',{weight:500});g.restore();
+  const p=eOut(prog(lt,.2,.7)),pw=540,ph=1090,py=1090;
+  g.save();g.translate(W/2,py+(1-p)*900);
+  g.shadowColor='rgba(0,0,0,.5)';g.shadowBlur=80;g.shadowOffsetY=40;
+  g.fillStyle='#0b1018';rr(-pw/2,-ph/2,pw,ph,84);g.fill();g.shadowColor='transparent';
+  const sx=-pw/2+16,sy=-ph/2+16,sw=pw-32,sh=ph-32;
+  g.save();rr(sx,sy,sw,sh,70);g.clip();g.fillStyle='#f2f5fb';g.fillRect(sx,sy,sw,sh);
+  // status
+  text('9:41',0,sy+44,30,'#111',{weight:700});
+  g.fillStyle='#111';rr(-60,sy+16,120,34,17);g.fill();
+  text('Salom, Aziz',sx+30,sy+120,44,'#111',{align:'left'});
+  text('Seshanba, 29 sentabr',sx+30,sy+168,26,'#6b7685',{align:'left',weight:500});
+  // check-in card
+  const ci=lt>1.15;const cc=prog(lt,1.15,.35);
+  g.fillStyle=ci?'#16891f':BLUE;rr(sx+24,sy+215,sw-48,230,36);g.fill();
+  text(ci?'Kirish qayd etildi':'Ish boshlanishi',sx+54,sy+265,28,'rgba(255,255,255,.85)',{align:'left',weight:600});
+  text(ci?'08:59':'09:00',sx+54,sy+330,86,WHITE,{align:'left'});
+  g.fillStyle=WHITE;rr(sx+54,sy+375,sw-108,52,26);g.fill();
+  text(ci?'Check-out':'Check-in',0,sy+402,28,ci?'#16891f':BLUE,{weight:700});
+  if(ci){g.save();g.translate(sx+sw-95,sy+300);g.scale(eBack(cc),eBack(cc));g.fillStyle='rgba(255,255,255,.25)';g.beginPath();g.arc(0,0,40,0,7);g.fill();g.translate(0,0);g.scale(.8,.8);icon('check',WHITE);g.restore()}
+  // tiles
+  const tiles=[['Ta\'til','Tasdiqlandi','#e8920a'],['Vaqt','38.5 soat','#2b96cf'],['Ish haqi','Tayyor','#e5457d']];
+  tiles.forEach(([a,b,col],k)=>{
+    const tp=eBack(prog(lt,.7+k*.15,.4));if(tp<=0)return;
+    const tw=(sw-48-24)/3,tx=sx+24+k*(tw+12),ty=sy+480;
+    g.save();g.translate(tx+tw/2,ty+80);g.scale(tp,tp);
+    g.fillStyle=WHITE;rr(-tw/2,-80,tw,160,28);g.fill();
+    g.fillStyle=col;g.beginPath();g.arc(0,-34,22,0,7);g.fill();
+    text(a,0,22,26,'#111',{weight:700});text(b,0,58,21,'#6b7685',{weight:500});g.restore();
+  });
+  // list rows
+  [['Hisobot yuborildi','2 daqiqa oldin'],['Yangi vazifa','Loyiha #1204']].forEach(([a,b],k)=>{
+    const rp=eOut(prog(lt,.95+k*.15,.4));g.save();g.globalAlpha=rp;
+    const ry=sy+690+k*120;g.fillStyle=WHITE;rr(sx+24,ry,sw-48,100,28);g.fill();
+    g.fillStyle='#dfe8fb';g.beginPath();g.arc(sx+80,ry+50,26,0,7);g.fill();
+    text(a,sx+126,ry+36,28,'#111',{align:'left',weight:700});text(b,sx+126,ry+70,22,'#6b7685',{align:'left',weight:500});g.restore();
+  });
+  // notification banner
+  const nb=eBack(prog(lt,1.5,.5));
+  if(nb>0){g.save();g.translate(0,sy+110+(nb-1)*200);g.globalAlpha=clamp(nb);
+    g.shadowColor='rgba(0,0,0,.25)';g.shadowBlur=30;g.shadowOffsetY=10;
+    g.fillStyle=WHITE;rr(sx+18,0,sw-36,110,30);g.fill();g.shadowColor='transparent';
+    g.fillStyle='#16891f';g.beginPath();g.arc(sx+78,55,28,0,7);g.fill();g.save();g.translate(sx+78,55);g.scale(.7,.7);icon('check',WHITE);g.restore();
+    text('Ta\'til so\'rovi tasdiqlandi',sx+122,40,26,'#111',{align:'left',weight:700});text('KPI · hozir',sx+122,76,21,'#6b7685',{align:'left',weight:500});
+    g.restore();}
+  g.restore();g.restore();
+  // chips around phone
+  chip('bell',W/2-410,py-300,BLUE,eBack(prog(lt,.9,.45)),t,1);
+  chip('clock',W/2+420,py-140,'#2b96cf',eBack(prog(lt,1.05,.45)),t,3);
+  chip('dollar',W/2-420,py+260,'#e5457d',eBack(prog(lt,1.2,.45)),t,5);
+}
+
+function ending(lt,t){
+  g.fillStyle=SLATE;g.fillRect(0,0,W,H);
+  const wr=eInOut(prog(lt,0,.55))*2600;g.fillStyle=BLUE;g.beginPath();g.arc(W/2,H*.78,wr,0,7);g.fill();
+  blobs(t,BLUE);
+  for(let i=0;i<3;i++){const rp=eOut(prog(lt,.15+i*.12,.8));g.strokeStyle='rgba(255,255,255,'+(.5-i*.14)+')';g.lineWidth=5;g.beginPath();g.arc(W/2,640,(210+i*70)*rp,0,7);g.stroke()}
+  const p=eBack(prog(lt,.2,.6));g.save();g.translate(W/2,640);g.scale(p,p);
+  g.shadowColor='rgba(0,0,0,.35)';g.shadowBlur=60;g.shadowOffsetY=30;
+  const im=IMGS.logo;if(im)g.drawImage(im,-170,-170,340,340);g.restore();
+  // module icon row
+  const keys=['accounts','humans','sales','projects','payroll','reports','documents'];
+  keys.forEach((k,i)=>{
+    const ip=eBack(prog(lt,.55+i*.07,.4));if(ip<=0)return;
+    const im=IMGS[k],s=94,x=W/2+(i-3)*128,y=1000+Math.sin(t*2.4+i)*8;
+    g.save();g.translate(x,y);g.scale(ip,ip);if(im)g.drawImage(im,-s*200/247/2,-s/2,s*200/247,s);g.restore();
+  });
+  const a=eOut(prog(lt,.5,.5));
+  g.save();g.globalAlpha=a;g.translate(0,(1-a)*50);
+  text('All-in-One',W/2,1180,110,WHITE);text('Business Management',W/2,1290,80,WHITE,{weight:600});g.restore();
+  const b=eBack(prog(lt,1.0,.5));
+  if(b>0){g.save();g.translate(W/2,1500);g.scale(b,b);g.fillStyle=WHITE;rr(-310,-76,620,152,76);g.fill();
+    text('kpi.com',0,4,84,BLUE);g.restore()}
+}
+
+window.draw=function(t){
+  if(t<T_INTRO)intro(t);
+  else if(t<T_PHONE){const i=Math.min(MODS.length-1,Math.floor((t-T_INTRO)/T_MOD));moduleScene(i,t-T_INTRO-i*T_MOD,t)}
+  else if(t<T_END)phone(t-T_PHONE,t);
+  else ending(t-T_END,t);
+  const f=1-eOut(prog(t,0,.25));if(f>0){g.fillStyle=`rgba(45,58,74,${f})`;g.fillRect(0,0,W,H)}
+};
+</script></body></html>
