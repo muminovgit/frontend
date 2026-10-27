@@ -2,7 +2,7 @@
 <html><head><meta charset="UTF-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head>
 <body><canvas id="c" width="1080" height="1920"></canvas>
 <script>
-const W=1080,H=1920,DUR=18.4;
+const W=1080,H=1920,DUR=23.6;
 const cv=document.getElementById('c'),g=cv.getContext('2d');
 const FONT='Inter,"Helvetica Neue",Arial,"DejaVu Sans",sans-serif';
 const SLATE='#2d3a4a', BLUE='#0a5ce0', WHITE='#ffffff';
@@ -73,7 +73,7 @@ function blobs(t,col){
 
 
 const GREEN='#16a34a',ORANGE='#e8920a',RED='#dc2626',INK='#111827',MUTED='#6b7685';
-const A=2.4,B=6.0,C=13.4,D=16.0;
+const A=2.4,B=6.0,C=13.4,D=16.0,E=21.2;
 const bgWipe=(lt,prev,col)=>{g.fillStyle=prev;g.fillRect(0,0,W,H);const r=eInOut(prog(lt,0,.55))*2600;g.fillStyle=col;g.beginPath();g.arc(W/2,H*.78,r,0,7);g.fill()};
 function pill(s,x,y,col,bg,size=26,p=1){g.save();g.translate(x,y);g.scale(p,p);g.font=`700 ${size}px ${FONT}`;const w=g.measureText(s).width+36,h=size+22;g.fillStyle=bg;rr(-w/2,-h/2,w,h,h/2);g.fill();text(s,0,2,size,col,{weight:700});g.restore();return w}
 
@@ -270,8 +270,79 @@ function kinetic(lt,t){
   g.restore();
 }
 
+
+const DBG='#eef2f8';
+function card(x,y,w,h,a,dy=0){g.save();g.globalAlpha*=a;g.translate(0,dy);g.shadowColor='rgba(15,23,42,.10)';g.shadowBlur=40;g.shadowOffsetY=14;g.fillStyle=WHITE;rr(x,y,w,h,32);g.fill();g.restore()}
+function dashboard(lt,t){
+  bgWipe(lt,'#1a2330',DBG);
+  const h=eOut(prog(lt,.2,.5));
+  g.save();g.globalAlpha=h;g.translate(0,(1-h)*40);
+  text('Tayyor dashboard',60,140,92,INK,{align:'left',weight:900});
+  text('Davomat · Bugun, 29 sentabr',60,222,36,MUTED,{align:'left',weight:500});
+  g.fillStyle=GREEN;const pu=1+Math.sin(t*6)*.25;g.beginPath();g.arc(W-150,140,10*pu,0,7);g.fill();text('Jonli',W-128,141,30,GREEN,{align:'left',weight:700});
+  g.restore();
+  // stat tiles
+  const stats=[['Ishda',38,'/45',GREEN,'user'],['Kech qoldi',7,'',ORANGE,'clock'],['Kelmadi',2,'',RED,'flag'],['O\'rtacha kelish',null,'08:54',BLUE,'check']];
+  stats.forEach(([lab,n,suf,col,ic],i)=>{
+    const a=eBack(prog(lt,.4+i*.12,.45));if(a<=0)return;
+    const x=60+(i%2)*490,y=290+Math.floor(i/2)*220,w=470,hh=200;
+    g.save();g.translate(x+w/2,y+hh/2);g.scale(a,a);g.translate(-(x+w/2),-(y+hh/2));
+    card(x,y,w,hh,1);
+    g.fillStyle=col+'22';g.beginPath();g.arc(x+70,y+hh/2,44,0,7);g.fill();g.save();g.translate(x+70,y+hh/2);g.scale(.8,.8);icon(ic,col);g.restore();
+    const v=n===null?suf:String(Math.round(eOut(prog(lt,.5+i*.12,.9))*n));
+    text(v,x+136,y+82,76,INK,{align:'left',weight:900});
+    if(n!==null&&suf){g.font=`900 76px ${FONT}`;const vw=g.measureText(v).width;text(suf,x+136+vw+6,y+92,40,MUTED,{align:'left',weight:700})}
+    text(lab,x+138,y+148,32,col,{align:'left',weight:700});
+    g.restore();
+  });
+  // weekly chart
+  const ca=eOut(prog(lt,.9,.5));
+  if(ca>0){const x=60,y=740,w=960,hh=400;card(x,y,w,hh,ca,(1-ca)*60);
+    g.save();g.globalAlpha=ca;g.translate(0,(1-ca)*60);
+    text('Haftalik kechikishlar',x+40,y+56,38,INK,{align:'left',weight:800});
+    pill('Bu hafta',x+w-110,y+56,BLUE,'#e0ebff',24);
+    const days=['Du','Se','Ch','Pa','Ju','Sh'],vals=[5,3,8,4,7,2],mx=8,bw=96,gap=(w-80-bw*6)/5,base=y+hh-60,top=y+140;
+    g.strokeStyle='#eef1f6';g.lineWidth=2;for(let k=0;k<=2;k++){const yy=base-(base-top)*k/2;g.beginPath();g.moveTo(x+40,yy);g.lineTo(x+w-40,yy);g.stroke()}
+    vals.forEach((v,i)=>{const gp=eOut(prog(lt,1.1+i*.08,.6));const bh=(base-top)*v/mx*gp,bx=x+40+i*(bw+gap);
+      const isMax=v===mx;g.fillStyle=isMax?ORANGE:'#bcd3ff';rr(bx,base-bh,bw,Math.max(bh,1),14);g.fill();
+      if(gp>.9)text(String(v),bx+bw/2,base-bh-22,28,isMax?ORANGE:MUTED,{weight:800});
+      text(days[i],bx+bw/2,base+32,26,MUTED,{weight:600});});
+    g.restore();}
+  // top late list
+  const la=eOut(prog(lt,1.5,.5));
+  if(la>0){const x=60,y=1170,w=960,hh=560;card(x,y,w,hh,la,(1-la)*60);
+    g.save();g.globalAlpha=la;g.translate(0,(1-la)*60);
+    text('Eng ko\'p kech qolganlar',x+40,y+58,40,INK,{align:'left',weight:800});
+    pill('Oy bo\'yicha',x+w-120,y+58,ORANGE,'#fff1dc',24);
+    const top=[['Jasur Aliyev','Sotuv','#0ea5e9',12,214],['Sardor Nazarov','Omborchi','#10b981',9,150],['Bekzod Tursunov','Haydovchi','#8b5cf6',7,98],['Kamola Ismoilova','Operator','#ec4899',5,61]];
+    top.forEach(([n,role,col,cnt,mins],i)=>{
+      const rp=eOut(prog(lt,1.75+i*.15,.45));if(rp<=0)return;
+      const ry=y+120+i*108;g.save();g.globalAlpha*=rp;g.translate((1-rp)*80,0);
+      if(i===0){const gl=.10+.06*Math.sin(t*5);g.fillStyle=`rgba(232,146,10,${gl})`;rr(x+20,ry-6,w-40,100,24);g.fill()}
+      text('#'+(i+1),x+64,ry+44,30,i===0?ORANGE:MUTED,{weight:900});
+      g.fillStyle=col;g.beginPath();g.arc(x+150,ry+44,34,0,7);g.fill();text(n.split(' ').map(s=>s[0]).join(''),x+150,ry+46,24,WHITE,{weight:800});
+      text(n,x+200,ry+28,30,INK,{align:'left',weight:700});text(role,x+200,ry+64,22,MUTED,{align:'left',weight:500});
+      text(cnt+' marta',x+w-60,ry+28,30,i===0?ORANGE:INK,{align:'right',weight:800});
+      const hm=Math.floor(mins/60)+' soat '+(mins%60)+' daq';text(hm,x+w-60,ry+64,22,MUTED,{align:'right',weight:500});
+      const bp=eOut(prog(lt,1.9+i*.15,.6));g.fillStyle='#f1f4f9';rr(x+480,ry+38,170,12,6);g.fill();g.fillStyle=i===0?ORANGE:'#fbbf77';rr(x+480,ry+38,170*mins/214*bp,12,6);g.fill();
+      g.restore();});
+    g.restore();}
+  // download button + click
+  const ba=eBack(prog(lt,2.7,.45));
+  if(ba>0){g.save();g.translate(W/2,1820);g.scale(ba,ba);const press=lt>3.55&&lt<3.7?.94:1;g.scale(press,press);
+    const done=lt>3.75;
+    g.shadowColor=done?'rgba(22,163,74,.35)':'rgba(10,92,224,.35)';g.shadowBlur=36;g.shadowOffsetY=14;g.fillStyle=done?GREEN:BLUE;rr(-330,-62,660,124,62);g.fill();g.shadowColor='transparent';
+    if(done){const k=eBack(prog(lt,3.75,.4));g.save();g.translate(-250,0);g.scale(.7*k,.7*k);icon('check',WHITE);g.restore();text('Hisobot tayyor · PDF / Excel',30,2,34,WHITE,{weight:800})}
+    else{g.strokeStyle=WHITE;g.lineWidth=6;g.lineCap='round';g.beginPath();g.moveTo(-230,-20);g.lineTo(-230,14);g.moveTo(-246,0);g.lineTo(-230,16);g.lineTo(-214,0);g.moveTo(-250,26);g.lineTo(-210,26);g.stroke();
+    text('Hisobotni yuklab olish',30,2,36,WHITE,{weight:800})}
+    g.restore();
+    const rp=prog(lt,3.6,.5);if(rp>0&&rp<1){g.strokeStyle=BLUE;g.lineWidth=8*(1-rp);g.globalAlpha=1-rp;g.beginPath();g.arc(W/2+60,1830,20+rp*120,0,7);g.stroke();g.globalAlpha=1}
+    const cu=eInOut(prog(lt,3.0,.55));if(cu>0&&lt<4.4)cursor(W/2+60+(1-cu)*300,1830+(1-cu)*120,lt>3.55&&lt<3.7?.85:1);
+  }
+}
+
 function ending(lt,t){
-  bgWipe(lt,'#1a2330',BLUE);blobs(t,BLUE);
+  bgWipe(lt,DBG,BLUE);blobs(t,BLUE);
   for(let i=0;i<3;i++){const rp=eOut(prog(lt,.15+i*.12,.8));g.strokeStyle='rgba(255,255,255,'+(.5-i*.14)+')';g.lineWidth=5;g.beginPath();g.arc(W/2,640,(210+i*70)*rp,0,7);g.stroke()}
   const p=eBack(prog(lt,.2,.6));g.save();g.translate(W/2,640);g.scale(p,p);g.shadowColor='rgba(0,0,0,.35)';g.shadowBlur=60;g.shadowOffsetY=30;
   const im=IMGS.logo;if(im)g.drawImage(im,-170,-170,340,340);g.restore();
@@ -283,7 +354,7 @@ function ending(lt,t){
 }
 
 window.draw=function(t){
-  if(t<A)intro(t);else if(t<B)terminal(t-A,t);else if(t<C)real(t-B,t);else if(t<D)kinetic(t-C,t);else ending(t-D,t);
+  if(t<A)intro(t);else if(t<B)terminal(t-A,t);else if(t<C)real(t-B,t);else if(t<D)kinetic(t-C,t);else if(t<E)dashboard(t-D,t);else ending(t-E,t);
   const f=1-eOut(prog(t,0,.25));if(f>0){g.fillStyle=`rgba(45,58,74,${f})`;g.fillRect(0,0,W,H)}
 };
 </script></body></html>
