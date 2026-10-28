@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<style>
+@font-face{font-family:Geist;src:url(fonts/Geist-Variable.woff2) format('woff2');font-weight:100 900}
+@font-face{font-family:'Instrument Serif';src:url(fonts/InstrumentSerif-Regular.woff2) format('woff2')}
+html,body{margin:0;background:#f5f5f2;overflow:hidden}
+*{box-sizing:border-box}
+#stage{position:relative;width:1920px;height:1080px;overflow:hidden;background:#f5f5f2;font-family:Geist,sans-serif;color:#0e0e10}
+#cam{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+.abs{position:absolute;left:0;top:0}
+/* phone */
+#bezel{z-index:10;width:450px;height:922px;border-radius:64px;background:#0e0e10;box-shadow:0 40px 90px rgba(14,14,16,.18),0 8px 20px rgba(14,14,16,.12)}
+#screen{z-index:11;width:428px;height:900px;border-radius:53px;background:#fbfbf9;overflow:hidden}
+#island{left:151px;top:11px;width:126px;height:36px;border-radius:18px;background:#0e0e10;z-index:30}
+.status{font-weight:600;font-size:16px;letter-spacing:-.2px}
+#hdr{left:0;top:62px;width:428px;text-align:center;font-weight:600;font-size:16px}
+#hdr small{display:block;font-weight:500;font-size:12px;color:#8a8a90;margin-top:2px}
+#composerWrap{z-index:20;border-radius:30px;padding:2px}
+#glow{z-index:19;border-radius:40px;filter:blur(16px)}
+#composer{width:100%;height:100%;border-radius:28px;background:#fff}
+.line{position:absolute;white-space:pre;font-weight:450}
+#caret{width:2px;background:#0e0e10;z-index:22}
+#send{z-index:23;width:40px;height:40px;border-radius:20px;background:#2f6bff}
+#send svg,#wokSend svg{position:absolute;left:10px;top:10px}
+#placeholder{font-size:17px;color:#a6a6ab;z-index:21}
+#ripple{z-index:21;border-radius:50%;border:6px solid #cdf24f}
+#limeMsg{z-index:24;background:#cdf24f;overflow:hidden}
+#bubble{z-index:24;background:#cdf24f;border-radius:22px}
+#gauge{z-index:26}
+.chip{z-index:25;width:30px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:#fff}
+#needle{z-index:27;width:4px;border-radius:2px;background:#0e0e10;transform-origin:50% 100%}
+#hub{z-index:28;width:16px;height:16px;border-radius:8px;background:#0e0e10}
+.mask{overflow:hidden;z-index:26}
+.shimmer{font-size:16px;font-weight:500;white-space:pre;background:linear-gradient(90deg,#9a9aa0 0%,#9a9aa0 35%,#0e0e10 50%,#9a9aa0 65%,#9a9aa0 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent}
+.ai{font-size:15px;line-height:22px;white-space:pre;font-weight:450}
+.pill{z-index:29;height:44px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden}
+#pOrder{background:#0e0e10;color:#fff}
+#pMore{border:1.5px solid #0e0e10;background:transparent}
+#spin{width:18px;height:18px;border-radius:9px;border:2.5px solid rgba(255,255,255,.3);border-top-color:#fff}
+/* world layers */
+#flood{z-index:50;background:#cdf24f;overflow:hidden}
+#floodWords{position:absolute;left:0;top:0;transform-origin:0 0;white-space:pre;font-size:15px;line-height:21px;font-weight:450;color:#0e0e10}
+.card{z-index:60;width:330px;height:440px;border-radius:28px;background:#0e0e10;color:#fff;overflow:hidden;transform-origin:50% 50%}
+.card .ph{position:absolute;left:0;top:0;width:330px;height:242px;background-size:cover;background-position:center}
+.card .nm{position:absolute;left:24px;top:262px;font-size:26px;font-weight:650;letter-spacing:-.4px}
+.card .ds{position:absolute;left:24px;top:302px;width:282px;font-size:15px;color:#a3a3aa;line-height:20px}
+.card .vl{position:absolute;left:24px;top:380px;font-size:22px;font-weight:700;color:#cdf24f}
+.card .tg{position:absolute;right:24px;top:381px;font-size:13px;font-weight:600;color:#0e0e10;background:#f5f5f2;border-radius:12px;padding:4px 10px}
+#best{z-index:62;height:34px;border-radius:17px;background:#cdf24f;color:#0e0e10;font-weight:700;font-size:15px;padding:0 14px;display:flex;align-items:center;transform-origin:0 50%}
+#cursor{z-index:66}
+#page{z-index:70;background:#0e0e10;overflow:hidden}
+#pageLabel{position:absolute;white-space:nowrap;color:#fff;font-weight:600;overflow:hidden}#pageLabelT{position:absolute;left:0;top:0}
+.ow{z-index:80;color:#fff;font-weight:600;white-space:pre}
+#route{z-index:79;overflow:visible}
+#pin{z-index:81}
+#mark{z-index:82}
+#wordWrap{z-index:81;overflow:hidden}
+#word{position:absolute;left:0;top:0;color:#fff;font-weight:700;white-space:nowrap;letter-spacing:-1px}
+#madeWith{z-index:83;color:#8a8a90;font-weight:500;white-space:nowrap}
+#prod{z-index:83;color:#fff;font-family:'Instrument Serif',serif;white-space:nowrap}
+</style></head>
+<body><div id="stage"><div id="cam">
+  <div id="bezel" class="abs"></div>
+  <div id="screen" class="abs">
+    <div id="island" class="abs"></div>
+    <div class="abs status" style="left:44px;top:18px">9:41</div>
+    <svg class="abs" style="left:330px;top:22px" width="68" height="14" viewBox="0 0 68 14"><g fill="#0e0e10"><rect x="0" y="9" width="3" height="5" rx="1"/><rect x="5" y="6" width="3" height="8" rx="1"/><rect x="10" y="3" width="3" height="11" rx="1"/><rect x="15" y="0" width="3" height="14" rx="1"/><path d="M27 4.5a10 10 0 0 1 14 0l-1.6 1.6a7.7 7.7 0 0 0-10.8 0zM30.2 7.7a5.5 5.5 0 0 1 7.6 0L34 11.5z"/><rect x="45" y="1" width="20" height="12" rx="3.5" fill="none" stroke="#0e0e10" stroke-width="1.2"/><rect x="47" y="3" width="15" height="8" rx="2"/><rect x="66" y="5" width="1.5" height="4" rx=".7"/></g></svg>
+    <div id="hdr" class="abs">KPI Assistant<small>HR · Davomat</small></div>
+    <div id="bubble" class="abs"></div>
+    <div id="bubbleText" class="abs" style="z-index:25"></div>
+    <div id="ai1" class="abs mask"><div class="ai" id="ai1t"></div></div>
+    <div id="ai2" class="abs mask"><div class="ai" id="ai2t"></div></div>
+    <div id="pOrder" class="abs pill"><span id="pOrderLbl" style="position:relative"></span><div id="spin" class="abs"></div></div>
+    <div id="pMore" class="abs pill">Batafsil</div>
+    <div id="shim" class="abs mask"><div class="shimmer" id="shimT">Davomat tahlil qilinmoqda…</div></div>
+    <div id="gauge" class="abs"></div>
+    <div id="needle" class="abs"></div><div id="hub" class="abs"></div>
+    <div id="chips"></div>
+    <div id="glow" class="abs"></div>
+    <div id="composerWrap" class="abs"><div id="composer"></div></div>
+    <div id="placeholder" class="abs">Savol bering…</div>
+    <div id="lines"></div>
+    <div id="caret" class="abs"></div>
+    <div id="ripple" class="abs"></div>
+    <div id="limeMsg" class="abs"></div>
+    <div id="msgText" class="abs" style="z-index:25"></div>
+    <div id="send" class="abs"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 16V4M4.5 9.5 10 4l5.5 5.5" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div id="flood" class="abs"><div id="floodWords"></div></div>
+  <div id="cards"></div>
+  <div id="best" class="abs">Eng mos</div>
+  <svg id="cursor" class="abs" width="30" height="38" viewBox="0 0 30 38"><path d="M2 2v28l7.5-6.5 5 11 5-2.2-5-10.8H25z" fill="#0e0e10" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/></svg>
+  <div id="page" class="abs"><div id="pageLabel"><span id="pageLabelT">&#10003; Yuborildi</span></div></div>
+  <div id="outroWords"></div>
+  <svg id="route" class="abs" width="10" height="10"><path id="routeP" fill="none" stroke="#3a3a42" stroke-linecap="round" stroke-linejoin="round"/><circle id="dot" r="9" fill="#cdf24f"/></svg>
+  <svg id="pin" class="abs" viewBox="-20 -52 40 52"><path d="M0 0C-4-10-20-20-20-32a20 20 0 0 1 40 0C20-20 4-10 0 0z" fill="#ff6a2a"/><circle cx="0" cy="-32" r="7" fill="#0e0e10"/></svg>
+  <img id="mark" class="abs" src="img/kpi-mark.png">
+  <div id="wordWrap" class="abs"><div id="word">kpi.com</div></div>
+  <div id="madeWith" class="abs mask"><div id="madeWithT">made with</div></div>
+  <div id="prod" class="abs mask"><div id="prodT">Davomat Assistant</div></div>
+</div></div>
+<script>
+// ---------------------------------------------------------------- constants (declared before first seek)
+const B=60/130, T_SEND=6*B, T_DROP=12*B, T_CHAT=16*B, T_OUT=21*B, END=32*B;
+const SX=746, SY=90;                 // world position of the phone screen's top-left
+const LIME='#cdf24f', ORANGE='#ff6a2a', BLUE='#2f6bff', INK='#0e0e10';
+const REQ=['Bugun kim kech qoldi, kim hali','kelmadi? Terminal ma’lumotidan','qisqa davomat hisoboti kerak'];
+const AI1=['Topdim. Bugun 38 kishi ishda, 7 kishi','kech qoldi, 2 kishi kelmadi.'];
+const AI2='Hisobotni PDF qilib yuboraymi?';
+const OUT1=['Kim','kech','qoldi,','endi','bilasiz.'], OUT2=['Hisobot','esa','allaqachon','tayyor.'];
+const CARDS=[
+ ['c0','Kechikkanlar','09:00 dan keyin kelganlar ro’yxati','7 kishi','Bugun'],
+ ['c1','Kelmaganlar','Terminalda belgi qoldirmaganlar','2 kishi','Bugun'],
+ ['c2','Haftalik grafik','Kunlar kesimida kechikishlar','8 maks.','Hafta'],
+ ['c5','Oylik tahlil','Davomat va ish vaqti dinamikasi','44-hafta','Oy'],
+ ['c3','Bugungi davomat','Kim keldi, kim ketdi — aniq vaqti bilan','38 / 45','Jonli'],
+ ['c4','Ish vaqti','Har bir xodimning ishlagan soatlari','8:00 o’rt.','Bugun'],
+];
+const BEST=4, PITCH=370;
+const CHIPS=[['#ff5fa2','JA',8],['#2f6bff','9:00',9],['#8b5cff','7',9],['#3fd0ff','✓',10],['#cdf24f','SN',11],['#ff6a2a','!',11]];
+// camera keys [t, zoom, x, y] + easing of the segment that ENDS at that key
+const CAM=[[0,2.3,960,914,null],[T_SEND,3.0,960,906,'sine'],[T_SEND+2*B,1.0,960,540,'cubic'],[T_DROP,1.0,960,522,'cubic'],
+           [T_CHAT,1.0,946,522,'cubic'],[T_OUT,1.17,936,600,'cubic'],[END,2.7,839,744,'quintOut']];
+const $=id=>document.getElementById(id);
+const E={};let KEYS=[],MEAS=null;
+
+// ---------------------------------------------------------------- math
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const P=(t,s,d)=>clamp((t-s)/d);
+const lerp=(a,b,k)=>a+(b-a)*k;
+const EASE={sine:x=>-(Math.cos(Math.PI*x)-1)/2,cubic:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,quintOut:x=>1-Math.pow(1-x,5),
+  expoOut:x=>x>=1?1:1-Math.pow(2,-10*x),expoIn:x=>x<=0?0:Math.pow(2,10*x-10),
+  expoInOut:x=>x<=0?0:x>=1?1:x<.5?Math.pow(2,20*x-10)/2:(2-Math.pow(2,-20*x+10))/2,cubicOut:x=>1-Math.pow(1-x,3)};
+// closed-form underdamped step response: 0 -> 1
+function spring(t,f=2.2,z=.55){if(t<=0)return 0;const w=2*Math.PI*f,wd=w*Math.sqrt(1-z*z);return 1-Math.exp(-z*w*t)*(Math.cos(wd*t)+z*w/wd*Math.sin(wd*t))}
+function mixHex(a,b,k){const p=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));const A=p(a),Bb=p(b);return `rgb(${A.map((v,i)=>Math.round(lerp(v,Bb[i],k))).join(',')})`}
+function rnd(i){const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)}
+function cam(t){
+  for(let i=1;i<CAM.length;i++){const [t1,z1,x1,y1,e]=CAM[i],[t0,z0,x0,y0]=CAM[i-1];
+    if(t<=t1||i===CAM.length-1){const k=EASE[e](P(t,t0,t1-t0));return {z:Math.exp(lerp(Math.log(z0),Math.log(z1),k)),x:lerp(x0,x1,k),y:lerp(y0,y1,k)}}}
+}
+function S(el,o){const s=el.style;for(const k in o){const v=o[k];s[k]=typeof v==='number'&&!['opacity','zIndex'].includes(k)?v+'px':v}}
+function box(el,x,y,w,h,extra={}){S(el,Object.assign({left:x,top:y,width:w,height:h},extra))}
+function show(el,on){el.style.display=on?'':'none'}
+
+// ---------------------------------------------------------------- setup (one-time DOM build; no time state)
+function setup(){
+  const ctx=document.createElement('canvas').getContext('2d');
+  const mw=(s,px,wt=450)=>{ctx.font=`${wt} ${px}px Geist`;return ctx.measureText(s).width};
+  MEAS={mw};
+  // typed lines + keystroke schedule (deterministic rhythm, fitted into 0.22..2.52s)
+  const lines=$('lines');REQ.forEach((l,i)=>{const d=document.createElement('div');d.className='line abs';d.id='ln'+i;lines.appendChild(d)});
+  let acc=0;REQ.forEach((l,li)=>{[...l].forEach((ch,ci)=>{let d=.018+rnd(li*50+ci)*.016;if(ch===' ')d+=.014;if(/[,?']/.test(ch))d+=.07;KEYS.push({li,ci,t:acc});acc+=d});acc+=.09});
+  const sc=(2.52-.22)/KEYS[KEYS.length-1].t;KEYS.forEach(k=>k.t=.22+k.t*sc);
+  // bubble geometry
+  const bw=Math.max(...REQ.map(l=>mw(l,15)))+32,bh=3*21+24;MEAS.bubble={x:414-bw,y:112,w:bw,h:bh};
+  ['msgText','bubbleText','floodWords'].forEach(id=>{const el=$(id);REQ.forEach(l=>{const d=document.createElement('div');d.textContent=l;el.appendChild(d)});S(el,{whiteSpace:'pre'})});
+  S($('bubbleText'),{fontSize:15,lineHeight:'21px',fontWeight:450});
+  $('ai1t').textContent=AI1.join('\n');$('ai2t').textContent=AI2;
+  // chips
+  CHIPS.forEach(([c,txt],i)=>{const d=document.createElement('div');d.className='chip abs';d.id='chip'+i;d.style.background=c;d.style.color=c==='#cdf24f'?INK:'#fff';d.textContent=txt;$('chips').appendChild(d)});
+  // cards
+  CARDS.forEach(([img,nm,ds,vl,tg],i)=>{const c=document.createElement('div');c.className='card abs';c.id='card'+i;
+    c.innerHTML=`<div class="ph" style="background-image:url(img/${img}.png)"></div><div class="nm">${nm}</div><div class="ds">${ds}</div><div class="vl">${vl}</div><div class="tg">${tg}</div>`;$('cards').appendChild(c)});
+  // outro words
+  [...OUT1.map(w=>[w,0]),...OUT2.map(w=>[w,1])].forEach(([w,l],i)=>{const m=document.createElement('div');m.className='abs ow mask';m.id='ow'+i;m.innerHTML=`<div>${w}</div>`;m.dataset.l=l;$('outroWords').appendChild(m)});
+}
+
+// ---------------------------------------------------------------- seek(t): every style derived from t only
+function seek(t){
+  const c=cam(t);
+  $('cam').style.transform=`translate(${960-c.x*c.z}px,${540-c.y*c.z}px) scale(${c.z})`;
+  box($('bezel'),SX-11,SY-11,450,922);box($('screen'),SX,SY,428,900);
+  const mw=MEAS.mw,bb=MEAS.bubble;
+
+  // ---------- ASK: composer, glow, typing
+  box($('composerWrap'),14,768,400,112,{background:`conic-gradient(from ${t*140}deg,#ff5fa2,#ff6a2a,#cdf24f,#3fe0ff,#8b5cff,#ff5fa2)`});
+  box($('glow'),8,762,412,124,{background:`conic-gradient(from ${t*140+40}deg,#ff5fa2,#ff6a2a,#cdf24f,#3fe0ff,#8b5cff,#ff5fa2)`,opacity:.85});
+  let n=0;for(const k of KEYS)if(k.t<=t)n++;
+  const sent=t>=T_SEND;
+  REQ.forEach((l,i)=>{const el=$('ln'+i);let cnt=0;KEYS.slice(0,n).forEach(k=>{if(k.li===i)cnt++});el.textContent=sent?'':l.slice(0,cnt);
+    box(el,34,784+i*25,360,25,{fontSize:'17px',lineHeight:'25px',zIndex:22})});
+  const last=n?KEYS[n-1]:null;
+  if(!sent&&t>.15){const li=last?last.li:0,txt=last?REQ[li].slice(0,last.ci+1):'';const blink=(t-(last?last.t:0))>.35&&Math.floor(t*2.6)%2;
+    show($('caret'),!blink);box($('caret'),34+mw(txt,17)+1,787+li*25,2,20)}else show($('caret'),false);
+  show($('placeholder'),n===0||t>T_SEND+.45);box($('placeholder'),34,784,300,25,{lineHeight:'25px'});
+  // send button: press, then it leaves to become the gauge; a fresh one springs back at chat
+  const press=t<T_SEND?1-.16*P(t,T_SEND-.1,.1):1-.16*(1-spring(t-T_SEND,4,.5));
+  const back=spring(t-(T_CHAT+.3),3,.6);
+  const sendScale=t<T_SEND+.2?press:back;
+  box($('send'),360,828,40,40,{transform:`scale(${sendScale})`,background:BLUE});
+
+  // ---------- SEND: lime ripple + message -> bubble
+  const rp=P(t,T_SEND,.55);
+  show($('ripple'),rp>0&&rp<1);if(rp>0&&rp<1){const r=20+EASE.expoOut(rp)*340;box($('ripple'),380-r,848-r,2*r,2*r,{borderWidth:(6*(1-rp))+'px'})}
+  const mA=EASE.expoOut(P(t,T_SEND,.22)),mB=EASE.cubic(P(t,T_SEND+.2,.6));
+  const inFlight=t>=T_SEND&&t<T_SEND+.8;
+  show($('limeMsg'),inFlight);show($('msgText'),inFlight);
+  if(inFlight){
+    const r0={x:360,y:828,w:40,h:40,r:20},r1={x:14,y:768,w:400,h:112,r:28},r2={x:bb.x,y:bb.y,w:bb.w,h:bb.h,r:22};
+    const a=mB>0?r1:r0,b=mB>0?r2:r1,k=mB>0?mB:mA;
+    box($('limeMsg'),lerp(a.x,b.x,k),lerp(a.y,b.y,k),lerp(a.w,b.w,k),lerp(a.h,b.h,k),{borderRadius:lerp(a.r,b.r,k)+'px'});
+    const fs=lerp(17,15,mB),lh=lerp(25,21,mB);
+    box($('msgText'),lerp(34,bb.x+16,mB),lerp(784,bb.y+12,mB),400,90,{fontSize:fs+'px',lineHeight:lh+'px',fontWeight:450});
+  }
+  const bubbleOn=(t>=T_SEND+.8&&t<T_DROP+.2)||t>=T_CHAT+.55;
+  show($('bubble'),bubbleOn);show($('bubbleText'),bubbleOn);
+  box($('bubble'),bb.x,bb.y,bb.w,bb.h);box($('bubbleText'),bb.x+16,bb.y+12,bb.w,bb.h);
+
+  // ---------- THINK: send button grows into the gauge, tosses chips
+  const thinkOn=t>=T_SEND+.18&&t<T_DROP+.36;
+  ['gauge','needle','hub','shim'].forEach(id=>show($(id),thinkOn));show($('chips'),thinkOn);
+  if(thinkOn){
+    const k=EASE.expoInOut(P(t,T_SEND+.18,.75));
+    const x=lerp(360,114,k),y=lerp(828,350,k),w=lerp(40,200,k),h=lerp(40,100,k);
+    const rt=lerp(20,100,k),rb=lerp(20,0,k);
+    box($('gauge'),x,y,w,h,{borderRadius:`${rt}px ${rt}px ${rb}px ${rb}px / ${rt}px ${rt}px ${rb}px ${rb}px`,background:mixHex(BLUE,ORANGE,clamp(k*1.3)),
+      boxShadow:`inset 0 0 0 ${lerp(0,14,k)}px rgba(255,255,255,.22)`});
+    // needle springs on each toss beat
+    let ang=-58+EASE.cubic(P(t,T_SEND+.7,.6))*30;
+    [8,9,10,11].forEach(bt=>{const tt=t-bt*B;if(tt>0)ang+=Math.exp(-tt*5)*Math.sin(tt*22)*38});
+    const nl=lerp(0,86,EASE.expoOut(P(t,T_SEND+.75,.4)));
+    box($('needle'),214-2,450-nl,4,nl,{transform:`rotate(${ang}deg)`});box($('hub'),206,442,16,16,{transform:`scale(${EASE.expoOut(P(t,T_SEND+.7,.3))})`});
+    CHIPS.forEach(([c,txt,bt],i)=>{const el=$('chip'+i),t0=bt*B+(i===2||i===5?.12:0),tau=t-t0,T=.82;
+      if(tau<0||tau>T){show(el,false);return}show(el,true);const q=tau/T,hgt=150+rnd(i+3)*90,vx=(rnd(i+9)-.5)*190;
+      box(el,214-15+vx*q,372-4*hgt*q*(1-q),30,30,{transform:`rotate(${(rnd(i)-.5)*720*q}deg)`})});
+    const sk=EASE.expoOut(P(t,T_SEND+.95,.6));
+    box($('shim'),0,498,428,26);box($('shimT'),0,(1-sk)*26,428,26,{textAlign:'center',backgroundPosition:`${100-((t*55)%100)*2}% 0`});
+  }
+
+  // ---------- DROP: lime flood from the gauge, cards burst
+  const fOn=t>=T_DROP&&t<T_CHAT+.55;show($('flood'),fOn);
+  const gc={x:SX+214,y:SY+400};
+  const bubbleW={x:SX+bb.x,y:SY+bb.y,w:bb.w,h:bb.h};
+  if(fOn){
+    let cx,cy,w,h,r,ws,wx,wy;const WS=2.9;
+    const big=1240;
+    if(t<T_CHAT){const k=EASE.cubicOut(P(t,T_DROP,.35));const R=lerp(50,big,k);cx=gc.x;cy=gc.y;w=h=2*R;r=R;ws=WS;}
+    else{const k=EASE.expoInOut(P(t,T_CHAT,.55));cx=lerp(gc.x,bubbleW.x+bubbleW.w/2,k);cy=lerp(gc.y,bubbleW.y+bubbleW.h/2,k);
+      w=Math.exp(lerp(Math.log(2*big),Math.log(bubbleW.w),k));h=Math.exp(lerp(Math.log(2*big),Math.log(bubbleW.h),k));r=Math.min(w,h)/2*(1-k)+22*k;ws=lerp(WS,1,k)}
+    box($('flood'),cx-w/2,cy-h/2,w,h,{borderRadius:r+'px'});
+    // words: world position centred on the frame during the drop, landing exactly on the bubble's text
+    const kk=t<T_CHAT?0:EASE.expoInOut(P(t,T_CHAT,.55));
+    const textW=bb.w-32,textH=63;
+    const bigX=960-textW*WS/2,bigY=c.y-540+92;
+    wx=lerp(bigX,bubbleW.x+16,kk);wy=lerp(bigY,bubbleW.y+12,kk);
+    S($('floodWords'),{left:(wx-(cx-w/2))+'px',top:(wy-(cy-h/2))+'px',transform:`scale(${ws})`});
+  }
+  // cards
+  const cardsOn=t>=T_DROP+.1;show($('cards'),cardsOn);
+  const slide=EASE.cubic(P(t,T_DROP+1*B,2*B));const off=-(1+3*slide)*PITCH;   // centre index 1 -> index 4
+  const lift=spring(t-(T_DROP+3.2*B),2.4,.6);
+  const scx=955,scy=c.y-540+640;
+  CARDS.forEach((_,i)=>{const el=$('card'+i);if(!cardsOn){show(el,false);return}
+    const d=Math.abs(i-1)*.045,s=spring(t-(T_DROP+.1+d),2.1,.62);
+    let x=scx+(i*PITCH+off)*s,y=scy,sc=lerp(.25,1,s),rot=(1-s)*(i-1)*-8;
+    if(i===BEST){y-=28*lift;sc*=1+.04*lift}
+    let z=60;
+    if(t>=T_CHAT){
+      if(i!==BEST){const q=EASE.expoIn(P(t,T_CHAT+Math.abs(i-BEST)*.03,.32));sc*=1-q;if(q>=1){show(el,false);return}}
+      else{const q=EASE.expoInOut(P(t,T_CHAT+.08,.7));const sx=SX+14+115,sy=SY+222+153;x=lerp(x,sx,q);y=lerp(y,sy,q);sc=lerp(sc,230/330,q);z=64}
+    }
+    show(el,true);box(el,x-165,y-220,330,440,{transform:`rotate(${rot}deg) scale(${sc})`,zIndex:z,boxShadow:i===BEST?`0 ${20+30*lift}px ${40+40*lift}px rgba(0,0,0,${.25*lift})`:'none'});
+  });
+  // best-match pill rides on the chosen card
+  const bp=spring(t-(T_DROP+3.35*B),2.8,.5);show($('best'),cardsOn&&bp>0&&t<T_OUT+.4);
+  if(bp>0){const el=$('card'+BEST);const L=parseFloat(el.style.left),Tp=parseFloat(el.style.top);
+    const m=new DOMMatrix(getComputedStyle(el).transform);const sc=Math.hypot(m.a,m.b);
+    box($('best'),L+165+(18-165)*sc,Tp+220+(18-220)*sc,'auto',34,{transform:`scale(${bp*sc})`,zIndex:65})}
+
+  // ---------- CHAT: AI reply, pills, cursor, order
+  const a1=EASE.expoOut(P(t,17.5*B,.6)),a2=EASE.expoOut(P(t,18.5*B,.6));
+  show($('ai1'),t>17.5*B);show($('ai2'),t>18.5*B);
+  box($('ai1'),18,544,400,46);box($('ai1t'),0,(1-a1)*46,400,46);
+  box($('ai2'),18,598,400,24);box($('ai2t'),0,(1-a2)*24,400,24);
+  const pp=spring(t-18.8*B,2.6,.55),pp2=spring(t-18.8*B-.07,2.6,.55);
+  const clickT=19.6*B,ok=t>clickT+.23;
+  const ow=lerp(128,150,spring(t-(clickT+.23),3,.6));
+  const pdip=t>clickT?1-.08*Math.exp(-(t-clickT)*9)*Math.sin(Math.min(Math.PI,(t-clickT)*18)):1;
+  show($('pOrder'),pp>0&&t<T_OUT+.02);show($('pMore'),pp2>0);
+  box($('pOrder'),18,632,ow,44,{transform:`scale(${pp*pdip})`,transformOrigin:'0 50%'});
+  box($('pMore'),18+ow+10,632,118,44,{transform:`scale(${pp2})`,transformOrigin:'0 50%'});
+  $('pOrderLbl').textContent=ok?'✓ Yuborildi':(t>clickT?'':'Yuborish');
+  const spinOn=t>clickT&&!ok;show($('spin'),spinOn);if(spinOn)box($('spin'),ow/2-9,13,18,18,{transform:`rotate(${(t-clickT)*900}deg)`});
+  // cursor (world)
+  const cuIn=EASE.cubic(P(t,18.9*B,.58));show($('cursor'),cuIn>0&&t<T_OUT+.1);
+  const cx0=SX+390,cy0=SY+760,cx1=SX+70,cy1=SY+650;
+  box($('cursor'),lerp(cx0,cx1,cuIn),lerp(cy0,cy1,cuIn),30,38,{transform:`scale(${t>clickT-.05&&t<clickT+.12?.86:1})`,transformOrigin:'0 0'});
+
+  // ---------- OUTRO: the black pill becomes the page, carrying its label
+  const pg=t>=T_OUT;show($('page'),pg);
+  const pcx=SX+18+75,pcy=SY+654;
+  if(pg){const k=EASE.expoInOut(P(t,T_OUT,1.0));const w=Math.exp(lerp(Math.log(150),Math.log(1700),k)),h=Math.exp(lerp(Math.log(44),Math.log(820),k));
+    box($('page'),pcx-w/2,pcy-h/2,w,h,{borderRadius:h/2+'px'});
+    const fs=Math.exp(lerp(Math.log(15),Math.log(44),EASE.expoInOut(P(t,T_OUT+.1,.9))));
+    const away=EASE.expoIn(P(t,T_OUT+1.18,.32));
+    const lw=mw('✓ Yuborildi',fs,600);
+    box($('pageLabel'),w/2-lw/2,h/2-fs*.64,lw+4,fs*1.3,{fontSize:fs+'px',lineHeight:fs*1.3+'px'});
+    S($('pageLabelT'),{transform:`translateY(${-away*fs*1.3}px)`});show($('pageLabel'),away<1);
+  }
+  // headline words (world units ~ 92px on screen at the zoom they appear)
+  const Z=2.35,FS=92/Z,LH=FS*1.18;
+  const linesW=[OUT1,OUT2].map(ws=>ws.reduce((a,w)=>a+mw(w,FS,600),0)+(ws.length-1)*FS*.26);
+  let idx=0,lineX=[pcx-linesW[0]/2,pcx-linesW[1]/2];
+  const exitK=EASE.expoIn(P(t,26.2*B,.3));
+  [OUT1,OUT2].forEach((ws,l)=>ws.forEach((w,j)=>{const el=$('ow'+idx),t0=(l?11.62:11.18)+j*.075,k=EASE.expoOut(P(t,t0,.55));
+    const ww=mw(w,FS,600);show(el,t>=t0&&exitK<1);
+    box(el,lineX[l],pcy-LH+l*LH-LH*.5,ww+6,LH,{fontSize:FS+'px',lineHeight:LH+'px'});
+    S(el.firstChild,{transform:`translateY(${((1-k)+exitK)*LH*(exitK>0?-1:1)}px)`});
+    lineX[l]+=ww+FS*.26;idx++}));
+  // route + courier dot -> pin
+  const ZR=2.55,rOn=t>=26.5*B&&t<29.6*B;show($('route'),rOn);
+  const ox=pcx,oy=pcy;
+  const pts=[[-300,95],[-150,95],[-150,10],[-30,10],[-30,-60],[140,-60],[140,-10]];
+  if(rOn){
+    const d='M'+pts.map(p=>`${ox+p[0]} ${oy+p[1]}`).join(' L');
+    const el=$('routeP');el.setAttribute('d',d);el.setAttribute('stroke-width',(8/ZR).toFixed(2));
+    const len=el.getTotalLength();const draw=EASE.cubicOut(P(t,26.5*B,.32)),run=EASE.cubic(P(t,26.5*B+.2,.85));
+    el.style.strokeDasharray=`${len*(draw-run)} ${len*2}`;el.style.strokeDashoffset=`${-len*run}`;
+    const pt=el.getPointAtLength(len*run);const dot=$('dot');dot.setAttribute('cx',pt.x);dot.setAttribute('cy',pt.y);dot.setAttribute('r',(10/ZR).toFixed(2));
+    S($('route'),{left:0,top:0,width:1920,height:1080});
+  }
+  // pin pops at the route end; then the mark grows out of it
+  const pinK=spring(t-(26.6*B),2.6,.55),pinGone=EASE.expoIn(P(t,29.05*B,.22));
+  const pinX=ox+140,pinY=oy-10;show($('pin'),pinK>0&&pinGone<1);
+  const PH=56/ZR*2.2;box($('pin'),pinX-PH*20/52,pinY-PH,PH*40/52,PH,{transform:`scale(${pinK*(1-pinGone)})`,transformOrigin:'50% 100%'});
+  // end card
+  const ZE=2.66,MK=150/ZE,WFS=132/ZE,GAP=28/ZE,ww=mw('kpi.com',WFS,700);
+  const mk=spring(t-29.05*B,2.2,.6),wipe=EASE.expoOut(P(t,29.7*B,.7));
+  const rowW=MK*(410/506)+GAP+ww*wipe,rowX=pcx-rowW/2;
+  const markX=lerp(pinX,rowX+MK*(410/506)/2,EASE.expoInOut(P(t,29.05*B,.55))),markY=lerp(pinY-PH*.6,pcy-8/ZE,EASE.expoInOut(P(t,29.05*B,.55)));
+  show($('mark'),mk>0);const msz=MK/(506/512);
+  box($('mark'),markX-msz/2,markY-msz/2,msz,msz,{transform:`scale(${mk})`});
+  show($('wordWrap'),wipe>0);box($('wordWrap'),markX+MK*(410/506)/2+GAP,markY-WFS*.62,ww*wipe+2,WFS*1.25);
+  S($('word'),{fontSize:WFS+'px',lineHeight:WFS*1.25+'px',left:(-ww*(1-wipe))+'px'});
+  const mwK=EASE.expoOut(P(t,30.2*B,.6)),prK=EASE.expoOut(P(t,30.5*B,.7));
+  const MFS=30/ZE,PFS=104/ZE;show($('madeWith'),mwK>0);show($('prod'),prK>0);
+  box($('madeWith'),pcx-200,markY-MK/2-MFS*2.2,400,MFS*1.4,{fontSize:MFS+'px',lineHeight:MFS*1.4+'px',textAlign:'center'});
+  S($('madeWithT'),{transform:`translateY(${(1-mwK)*MFS*1.4}px)`});
+  box($('prod'),pcx-400,markY+MK/2+PFS*.35,800,PFS*1.2,{fontSize:PFS+'px',lineHeight:PFS*1.2+'px',textAlign:'center'});
+  S($('prodT'),{transform:`translateY(${(1-prK)*PFS*1.2}px)`});
+}
+window.ready=document.fonts.ready.then(()=>Promise.all([...document.images].map(i=>i.complete?1:new Promise(r=>{i.onload=i.onerror=r})))).then(()=>{setup();seek(0)});
+window.seek=seek;
+</script></body></html>
