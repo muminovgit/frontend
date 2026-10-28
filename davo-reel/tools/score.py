@@ -1,10 +1,10 @@
 # Davo Delivery reel — generated score + SFX (no samples, no licence needed). Timing mirrors reel.html's T table.
 import json, subprocess, sys, numpy as np, wave, os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SR = 48000; DUR = 15.0; N = int(SR * DUR)
+SR = 48000; DUR = 23.55; N = int(SR * DUR)
 L = np.zeros(N); R = np.zeros(N)
 rng = np.random.default_rng(21)
-T = dict(s1=0, s2=1.85, s3=3.7, s4=5.5, s5=7.3, s6=9.9, s7=11.7, s8=13.1)
+T = dict(s1=0, s2=1.85, s3=4.8, s4=6.65, s5=8.95, s6=13.55, s7=16.25, s8=18.8)
 def ts(d): return np.arange(int(d * SR)) / SR
 def add(sig, t0, g=1.0, pan=0.0):
     i = int(round(t0 * SR)); j = min(N, i + len(sig))
@@ -39,7 +39,7 @@ def crash(t0, g=0.25):
     t = ts(1.4); add(hp(rng.standard_normal(len(t)), 0.35) * np.exp(-t * 3.2) * g, t0)
 
 # drums: in on the cross stamp, out while the camera pushes into it, slam back on each new scene beat
-drum_windows = [(0.72, 1.22), (T["s2"], T["s5"]), (7.45, T["s8"]), (13.52, DUR - 0.5)]
+drum_windows = [(0.72, 1.22), (T["s2"], T["s5"]), (T["s5"] + 0.15, T["s8"]), (T["s8"] + 0.42, DUR - 0.5)]
 for a, b in drum_windows:
     k = 0
     while a + k * beat / 2 < b - 1e-6:
@@ -49,7 +49,7 @@ for a, b in drum_windows:
         hat(t + beat / 4)
         k += 1
     crash(a, 0.28)
-for a, b in [(1.22, T["s2"]), (T["s5"], 7.45), (T["s8"], 13.52)]:
+for a, b in [(1.22, T["s2"]), (T["s5"], T["s5"] + 0.15), (T["s8"], T["s8"] + 0.42)]:
     t = ts(b - a); x = hp(rng.standard_normal(len(t)), 0.2); add(x * (t / (b - a)) ** 2 * 0.12, a)
 def thud(t0, g=0.7):   # type slam: low body + paper slap
     t = ts(0.3); f = 90 * np.exp(-t * 18) + 50; body = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 14)
@@ -105,17 +105,28 @@ thud(T["s4"] + 1.5, 0.35)
 thud(T["s5"] + 0.16, 0.8); pop(T["s5"] + 0.2, 1100, 0.25)
 chime(T["s5"] + 0.62, 0.28)
 whoosh(T["s5"] + 0.75, 0.3, 0.12)
-for i in range(3): plastic(T["s5"] + 1.05 + i * 0.42 + 0.26, 0.35); pop(T["s5"] + 1.05 + i * 0.42 + 0.33, 1400 + i * 200, 0.15)
+for i in range(3): plastic(T["s5"] + 1.25 + i * 0.8 + 0.26, 0.35); pop(T["s5"] + 1.25 + i * 0.8 + 0.33, 1400 + i * 200, 0.15)
 whoosh(T["s6"] - 0.02, 0.36, 0.25)
 # S6 carousel steps
-for a in [.25, .6, .95, 1.3]: whoosh(T["s6"] + a + 0.15, 0.22, 0.12); tick(T["s6"] + a + 0.28, 0.1)
+for a in [.35, .85, 1.35, 1.85]: whoosh(T["s6"] + a + 0.15, 0.22, 0.12); tick(T["s6"] + a + 0.28, 0.1)
 # S7 four steps
-for i in range(4): thud(T["s7"] + 0.32 + i * 0.2, 0.45); pop(T["s7"] + 0.33 + i * 0.2, 700 + i * 180, 0.14)
+for i in range(4): thud(T["s7"] + 0.32 + i * 0.38, 0.45); pop(T["s7"] + 0.33 + i * 0.38, 700 + i * 180, 0.14)
 # S8 outro
 for i in range(4): pop(T["s8"] + 0.14 + i * 0.06, 600 + i * 140, 0.24, pan=[-.3, .3, -.3, .3][i])
-thud(13.52, 0.8); subhit(13.52); whoosh(T["s8"] + 0.75, 0.3, 0.14, pan=0.3)
+thud(T["s8"] + 0.42, 0.8); subhit(T["s8"] + 0.42); whoosh(T["s8"] + 0.75, 0.3, 0.14, pan=0.3)
 for i in range(2): pop(T["s8"] + 1.3 + i * 0.1, 900 + i * 200, 0.2)
 
+# ---------------------------------------------------------------- voiceover (uz-UZ Madina), music ducked under it
+def loadw(p):
+    w = wave.open(p); x = np.frombuffer(w.readframes(w.getnframes()), "<i2").reshape(-1, 2).astype(np.float64) / 32768; return x
+VO = [(0, 0.78), (1, T["s2"] + 0.25), (2, T["s3"] + 0.3), (3, T["s4"] + 0.3), (4, T["s5"] + 0.35), (5, T["s6"] + 0.3), (6, T["s7"] + 0.3), (7, T["s8"] + 0.5)]
+vL = np.zeros(N); vR = np.zeros(N)
+for i, t0 in VO:
+    x = loadw(os.path.join(ROOT, f"audio/vo/v{i}.wav")); x = x / np.abs(x).max() * 0.9
+    a = int(t0 * SR); b = min(N, a + len(x)); vL[a:b] += x[:b - a, 0]; vR[a:b] += x[:b - a, 1]
+env = np.abs(vL) + np.abs(vR); k = int(0.12 * SR); env = np.convolve(env, np.ones(k) / k, "same"); env = np.convolve(env, np.ones(k) / k, "same")
+duck = 1 - 0.62 * np.clip(env / (env.max() * 0.25), 0, 1)      # about -8 dB under the voice, smooth release
+m = np.abs(np.stack([L, R], 1)).max(); L = L / m * 0.55 * duck + vL; R = R / m * 0.55 * duck + vR
 mix = np.stack([L, R], 1); fo = int(0.45 * SR); mix[-fo:] *= np.linspace(1, 0, fo)[:, None]
 mix = np.tanh(mix / np.abs(mix).max() * 1.2) / np.tanh(1.2) * 0.9
 pre = os.path.join(ROOT, "audio/premaster.wav")

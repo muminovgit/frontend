@@ -21,10 +21,10 @@ svg{overflow:visible}
 <script>
 // ===================================================================== Davo Delivery — 15s showreel
 // Every style is computed from t inside seek(t). Constants and DOM are declared before the first seek.
-const W=1080,H=1920,DUR=15;
+const W=1080,H=1920,DUR=23.55;
 const INK='#121212',TEAL='#09bbd4',BG='#f4f4f4',WHITE='#ffffff',Y='#ffce68',PK='#fb4669',V='#5e3a9a',G='#01bdac',MAG='#e8308a';
 const T={ // scene starts
-  s1:0, s2:1.85, s3:3.7, s4:5.5, s5:7.3, s6:9.9, s7:11.7, s8:13.1};
+  s1:0, s2:1.85, s3:4.8, s4:6.65, s5:8.95, s6:13.55, s7:16.25, s8:18.8};   // paced to the voiceover
 const E={};
 const $=id=>document.getElementById(id);
 // ---------------------------------------------------------------- math
@@ -179,7 +179,7 @@ function seek(t){
     show(E.notif,1);S(E.notif,{left:80,top:lerp(-260,640,nk),transform:`rotate(${ring}deg)`});
     E.slots.forEach((s,i)=>{const k=spring(t-(T.s5+.6+i*.08),2.4,.5);show(s,1);S(s,{left:80+i*320,top:1120,transform:`translateY(${(1-k)*600}px)`})});
     // capsules drop into the compartments with gravity and settle; a check pops when each lands
-    E.caps.forEach((c,i)=>{const t0=T.s5+1.05+i*.42,k=t-t0;if(k<0)return;show(c.parentNode,1);const fall=.26,g=2*420/(fall*fall);let y,sx=1,sy=1,rot=(1-Math.min(1,k/fall))*180*(i%2?1:-1);
+    E.caps.forEach((c,i)=>{const t0=T.s5+1.25+i*.8,k=t-t0;if(k<0)return;show(c.parentNode,1);const fall=.26,g=2*420/(fall*fall);let y,sx=1,sy=1,rot=(1-Math.min(1,k/fall))*180*(i%2?1:-1);
       if(k<fall){y=1260-420+.5*g*k*k;sy=1+Math.min(.25,g*k/30000);sx=1/Math.sqrt(sy)}else{y=1260;const q=squash(k-fall,.3);sx=q[0];sy=q[1];rot=0}
       c.querySelector('g').setAttribute('transform',`translate(${220+i*320} ${y}) rotate(${rot-20}) scale(${sx} ${sy})`);
       const ch=spring(k-fall-.05,3.2,.45);if(ch>0){show(E.checks[i].parentNode,1);E.checks[i].querySelector('g').setAttribute('transform',`translate(${330+i*320} ${1140}) scale(${ch})`)}});
@@ -188,7 +188,7 @@ function seek(t){
   // ================= S6  services carousel (9.9 – 11.7)
   if(t>=T.s6&&t<T.s7){
     bg=BG;setHeadline('h6',t,T.s6+.05,T.s7-.3);
-    const steps=[.25,.6,.95,1.3].map(a=>T.s6+a);let pos=steps.reduce((a,s)=>a+ease.expoInOut(P(t,s,.3)),0);const intro=ease.expoOut(P(t,T.s6,.5));
+    const steps=[.35,.85,1.35,1.85].map(a=>T.s6+a);let pos=steps.reduce((a,s)=>a+ease.expoInOut(P(t,s,.3)),0);const intro=ease.expoOut(P(t,T.s6,.5));
     const N=E.serv.length;E.serv.forEach((s,i)=>{let a=((i-pos)/N)*Math.PI*2;const depth=(Math.cos(a)+1)/2;const x=540+Math.sin(a)*400,y=1040+(1-depth)*-120;
       const sc=lerp(.45,1.35,depth)*intro;show(s.b,1);s.b.style.zIndex=10+Math.round(depth*10);S(s.b,{left:x,top:y,transform:`scale(${sc})`,opacity:1});
       // label of the front item rises; leaving label drops
@@ -198,7 +198,7 @@ function seek(t){
   // ================= S7  four steps (11.7 – 13.15)
   if(t>=T.s7&&t<T.s8+.05){
     bg=TEAL;setHeadline('h7',t,T.s7+.03,T.s8-.25);
-    E.st.forEach((r,i)=>{const t0=T.s7+.3+i*.2,k=spring(t-t0,3,.45),wk=ease.expoOut(P(t,t0+.05,.45)),out=ease.expoIn(P(t,T.s8-.28+i*.03,.25));show(r,k>0&&out<1);
+    E.st.forEach((r,i)=>{const t0=T.s7+.3+i*.38,k=spring(t-t0,3,.45),wk=ease.expoOut(P(t,t0+.05,.45)),out=ease.expoIn(P(t,T.s8-.28+i*.03,.25));show(r,k>0&&out<1);
       S(r,{left:90,top:560+i*200});r.querySelector('.num').style.transform=`scale(${k*(1-out)})`;r.querySelector('.w').style.transform=`translateY(${((1-wk)+out)*130}px)`});
   }
   // ================= S8  outro: the mark assembles, wordmark wipes out from behind it (13.1 – 15)
