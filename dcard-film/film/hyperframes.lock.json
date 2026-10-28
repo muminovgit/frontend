@@ -1,0 +1,10 @@
+{
+  "assets/baked/caveat-pen.js": "d7fff8f92e60c6901b3db8b9c0e0f5e1ea4df81f1ea5075b4b8224bbf12b5b0a",
+  "assets/fonts/Caveat-700-latin.woff2": "891951df5e8b5b0f0bc760d31375405e795c666b5add70437de12d4a6482b33f",
+  "compositions/components/camera-scan-gate.html": "51ef99326f8e4f3353d1019fac5ec5a5cd8aee250dde3f7c319b3f917790a326",
+  "compositions/components/echo-smear.html": "39c896ab1a3d52fb247af88f2213ea114f9bda35cc30a6b95dc0f7311f71e0d4",
+  "compositions/components/hw-arrow.html": "73585adc010db9ec60568eabeb1afb544601e6deef19ac22e2db3a1a380f0dad",
+  "compositions/components/marker-highlight.html": "bedd128ffab3808b4624f9aa5bcd0e80c9022726fdad59191301259adb0512dc",
+  "compositions/components/motion-blur.html": "b604aa760009d6966241f3ea47e24c92b52bd807e99d52e38239c2466b782eef",
+  "compositions/hw-write-title.html": "33539023003ac474847bbc5904c51ec0851459f227766b03556e6950b5994611"
+}

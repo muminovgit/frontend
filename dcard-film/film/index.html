@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="uz" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <script src="assets/baked/caveat-pen.js"></script>
+    <script src="cues.js"></script>
+    <style>
+      @font-face { font-family: "Anton"; src: url("assets/fonts/Anton-400-latin.woff2") format("woff2"); font-display: block; }
+      @font-face { font-family: "Anton"; src: url("assets/fonts/Anton-400-latin-ext.woff2") format("woff2"); unicode-range: U+0100-024F, U+1E00-1EFF; font-display: block; }
+      @font-face { font-family: "Inter"; src: url("assets/fonts/Inter-800-latin.woff2") format("woff2"); font-weight: 100 900; font-display: block; }
+      @font-face { font-family: "Caveat"; src: url("assets/fonts/Caveat-700-latin.woff2") format("woff2"); font-weight: 700; font-display: block; }
+      :root {
+        --canvas: #f5f7fa;
+        --ink: #030003;
+        --yellow: #ffe900;
+        --blue: #00adff;
+        --charcoal: #1b1a1f;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--canvas); }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; font-family: Inter, sans-serif; }
+      .layer { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      #bg { z-index: 0; background: var(--canvas); }
+      #grain { z-index: 1; pointer-events: none; mix-blend-mode: multiply; opacity: 0.5; }
+      .k { position: absolute; left: 0; top: 0; font-family: Anton, sans-serif; text-transform: uppercase; line-height: 1;
+           white-space: nowrap; color: var(--ink); transform-origin: 50% 100%; will-change: transform; z-index: 20; }
+      .note { position: absolute; left: 0; top: 0; overflow: visible; z-index: 30; }
+      .mk { position: absolute; left: 0; top: 0; overflow: visible; z-index: 15; }
+      .mk path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .coin { position: absolute; left: 0; top: 0; width: 150px; height: 150px; z-index: 40; transform-origin: 50% 50%; }
+      .coin img { width: 100%; height: 100%; display: block; }
+      #phone { position: absolute; left: 0; top: 0; width: 480px; height: 1180px; border-radius: 74px; background: #0c0b0e;
+               padding: 14px; z-index: 18; box-shadow: 0 40px 120px rgba(0, 0, 0, 0.45); }
+      #phoneScreen { width: 100%; height: 100%; border-radius: 60px; overflow: hidden; background: linear-gradient(#ffffff, #e8f6ff 60%); position: relative; }
+      #phoneScreen img { position: absolute; left: 0; top: 0; width: 452px; }
+      #brackets { position: absolute; left: 0; top: 0; z-index: 25; overflow: visible; }
+      #brackets path { fill: none; stroke: var(--yellow); stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; }
+      #mark { position: absolute; left: 0; top: 0; width: 220px; height: 220px; z-index: 45; transform-origin: 50% 100%; }
+      #wordWrap { position: absolute; left: 0; top: 0; overflow: hidden; z-index: 44; }
+      #word { position: absolute; left: 0; top: 0; font-family: Inter, sans-serif; font-weight: 800; font-size: 210px; line-height: 1;
+              letter-spacing: -0.055em; color: var(--ink); white-space: nowrap; }
+      #footer { position: absolute; left: 0; top: 0; font-family: Inter, sans-serif; font-weight: 500; font-size: 40px; color: #66636a; white-space: nowrap; z-index: 46; transform-origin: 50% 50%; }
+      #reelWin { position: absolute; left: 0; top: 0; width: 1080px; overflow: hidden; z-index: 20; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="15" data-width="1080" data-height="1920">
+      <div id="bg" class="layer clip" data-start="0" data-duration="15"></div>
+      <svg id="grain" class="layer clip" data-start="0" data-duration="15" width="1080" height="1920">
+        <filter id="paper"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="7" /><feColorMatrix type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.45  0 0 0 0 0.5  0 0 0 0.55 0" /></filter>
+        <rect width="1080" height="1920" filter="url(#paper)" />
+      </svg>
+      <div id="stage" class="layer clip" data-start="0" data-duration="15"></div>
+      <audio id="score" class="clip" data-start="0" data-duration="15" src="assets/audio/score.wav" data-volume="1"></audio>
+    </div>
+    <script>
+      (function () {
+        window.__timelines = window.__timelines || {};
+        // ---------------------------------------------------------------- constants & state (declared before first render)
+        var C = window.CUES, W = 1080, H = 1920;
+        var INK = "#030003", CANVAS = "#f5f7fa", YELLOW = "#ffe900", BLUE = "#00adff", CHAR = "#1b1a1f";
+        var G = 6200; // px/s^2, gravity for type and coins
+        var stage = document.getElementById("stage");
+        var NS = "http://www.w3.org/2000/svg";
+        var E = {}; // elements
+        var KW = []; // kinetic words (re-fitted once fonts are ready)
+        var ease = {
+          expoOut: gsap.parseEase("expo.out"), expoIn: gsap.parseEase("expo.in"), expoInOut: gsap.parseEase("expo.inOut"),
+          backOut: gsap.parseEase("back.out(2.2)"), powIn: gsap.parseEase("power2.in"), powOut: gsap.parseEase("power3.out"),
+          sine: gsap.parseEase("sine.inOut"),
+        };
+        var clamp = function (x, a, b) { return Math.min(b === undefined ? 1 : b, Math.max(a === undefined ? 0 : a, x)); };
+        var P = function (t, s, d) { return clamp((t - s) / d); };
+        var lerp = function (a, b, k) { return a + (b - a) * k; };
+        function hash(n, s) { var x = Math.sin(n * 127.1 + (s || 1) * 311.7) * 43758.5453; return x - Math.floor(x); }
+        // closed-form damped spring (step response 0 -> 1)
+        function spring(t, f, z) { if (t <= 0) return 0; var w = 2 * Math.PI * f, wd = w * Math.sqrt(1 - z * z);
+          return 1 - Math.exp(-z * w * t) * (Math.cos(wd * t) + (z * w / wd) * Math.sin(wd * t)); }
+        // squash after an impact: returns [sx, sy]; amp grows with impact speed
+        function squash(tau, amp) { if (tau < 0) return [1, 1]; var s = amp * Math.exp(-tau * 14) * Math.cos(tau * 46);
+          var sy = 1 - s; return [1 / Math.sqrt(Math.max(sy, 0.3)), sy]; }
+
+        // ---------------------------------------------------------------- builders
+        function el(tag, cls, parent) { var e = document.createElement(tag); if (cls) e.className = cls; (parent || stage).appendChild(e); return e; }
+        function svgEl(tag, attrs, parent) { var e = document.createElementNS(NS, tag); for (var k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+        var meas = document.createElement("canvas").getContext("2d");
+        function antonW(text, size) { meas.font = size + "px Anton"; return meas.measureText(text.toUpperCase()).width; }
+        // measure once (fonts ready): fit long words to their width, cache every width so hidden words never read 0
+        function refit() { var rw = E.reelWin && E.reelWin.el, rwd = rw ? rw.style.display : ""; if (rw) rw.style.display = "";
+          KW.forEach(function (k) { var d = k.el.style.display; k.el.style.display = ""; k.el.style.fontSize = k.maxSize + "px";
+            if (k.fitW) { var w0 = k.el.offsetWidth, sz = Math.min(k.maxSize, Math.floor(k.maxSize * k.fitW / w0)); k.el.style.fontSize = sz + "px"; k.size = sz; k.h = sz; }
+            k.wc = k.el.offsetWidth; k.el.style.display = d; }); if (rw) rw.style.display = rwd; }
+        // kinetic word: Anton, centred at cx, its baseline box bottom at `bottom`
+        function kword(id, text, size, opts) {
+          opts = opts || {}; var e = el("div", "k"); e.textContent = text; e.style.fontSize = size + "px";
+          var k = { el: e, h: size * 1.0, size: size, maxSize: size, fitW: opts.fitW, text: text, cx: opts.cx === undefined ? W / 2 : opts.cx,
+            bottom: opts.bottom, color: opts.color || INK };
+          Object.defineProperty(k, "w", { get: function () { return k.wc || 0; } });
+          e.style.color = k.color; E[id] = k; KW.push(k); return k;
+        }
+        // Caveat note built from the baked per-glyph centerlines (true stroke write-on via stroke-dashoffset)
+        function penEase(path) {
+          var L = path.getTotalLength(), PRE = 40, pts = [], i;
+          for (i = 0; i <= PRE; i++) pts.push(path.getPointAtLength((L * i) / PRE));
+          var curv = [0];
+          for (i = 1; i < PRE; i++) { var ax = pts[i].x - pts[i - 1].x, ay = pts[i].y - pts[i - 1].y, bx = pts[i + 1].x - pts[i].x, by = pts[i + 1].y - pts[i].y;
+            var la = Math.hypot(ax, ay) || 1e-6, lb = Math.hypot(bx, by) || 1e-6; var d = Math.max(-1, Math.min(1, (ax * bx + ay * by) / (la * lb)));
+            curv.push(Math.acos(d) / ((la + lb) / 2)); }
+          curv.push(0);
+          var N = 32, seg = L / N, times = [0], tt = 0;
+          for (i = 1; i <= N; i++) { var u = ((i - 0.5) / N) * PRE, i0 = Math.floor(u), f = u - i0;
+            var c = curv[Math.min(i0, PRE)] * (1 - f) + curv[Math.min(i0 + 1, PRE)] * f; tt += seg / Math.max(1 / (1 + 140 * c), 0.22); times.push(tt); }
+          for (i = 0; i <= N; i++) times[i] /= tt;
+          return { len: L, ink: tt, ease: function (p) { if (p <= 0) return 0; if (p >= 1) return 1; var lo = 0, hi = N;
+            while (hi - lo > 1) { var m = (lo + hi) >> 1; if (times[m] <= p) lo = m; else hi = m; } return (lo + (p - times[lo]) / (times[hi] - times[lo] || 1e-9)) / N; } };
+        }
+        function note(id, lines, size, color, opts) {
+          opts = opts || {}; var tab = window.__hwPenCaveat, s = size / 1000, lh = 1.05;
+          var svg = svgEl("svg", { class: "note" }, stage); var strokes = [], maxW = 0, gi = 0, uid = id;
+          lines.forEach(function (line, li) {
+            var g = svgEl("g", {}, svg), x = 0;
+            for (var ci = 0; ci < line.length; ci++) { var ch = line[ci], gl = tab.glyphs[ch];
+              if (ch === " ") { x += 300; continue; }
+              if (!gl) { x += 420; continue; }
+              var gg = svgEl("g", { transform: "translate(" + x + ",0)" }, g);
+              var mid = "m-" + uid + "-" + gi++;
+              var mask = svgEl("mask", { id: mid, maskUnits: "userSpaceOnUse", x: -200, y: -1000, width: gl.adv + 400, height: 1500 }, gg);
+              gl.strokes.forEach(function (d) { var p = svgEl("path", { d: d, fill: "none", stroke: "#fff", "stroke-width": Math.max(30, Math.round(gl.stem * 1.4)), "stroke-linecap": "round", "stroke-linejoin": "round" }, mask); strokes.push({ path: p }); });
+              svgEl("path", { d: gl.outline, fill: color, mask: "url(#" + mid + ")" }, gg);
+              x += gl.adv;
+            }
+            g.setAttribute("transform", "translate(0," + (li * 1000 * lh) + ")"); g.__w = x; maxW = Math.max(maxW, x);
+          });
+          // centre each line
+          [].forEach.call(svg.children, function (g, li) { if (g.__w !== undefined && opts.align !== "left") g.setAttribute("transform", "translate(" + (maxW - g.__w) / 2 + "," + li * 1000 * lh + ")"); });
+          var hU = 1000 * lh * (lines.length - 1) + 1260;
+          svg.setAttribute("viewBox", "0 -960 " + maxW + " " + hU); svg.setAttribute("width", maxW * s); svg.setAttribute("height", hU * s);
+          strokes.forEach(function (st) { st.pe = penEase(st.path); st.path.style.strokeDasharray = st.pe.len + " " + st.pe.len; });
+          var inkSum = strokes.reduce(function (a, b) { return a + b.pe.ink; }, 0);
+          var acc = 0; strokes.forEach(function (st) { st.a = acc / inkSum; acc += st.pe.ink; st.b = acc / inkSum; });
+          var n = { el: svg, w: maxW * s, h: hU * s, strokes: strokes, rot: opts.rot || 0 }; E[id] = n; return n;
+        }
+        function setNote(n, p) { n.strokes.forEach(function (st) { var q = clamp((p - st.a) / (st.b - st.a)); var e = st.pe.ease(q);
+          st.path.style.strokeDashoffset = st.pe.len * (1 - e); st.path.style.opacity = q > 0 ? 1 : 0; }); }
+        // marker stroke (wobbly, seeded) as an svg path drawn on by dashoffset
+        function marker(id, d, color, width, opts) {
+          opts = opts || {}; var svg = svgEl("svg", { class: "mk", width: W, height: H, viewBox: "0 0 " + W + " " + H }, stage);
+          if (opts.z) svg.style.zIndex = opts.z;
+          var p = svgEl("path", { d: d, stroke: color, "stroke-width": width }, svg);
+          if (opts.blend) svg.style.mixBlendMode = opts.blend;
+          var L = p.getTotalLength(); p.style.strokeDasharray = L + " " + L; var m = { el: svg, path: p, len: L }; E[id] = m; return m;
+        }
+        function setMarker(m, p) { m.path.style.strokeDashoffset = m.len * (1 - p); m.path.style.opacity = p > 0 ? 1 : 0; }
+        function wobbleLine(x0, x1, y, amp, seed) { var n = 7, d = "M" + x0 + " " + (y + (hash(1, seed) - 0.5) * amp);
+          for (var i = 1; i <= n; i++) { var x = lerp(x0, x1, i / n), cx = x - (x1 - x0) / n / 2; d += " Q" + cx.toFixed(1) + " " + (y + (hash(i * 3, seed) - 0.5) * amp * 2).toFixed(1) + " " + x.toFixed(1) + " " + (y + (hash(i * 5, seed) - 0.5) * amp).toFixed(1); }
+          return d; }
+        function loopPath(cx, cy, rx, ry, seed) { var d = "", n = 40; for (var i = 0; i <= n * 1.12; i++) { var a = -2.4 + (i / n) * Math.PI * 2, r = 1 + (hash(i, seed) - 0.5) * 0.06 + i / n * 0.05;
+            d += (i ? " L" : "M") + (cx + Math.cos(a) * rx * r).toFixed(1) + " " + (cy + Math.sin(a) * ry * r).toFixed(1); } return d; }
+        function coin(id) { var c = el("div", "coin"); var img = el("img", "", c); img.src = "assets/img/coin.svg"; E[id] = { el: c }; return E[id]; }
+
+        // ---------------------------------------------------------------- physics
+        // ball with gravity bouncing on a floor (or a sequence of floors); pure function of t
+        function ball(t, o) { // o: {t0, x0, y0, vx, vy, floor(x)->y, e, r}
+          if (t < o.t0) return { x: o.x0, y: o.y0, vx: 0, vy: 0, hit: -1, hits: [] };
+          var x = o.x0, y = o.y0, vx = o.vx, vy = o.vy, tt = o.t0, dt = 1 / 600, hits = [];
+          while (tt < t) { var h = Math.min(dt, t - tt); vy += G * h; x += vx * h; y += vy * h; tt += h;
+            var fy = o.floor(x) - o.r;
+            if (y > fy && vy > 0) { y = fy; hits.push({ t: tt, v: vy }); vy = vy > 380 ? -vy * o.e : 0; vx *= 0.72; } }
+          return { x: x, y: y, vx: vx, vy: vy, hits: hits };
+        }
+        // a word that falls from above and lands at `land` (bottom at k.bottom), then squashes
+        function slamWord(k, t, land, drop) {
+          drop = drop || 0.22; var D = k.bottom + 40, g = (2 * D) / (drop * drop), x = k.cx - k.w / 2, y, sx = 1, sy = 1;
+          if (t < land - drop) return false;
+          if (t < land) { var tau = t - (land - drop); y = k.bottom - D + 0.5 * g * tau * tau; var v = g * tau; sy = 1 + Math.min(0.28, v / 26000); sx = 1 / Math.sqrt(sy); }
+          else { y = k.bottom; var s = squash(t - land, 0.2); sx = s[0]; sy = s[1]; }
+          k.el.style.transform = "translate(" + x + "px," + (y - k.h) + "px) scale(" + sx + "," + sy + ")"; k.x = x; k.y = y; return true;
+        }
+        // gravity exit with follow-through rotation, starting from rest at its landed pose
+        function fallAway(k, t, t0, dir, extra) {
+          if (t < t0) return 0; var tau = t - t0; var dy = 0.5 * G * tau * tau, rot = dir * (tau * tau) * 160 + (extra || 0) * tau;
+          return { dy: dy, rot: rot };
+        }
+        function place(k, x, y, sx, sy, rot) { k.el.style.transform = "translate(" + x + "px," + y + "px) rotate(" + (rot || 0) + "deg) scale(" + sx + "," + sy + ")"; }
+        function show(k, on) { (k.el || k).style.display = on ? "" : "none"; }
+
+        // ---------------------------------------------------------------- build the cast
+        function build() {
+          // S1 everyday purchases
+          kword("w1", "Qahva.", 290, { bottom: 720 }); kword("w2", "Tushlik.", 290, { bottom: 1010 }); kword("w3", "Xarid.", 290, { bottom: 1300 });
+          note("n1", ["har kuni, odatdagidek"], 96, BLUE); marker("u1", wobbleLine(300, 780, 1330, 10, 3), YELLOW, 16);
+          // S2 1+1
+          kword("oneL", "1", 600, { cx: 330, bottom: 1180 }); kword("oneR", "1", 600, { cx: 760, bottom: 1180 }); kword("plus", "+", 380, { cx: 545, bottom: 1060 });
+          marker("loop", loopPath(545, 880, 420, 330, 5), YELLOW, 22, { z: 14 });
+          note("n2", ["bitta xarid, ikki quvonch"], 88, BLUE);
+          // S3 coin flight, discounts
+          coin("cf"); for (var i = 1; i <= 4; i++) { coin("ghost" + i); E["ghost" + i].el.style.opacity = [0, 0.32, 0.2, 0.11, 0.05][i]; E["ghost" + i].el.style.zIndex = 39; }
+          kword("cheg", "Chegirmalar", 330, { fitW: 980, bottom: 1250 });
+          marker("u3", wobbleLine(90, 990, 1282, 12, 9), YELLOW, 18); note("n3", ["sevimli joylaringizda"], 92, BLUE);
+          // S4 dark: QR
+          var ph = el("div"); ph.id = "phone"; var scr = el("div", "", ph); scr.id = "phoneScreen"; var im = el("img", "", scr); im.src = "assets/img/app-qr-crop.png"; E.phone = { el: ph };
+          kword("q1", "QR-kodni", 300, { fitW: 900,  bottom: 430, color: CANVAS }); kword("q2", "ko'rsating.", 300, { fitW: 980,  bottom: 720, color: CANVAS });
+          var br = svgEl("svg", { id: "brackets", width: W, height: H, viewBox: "0 0 " + W + " " + H }, stage); E.br = { el: br, paths: [] };
+          for (var b = 0; b < 4; b++) E.br.paths.push(svgEl("path", {}, br));
+          note("n4", ["kassirga"], 92, YELLOW); marker("arr", "M190 1290 C 210 1200, 280 1150, 355 1145 M330 1118 L 360 1145 L 326 1170", YELLOW, 10, { z: 31 });
+          // S5 coins
+          kword("c1", "Coin", 430, { bottom: 600, color: CANVAS }); kword("c2", "yig'ing.", 300, { fitW: 900,  bottom: 880, color: CANVAS });
+          for (i = 0; i < C.rain.length; i++) coin("r" + i);
+          note("n5", ["har bir xariddan"], 92, YELLOW);
+          // S6 places reel
+          var rw = el("div"); rw.id = "reelWin"; E.reelWin = { el: rw };
+          E.reel = ["Restoranlar", "Supermarketlar", "Go'zallik", "Texnika", "Xizmatlar"].map(function (w, i) { var k = kword("reel" + i, w, 300, { fitW: 960, bottom: 0 }); rw.appendChild(k.el); return k; });
+          note("n6", ["hammasi bitta ilovada"], 96, BLUE);
+          // S7 verbs
+          kword("v1", "Toping.", 300, { bottom: 760 }); kword("v2", "Ko'rsating.", 300, { fitW: 900,  bottom: 1060 }); kword("v3", "Yig'ing.", 300, { bottom: 1360 });
+          note("d1", ["1"], 110, BLUE); note("d2", ["2"], 110, BLUE); note("d3", ["3"], 110, BLUE);
+          marker("hl", wobbleLine(250, 840, 1240, 8, 13), YELLOW, 120, { z: 12, blend: "multiply" });
+          // S8 logo
+          coin("cl");
+          var mk = el("img"); mk.id = "mark"; mk.src = "assets/img/dcard-mark.svg"; E.mark = { el: mk };
+          var ww = el("div"); ww.id = "wordWrap"; var wd = el("div", "", ww); wd.id = "word"; wd.textContent = "Dcard"; E.word = { el: ww, inner: wd };
+          note("n8", ["har bir xariddan", "ko'proq foyda."], 92, BLUE);
+          var ft = el("div"); ft.id = "footer"; ft.textContent = "iOS va Android uchun"; E.footer = { el: ft };
+        }
+
+        // ---------------------------------------------------------------- render(t): every style derives from t alone
+        var WORDW = 0, FOOTW = 400;
+        function R(t) {
+          var dark = t >= C.dark && t < C.light;
+          document.getElementById("bg").style.background = dark ? CHAR : CANVAS;
+          document.getElementById("grain").style.opacity = dark ? 0.18 : 0.5;
+          // hide everything; scenes switch on what they draw
+          Object.keys(E).forEach(function (k) { if (E[k].el) E[k].el.style.display = "none"; });
+
+          // ---------- S1
+          if (t < 2.4) {
+            ["w1", "w2", "w3"].forEach(function (id, i) { var k = E[id]; if (!slamWord(k, t, C.s1Land[i])) return; show(k, 1);
+              var f = fallAway(k, t, C.s1Exit + i * 0.05, i % 2 ? 1 : -1); if (f) place(k, k.x, k.bottom - k.h + f.dy, 1, 1, f.rot); });
+            var n1 = E.n1, nx = (W - n1.w) / 2, ny = 1400; if (t >= 1.0) { show(n1, 1); setNote(n1, P(t, 1.0, 0.58));
+              var f1 = fallAway(n1, t, C.s1Exit + 0.12, 1); n1.el.style.transform = "translate(" + nx + "px," + (ny + (f1 ? f1.dy : 0)) + "px) rotate(" + (-3 + (f1 ? f1.rot : 0)) + "deg)"; }
+            if (t >= 1.02) { show(E.u1, 1); setMarker(E.u1, ease.powOut(P(t, 1.02, 0.26))); var fu = fallAway(E.u1, t, C.s1Exit + 0.1, 0); E.u1.el.style.transform = "translateY(" + (fu ? fu.dy : 0) + "px)"; }
+          }
+          // ---------- S2 (1+1) and its exit; the plus becomes the coin
+          if (t >= 1.7 && t < 4.4) {
+            [["oneL", C.oneL, -1], ["oneR", C.oneR, 1]].forEach(function (a) { var k = E[a[0]]; if (!slamWord(k, t, a[1], 0.2)) return; show(k, 1);
+              var f = fallAway(k, t, C.s2Exit + (a[2] > 0 ? 0.06 : 0), a[2], a[2] * 30); if (f) { k.el.style.transformOrigin = a[2] < 0 ? "0% 100%" : "100% 100%"; place(k, k.x + a[2] * f.dy * 0.15, k.bottom - k.h + f.dy, 1, 1, f.rot); } });
+            var pk = E.plus; if (t >= C.plus && t < C.coinPop + 0.12) { show(pk, 1); var s = spring(t - C.plus, 3.2, 0.42); var shrink = 1 - ease.expoIn(P(t, C.coinPop, 0.12));
+              pk.el.style.transformOrigin = "50% 60%"; place(pk, pk.cx - pk.w / 2, pk.bottom - pk.h, s * shrink, s * shrink, (1 - s) * -40); }
+            if (t >= C.loop[0] && t < C.s2Exit + 0.6) { show(E.loop, 1); setMarker(E.loop, ease.sine(P(t, C.loop[0], C.loop[1] - C.loop[0]))); var fl = fallAway(E.loop, t, C.s2Exit + 0.03, 0); E.loop.el.style.transform = "translateY(" + (fl ? fl.dy : 0) + "px)"; }
+            var n2 = E.n2; if (t >= 2.55 && t < C.s2Exit + 0.6) { show(n2, 1); setNote(n2, P(t, 2.55, 0.8)); var f2 = fallAway(n2, t, C.s2Exit + 0.1, -1);
+              n2.el.style.transform = "translate(" + (W - n2.w) / 2 + "px," + (1330 + (f2 ? f2.dy : 0)) + "px) rotate(" + (2 + (f2 ? f2.rot : 0)) + "deg)"; }
+          }
+          // ---------- S3 the coin flies, lands on CHEGIRMALAR
+          var cheg = E.cheg, chegTop = cheg.bottom - cheg.h * 0.86;
+          var flight = { t0: C.launch, x0: 545, y0: 880, vx: 300, vy: -2380, r: 75, e: 0.42, floor: function (x) { return t >= C.chegLand - 0.02 ? chegTop : 9999; } };
+          if (t >= C.coinPop && t < C.dark) {
+            var popS = spring(t - C.coinPop, 3.4, 0.45), st = ball(t, flight), cf = E.cf; show(cf, 1);
+            // smear: stretch along velocity; onion skin: earlier states at fixed time offsets
+            var sp = Math.hypot(st.vx, st.vy), ang = Math.atan2(st.vy, st.vx) * 180 / Math.PI, str = 1 + Math.min(0.55, sp / 5200);
+            var last = st.hits.length ? st.hits[st.hits.length - 1] : null, sq = last ? squash(t - last.t, Math.min(0.42, last.v / 5000)) : [1, 1];
+            var sc = t < C.launch ? popS : 1;
+            cf.el.style.transform = "translate(" + (st.x - 75) + "px," + (st.y - 75) + "px) rotate(" + ang + "deg) scale(" + (sc * str * sq[0]) + "," + (sc / Math.sqrt(str) * sq[1]) + ") rotate(" + -ang + "deg)";
+            for (var g = 1; g <= 4; g++) { var gt = t - g * 0.03, gs = ball(gt, flight), gh = E["ghost" + g];
+              if (gt > C.launch && !st.hits.length) { show(gh, 1); gh.el.style.transform = "translate(" + (gs.x - 75) + "px," + (gs.y - 75) + "px)"; } }
+          }
+          if (t >= C.chegLand - 0.25 && t < C.dark) { if (slamWord(cheg, t, C.chegLand, 0.2)) show(cheg, 1); }
+          if (t >= 4.6 && t < C.dark) { show(E.u3, 1); setMarker(E.u3, ease.powOut(P(t, 4.6, 0.3))); var n3 = E.n3; show(n3, 1); setNote(n3, P(t, 4.66, 0.5)); n3.el.style.transform = "translate(" + (W - n3.w) / 2 + "px,1390px) rotate(-2deg)"; }
+
+          // ---------- S4 dark: phone with the real QR screen
+          var phY = 0;
+          if (t >= C.dark && t < 7.6) {
+            var rise = spring(t - C.phoneIn, 2.1, 0.62), fp = fallAway(E.phone, t, C.s4Exit, 0); phY = lerp(1960, 860, rise) + (fp ? fp.dy : 0);
+            show(E.phone, 1); E.phone.el.style.transform = "translate(300px," + phY + "px) rotate(" + (fp ? fp.rot * 0.2 : (1 - rise) * 6) + "deg)";
+            [["q1", C.qrType[0]], ["q2", C.qrType[1]]].forEach(function (a, i) { var k = E[a[0]]; if (!slamWord(k, t, a[1], 0.2)) return; show(k, 1);
+              var f = fallAway(k, t, C.s4Exit + 0.04 * i, i ? 1 : -1); if (f) place(k, k.x, k.bottom - k.h + f.dy, 1, 1, f.rot); });
+            // QR bounds inside the phone screen (crop scaled 452/393): x 110..345, y 218..448
+            if (t >= C.lock - 0.25 && t < C.s4Exit) { show(E.br, 1); var lk = spring(t - (C.lock - 0.25), 2.6, 0.5), pad = lerp(120, 8, lk), x0 = 314 + 110 - pad, x1 = 314 + 345 + pad, y0 = phY + 14 + 218 - pad, y1 = phY + 14 + 448 + pad, L = 60;
+              var c = [[x0, y0, 1, 1], [x1, y0, -1, 1], [x0, y1, 1, -1], [x1, y1, -1, -1]];
+              E.br.paths.forEach(function (p, i) { var q = c[i]; p.setAttribute("d", "M" + q[0] + " " + (q[1] + q[3] * L) + " L" + q[0] + " " + q[1] + " L" + (q[0] + q[2] * L) + " " + q[1]); }); }
+            if (t >= 6.3 && t < C.s4Exit) { var n4 = E.n4; show(n4, 1); setNote(n4, P(t, 6.3, 0.42)); n4.el.style.transform = "translate(40px,1300px) rotate(-8deg)"; show(E.arr, 1); setMarker(E.arr, ease.powOut(P(t, 6.62, 0.28))); }
+          }
+          // ---------- S5 coins pile up
+          if (t >= C.s4Exit && t < C.light) {
+            [["c1", C.coinType[0]], ["c2", C.coinType[1]]].forEach(function (a) { var k = E[a[0]]; if (slamWord(k, t, a[1], 0.2)) show(k, 1); });
+            var xs = [300, 470, 640, 790, 385, 560, 720];
+            C.rain.forEach(function (t0, i) { var o = { t0: t0, x0: xs[i], y0: 120, vx: (hash(i, 4) - 0.5) * 160, vy: 0, r: 75, e: 0.3, floor: function () { return 1560 - (i >= 4 ? 120 : 0); } };
+              if (t < t0) return; var s = ball(t, o), k = E["r" + i]; show(k, 1); var lh = s.hits.length ? s.hits[s.hits.length - 1] : null, q = lh ? squash(t - lh.t, Math.min(0.4, lh.v / 5200)) : [1, 1];
+              var str = lh ? 1 : 1 + Math.min(0.35, Math.abs(s.vy) / 7000);
+              k.el.style.transformOrigin = "50% 100%"; k.el.style.transform = "translate(" + (s.x - 75) + "px," + (s.y - 75) + "px) scale(" + q[0] / Math.sqrt(str) + "," + q[1] * str + ") rotate(" + (i * 23 % 40 - 20) + "deg)"; });
+            if (t >= 7.85) { var n5 = E.n5; show(n5, 1); setNote(n5, P(t, 7.85, 0.6)); n5.el.style.transform = "translate(" + (W - n5.w) / 2 + "px,1650px) rotate(-2deg)"; }
+          }
+          // ---------- S6 places: a reel through a fixed window, one vertical move per word
+          if (t >= C.light && t < C.verbs[0] - 0.05) {
+            var win = E.reelWin; show(win, 1); win.el.style.top = "780px"; win.el.style.height = "360px";
+            E.reel.forEach(function (k, i) { var a = C.reel[i], b = C.reel[i + 1] || 99; if (t < a || t > b + 0.17) return; show(k, 1);
+              var inK = ease.expoOut(P(t, a, 0.26)), outK = ease.expoIn(P(t, b - 0.0, 0.16)), y = lerp(380, 20, inK) - outK * 380;
+              var vel = (1 - inK) * 1.0 + outK; k.el.style.transformOrigin = "50% 50%";
+              k.el.style.transform = "translate(" + (W - k.w) / 2 + "px," + y + "px) scale(" + (1 - vel * 0.08) + "," + (1 + vel * 0.25) + ")"; });
+            if (t >= 8.78) { var n6 = E.n6; show(n6, 1); setNote(n6, P(t, 8.78, 0.62)); n6.el.style.transform = "translate(" + (W - n6.w) / 2 + "px,560px) rotate(-2deg)"; }
+          }
+          // ---------- S7 three verbs
+          if (t >= C.verbs[0] - 0.25 && t < 12.9) {
+            ["v1", "v2", "v3"].forEach(function (id, i) { var k = E[id]; if (!slamWord(k, t, C.verbs[i], 0.2)) return; show(k, 1);
+              var f = fallAway(k, t, C.s7Exit + i * 0.05, i % 2 ? 1 : -1); if (f) place(k, k.x, k.bottom - k.h + f.dy, 1, 1, f.rot);
+              var d = E["d" + (i + 1)]; if (t >= C.verbs[i] + 0.04) { show(d, 1); setNote(d, P(t, C.verbs[i] + 0.04, 0.2)); d.el.style.transform = "translate(" + (k.x - 95) + "px," + (k.bottom - 230 + (f ? f.dy : 0)) + "px) rotate(-6deg)"; } });
+            if (t >= 11.42) { show(E.hl, 1); setMarker(E.hl, ease.powOut(P(t, 11.42, 0.32))); var fh = fallAway(E.hl, t, C.s7Exit + 0.1, 0); E.hl.el.style.transform = "translateY(" + (fh ? fh.dy : 0) + "px)"; }
+          }
+          // ---------- S8 coin drops, becomes the mark; wordmark wipes out from behind it
+          if (t >= C.logoDrop) {
+            var MK = 220, gap = 34, ww = WORDW, wipe = ease.expoOut(P(t, C.wordWipe, 0.5));
+            var rowW = MK + (gap + ww) * wipe, mx = W / 2 - rowW / 2, mBottom = 980;
+            if (t < C.logoLand + 0.05) { var D = 1120, dur = C.logoLand - C.logoDrop, gg = 2 * D / (dur * dur), tau = Math.min(t - C.logoDrop, dur), cy = mBottom - 75 - D + 0.5 * gg * tau * tau;
+              var str2 = 1 + Math.min(0.5, gg * tau / 9000), sqk = t > C.logoLand ? squash(t - C.logoLand, 0.45) : [1 / Math.sqrt(str2), str2];
+              var cl = E.cl; show(cl, 1); cl.el.style.transformOrigin = "50% 100%"; cl.el.style.transform = "translate(" + (W / 2 - 75) + "px," + (cy - 75) + "px) scale(" + sqk[0] + "," + sqk[1] + ")"; }
+            if (t >= C.logoLand) { var ms = spring(t - C.logoLand, 2.6, 0.38), sq = squash(t - C.logoLand - 0.02, 0.18); show(E.mark, 1);
+              E.mark.el.style.transform = "translate(" + mx + "px," + (mBottom - MK) + "px) scale(" + lerp(0.5, 1, ms) * sq[0] + "," + lerp(0.5, 1, ms) * sq[1] + ")"; }
+            if (wipe > 0) { show(E.word, 1); var wr = E.word.el; wr.style.width = (ww * wipe + 6) + "px"; wr.style.height = "230px";
+              wr.style.transform = "translate(" + (mx + MK + gap) + "px," + (mBottom - 205) + "px)"; E.word.inner.style.transform = "translateX(" + (-ww * (1 - wipe)) + "px)"; }
+            if (t >= 13.2) { var n8 = E.n8; show(n8, 1); setNote(n8, P(t, 13.2, 0.95)); n8.el.style.transform = "translate(" + (W - n8.w) / 2 + "px,1060px) rotate(-2deg)"; }
+            if (t >= C.footer) { var fs = spring(t - C.footer, 3, 0.5); show(E.footer, 1); var fw = FOOTW; E.footer.el.style.transform = "translate(" + (W - fw) / 2 + "px,1640px) scale(" + fs + ")"; }
+          }
+        }
+
+        // ---------------------------------------------------------------- timeline
+        var tl = gsap.timeline({ paused: true });
+        build();
+        document.fonts.ready.then(function () { refit(); E.word.el.style.display = ""; E.footer.el.style.display = ""; WORDW = E.word.inner.offsetWidth; FOOTW = E.footer.el.offsetWidth; R(tl.time()); });
+        refit(); E.word.el.style.display = ""; E.footer.el.style.display = ""; WORDW = E.word.inner.offsetWidth; FOOTW = E.footer.el.offsetWidth;
+        tl.to({ v: 0 }, { v: 1, duration: C.dur, ease: "none" }, 0); // the clock: every pose is R(time)
+        tl.eventCallback("onUpdate", function () { R(tl.time()); });
+        R(0);
+        window.__timelines["main"] = tl;
+        window.__dcardHits = function () { var out = [], cheg = E.cheg, chegTop = cheg.bottom - cheg.h * 0.86;
+          var fl = ball(C.dark - 0.01, { t0: C.launch, x0: 545, y0: 880, vx: 300, vy: -2380, r: 75, e: 0.42, floor: function () { return 0; } });
+          // flight: floor appears at chegLand; replicate the scene's floor rule exactly
+          var tt = C.launch, st = { x: 545, y: 880, vx: 300, vy: -2380 }, dt = 1 / 600;
+          while (tt < C.dark) { st.vy += G * dt; st.x += st.vx * dt; st.y += st.vy * dt; tt += dt; var fy = (tt >= C.chegLand - 0.02 ? chegTop : 9999) - 75;
+            if (st.y > fy && st.vy > 0) { st.y = fy; out.push(["coin", +tt.toFixed(4), +st.vy.toFixed(0)]); st.vy = st.vy > 380 ? -st.vy * 0.42 : 0; st.vx *= 0.72; } }
+          var xs = [300, 470, 640, 790, 385, 560, 720];
+          C.rain.forEach(function (t0, i) { var b = ball(C.light, { t0: t0, x0: xs[i], y0: 120, vx: (hash(i, 4) - 0.5) * 160, vy: 0, r: 75, e: 0.3, floor: function () { return 1560 - (i >= 4 ? 120 : 0); } });
+            b.hits.forEach(function (h) { out.push(["rain", +h.t.toFixed(4), +h.v.toFixed(0)]); }); });
+          return out; };
+      })();
+    </script>
+  </body>
+</html>
