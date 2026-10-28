@@ -17,5 +17,5 @@ print('largest frame-to-frame changes (frame, t, diff):',[(int(i),round(i/60,3),
 moments={'send':(2.70,3.75),'drop':(5.48,6.05),'contract':(7.36,8.00),'pagefill':(9.66,10.75),'mark':(13.30,13.90)}
 for name,(a,b) in moments.items():
     fa,fb=int(a*60),int(b*60);n=fb-fa;cols=8;rows=(n+cols-1)//cols
-    subprocess.run(['ffmpeg','-y','-loglevel','error','-ss',f'{fa/60:.4f}','-i',src,'-frames:v',str(n),'-vf',f'scale=320:180,tile={cols}x{rows}',f'{out}/{name}.png'])
+    subprocess.run(['ffmpeg','-y','-loglevel','error','-ss',f'{fa/60:.4f}','-t',f'{n/60:.4f}','-i',src,'-vf',f'scale=320:180,tile={cols}x{rows}','-frames:v','1','-update','1',f'{out}/{name}.png'])
     print('sheet',name,fa,fb)
