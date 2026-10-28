@@ -28,7 +28,7 @@ def nf(m): return 440 * 2 ** ((m - 69) / 12)
 BPM = 120; beat = 60 / BPM
 prog = [[45, 52, 57, 60], [41, 48, 53, 57], [48, 55, 60, 64], [43, 50, 55, 62]]   # Am F C G
 # pads + bass run through; drums run only inside these windows (they restart on the slam)
-drum_windows = [(0.0, C["launch"]), (C["chegLand"], C["dark"]), (C["qrType"][0], C["logoDrop"]), (C["logoLand"], DUR - 0.6)]
+drum_windows = [(0.0, C["launch"]), (C["chegLand"], C["dark"]), (C["qrType"][0], C["logoDrop"]), (C["logoLand"], C["zoom"]), (C["lockup"], DUR - 0.6)]
 for b in range(int(DUR / (4 * beat)) + 1):
     ch = prog[b % 4]; t0 = b * 4 * beat; t = ts(4 * beat + 0.3)
     env = np.minimum(1, t / 0.08) * np.exp(-t * 0.35)
@@ -56,7 +56,7 @@ for a, b in drum_windows:
         k += 1
     if a > 0: crash(a, 0.3)      # the slam back
 # risers into each slam (drums are out)
-for a, b in [(C["launch"], C["chegLand"]), (C["dark"], C["qrType"][0]), (C["logoDrop"], C["logoLand"])]:
+for a, b in [(C["launch"], C["chegLand"]), (C["dark"], C["qrType"][0]), (C["logoDrop"], C["logoLand"]), (C["zoom"], C["zoomEnd"])]:
     t = ts(b - a); x = hp(rng.standard_normal(len(t)), 0.2); add(x * (t / (b - a)) ** 2 * 0.12, a)
 
 # ---------------------------------------------------------------- SFX
@@ -100,6 +100,13 @@ whoosh(C["wordWipe"] + 0.15, 0.3, 0.16, pan=0.3)
 for kind, t, v in HITS: clink(t, v, pan=(0.25 if kind == "rain" else 0.1) * (1 if int(t * 100) % 2 else -1))
 # logo: the coin lands and becomes the mark
 clink(C["logoLand"], 3000); subhit(C["logoLand"])
+# S9 the app's close animation: wordmark tucks in, push into the blue, pattern ripples out, lockup slams back
+whoosh(C["retract"] + 0.12, 0.25, 0.12, pan=-0.3)
+whoosh(C["zoomEnd"], C["zoomEnd"] - C["zoom"], 0.32)
+for i in range(26):   # one pop per ring of the pattern ripple, centre first
+    q = i / 25; pop(C["pattern"] + 0.5 * q ** 1.2 + 0.08, 900 + 900 * (1 - q) + 200 * ((i * 7) % 3), 0.11 * (1 - 0.5 * q), pan=((i * 37) % 11 - 5) / 7)
+whoosh(C["clear"] + 0.2, 0.3, 0.14)
+subhit(C["lockup"]); pop(C["lockup"] + 0.02, 1200, 0.25); whoosh(C["lockup"] + 0.3, 0.25, 0.12, pan=0.3)
 
 # ---------------------------------------------------------------- master
 mix = np.stack([L, R], 1)

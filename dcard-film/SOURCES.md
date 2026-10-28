@@ -22,3 +22,9 @@ Master: −14 LUFS integrated, ≤ −2 dBTP, re-measured on the final AAC (`too
 hw-write-title (Caveat stroke write-on data), marker-highlight, hw-arrow, echo-smear, motion-blur, camera-scan-gate.
 The composition reuses the baked Caveat centerlines and pen-velocity easing; marker strokes, physics, smear and
 onion-skin are authored in `film/index.html`.
+
+## Ending (added)
+The closing sequence recreates Dcard's own app close/open animation (reference: the client's screen recording
+IMG_6174.MP4, not included in the film): the wordmark tucks into the mark, the mark zooms into its blue, and the
+white glyph + yellow sparkle pattern ripples out from the centre. Rebuilt in code from the real mark's glyph path
+(`assets/img/dcard-mark.svg`, path "Subtract"), so it stays sharp at 1080×1920.

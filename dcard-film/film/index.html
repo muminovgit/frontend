@@ -37,23 +37,27 @@
       #phoneScreen img { position: absolute; left: 0; top: 0; width: 452px; }
       #brackets { position: absolute; left: 0; top: 0; z-index: 25; overflow: visible; }
       #brackets path { fill: none; stroke: var(--yellow); stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; }
-      #mark { position: absolute; left: 0; top: 0; width: 220px; height: 220px; z-index: 45; transform-origin: 50% 100%; }
+      #mark, #mark2 { position: absolute; left: 0; top: 0; width: 220px; height: 220px; z-index: 45; transform-origin: 0 0; overflow: visible; }
+      #mark2 { z-index: 62; }
+      #pattern { z-index: 55; }
+      #word2Wrap { position: absolute; left: 0; top: 0; overflow: hidden; z-index: 61; }
+      #word2 { position: absolute; left: 0; top: 0; font-family: Inter, sans-serif; font-weight: 800; font-size: 190px; line-height: 1; letter-spacing: -0.055em; color: #ffffff; white-space: nowrap; }
       #wordWrap { position: absolute; left: 0; top: 0; overflow: hidden; z-index: 44; }
       #word { position: absolute; left: 0; top: 0; font-family: Inter, sans-serif; font-weight: 800; font-size: 210px; line-height: 1;
               letter-spacing: -0.055em; color: var(--ink); white-space: nowrap; }
-      #footer { position: absolute; left: 0; top: 0; font-family: Inter, sans-serif; font-weight: 500; font-size: 40px; color: #66636a; white-space: nowrap; z-index: 46; transform-origin: 50% 50%; }
+      #footer { position: absolute; left: 0; top: 0; font-family: Inter, sans-serif; font-weight: 500; font-size: 40px; color: rgba(255,255,255,0.88); white-space: nowrap; z-index: 63; transform-origin: 50% 50%; }
       #reelWin { position: absolute; left: 0; top: 0; width: 1080px; overflow: hidden; z-index: 20; }
     </style>
   </head>
   <body>
-    <div id="root" data-composition-id="main" data-start="0" data-duration="15" data-width="1080" data-height="1920">
-      <div id="bg" class="layer clip" data-start="0" data-duration="15"></div>
-      <svg id="grain" class="layer clip" data-start="0" data-duration="15" width="1080" height="1920">
+    <div id="root" data-composition-id="main" data-start="0" data-duration="17.2" data-width="1080" data-height="1920">
+      <div id="bg" class="layer clip" data-start="0" data-duration="17.2"></div>
+      <svg id="grain" class="layer clip" data-start="0" data-duration="17.2" width="1080" height="1920">
         <filter id="paper"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="7" /><feColorMatrix type="matrix" values="0 0 0 0 0.45  0 0 0 0 0.45  0 0 0 0 0.5  0 0 0 0.55 0" /></filter>
         <rect width="1080" height="1920" filter="url(#paper)" />
       </svg>
-      <div id="stage" class="layer clip" data-start="0" data-duration="15"></div>
-      <audio id="score" class="clip" data-start="0" data-duration="15" src="assets/audio/score.wav" data-volume="1"></audio>
+      <div id="stage" class="layer clip" data-start="0" data-duration="17.2"></div>
+      <audio id="score" class="clip" data-start="0" data-duration="17.2" src="assets/audio/score.wav" data-volume="1"></audio>
     </div>
     <script>
       (function () {
@@ -62,6 +66,8 @@
         var C = window.CUES, W = 1080, H = 1920;
         var INK = "#030003", CANVAS = "#f5f7fa", YELLOW = "#ffe900", BLUE = "#00adff", CHAR = "#1b1a1f";
         var G = 6200; // px/s^2, gravity for type and coins
+        var MARK_SVG = '<svg width="220" height="220" viewBox="0 0 45 45" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="Frame 2136136728"><g clip-path="url(#CLIPID)"><rect width="45" height="45" rx="13.5" fill="#FFE900"/><path id="Subtract" d="M30.4747 -0.752986C30.8871 -0.617932 32.6777 -0.584722 33.002 -0.400447C33.0167 -0.388724 33.2391 -0.331457 33.4718 -0.272517V-0.271541C33.3551 -0.3011 33.241 -0.330293 33.1544 -0.353572C33.0682 -0.37664 33.0094 -0.394599 33.002 -0.400447C32.8835 -0.150089 32.7671 0.254606 32.6788 0.528264L32.2042 2.0058C31.8496 3.12076 31.4518 4.24642 31.089 5.36811L27.9972 14.7675C27.5618 16.1407 27.113 17.5097 26.6505 18.874C26.4422 19.5066 26.2002 20.343 25.9669 20.9492C26.3661 20.7662 26.9237 20.6247 27.3556 20.5322C29.8615 19.9954 32.53 20.113 35.0606 20.4023C36.0005 20.5098 37.0816 20.6364 37.963 20.9609C39.5202 21.5344 40.6543 22.6927 41.3341 24.1972C42.6119 27.0258 42.4158 30.3798 41.3624 33.246C40.4434 35.7459 38.3808 37.4995 36.0167 38.5966C34.0103 39.5277 31.449 39.8432 29.3526 39.0361C28.317 38.6369 27.6006 38.1264 26.796 37.3564C26.3828 36.9609 26.1254 36.5783 25.7794 36.1415C24.7663 34.8621 23.9894 33.5222 23.3087 32.0419C23.2245 31.8589 22.8367 30.7866 22.7804 30.746C22.6772 30.8135 22.2498 32.2931 22.1798 32.5048L19.5313 40.5429C19.1323 41.8039 18.7207 43.0611 18.297 44.3144C18.1527 44.7411 17.9769 45.3541 17.8175 45.7529H14.2931C13.8441 45.6215 12.7719 45.5557 12.3653 45.3837C12.5914 44.8879 13.0106 43.4533 13.1944 42.8847L14.6475 38.4697L18.8292 25.7529C16.2283 26.4632 12.9948 26.3318 10.335 26.0038C9.40647 25.8792 8.40833 25.784 7.53524 25.4316C2.84983 23.5397 2.676 16.9819 4.2872 12.9726C6.02122 8.6584 11.9632 5.68811 16.3956 7.45795C17.8997 8.05859 18.8354 9.02655 19.7911 10.2724C20.8665 11.647 21.7576 13.1569 22.4415 14.7626C22.854 13.3093 23.4561 11.6793 23.9268 10.2314L27.5294 -0.752986H30.4747ZM28.2286 22.9833C27.212 23.0939 26.3521 23.459 25.6895 24.2695C23.4548 27.0033 26.2405 30.1521 28.4044 31.8212C30.3734 33.34 32.9597 34.942 35.5284 34.8583C36.625 34.6987 37.4574 34.3791 38.1388 33.4511C40.5615 30.1533 36.3562 26.3677 33.8038 24.748C32.3318 23.8139 29.9888 22.7746 28.2286 22.9833ZM16.7657 14.2724C15.0398 13.006 12.3053 11.4022 10.127 11.5585C9.34482 11.6285 8.53788 11.8872 7.95223 12.4218C5.12144 15.0059 7.77032 18.5692 10.0157 20.3818C12.0695 22.0397 14.721 23.5921 17.4161 23.4404C18.4902 23.2711 19.4066 22.8634 20.046 21.9511C22.0929 19.0304 18.9824 15.899 16.7657 14.2724Z" fill="#00ADFF"/></g></g><defs><clipPath id="CLIPID"><rect width="45" height="45" rx="13.5" fill="white"/></clipPath></defs></svg>';
+        var GLYPH_D = "M30.4747 -0.752986C30.8871 -0.617932 32.6777 -0.584722 33.002 -0.400447C33.0167 -0.388724 33.2391 -0.331457 33.4718 -0.272517V-0.271541C33.3551 -0.3011 33.241 -0.330293 33.1544 -0.353572C33.0682 -0.37664 33.0094 -0.394599 33.002 -0.400447C32.8835 -0.150089 32.7671 0.254606 32.6788 0.528264L32.2042 2.0058C31.8496 3.12076 31.4518 4.24642 31.089 5.36811L27.9972 14.7675C27.5618 16.1407 27.113 17.5097 26.6505 18.874C26.4422 19.5066 26.2002 20.343 25.9669 20.9492C26.3661 20.7662 26.9237 20.6247 27.3556 20.5322C29.8615 19.9954 32.53 20.113 35.0606 20.4023C36.0005 20.5098 37.0816 20.6364 37.963 20.9609C39.5202 21.5344 40.6543 22.6927 41.3341 24.1972C42.6119 27.0258 42.4158 30.3798 41.3624 33.246C40.4434 35.7459 38.3808 37.4995 36.0167 38.5966C34.0103 39.5277 31.449 39.8432 29.3526 39.0361C28.317 38.6369 27.6006 38.1264 26.796 37.3564C26.3828 36.9609 26.1254 36.5783 25.7794 36.1415C24.7663 34.8621 23.9894 33.5222 23.3087 32.0419C23.2245 31.8589 22.8367 30.7866 22.7804 30.746C22.6772 30.8135 22.2498 32.2931 22.1798 32.5048L19.5313 40.5429C19.1323 41.8039 18.7207 43.0611 18.297 44.3144C18.1527 44.7411 17.9769 45.3541 17.8175 45.7529H14.2931C13.8441 45.6215 12.7719 45.5557 12.3653 45.3837C12.5914 44.8879 13.0106 43.4533 13.1944 42.8847L14.6475 38.4697L18.8292 25.7529C16.2283 26.4632 12.9948 26.3318 10.335 26.0038C9.40647 25.8792 8.40833 25.784 7.53524 25.4316C2.84983 23.5397 2.676 16.9819 4.2872 12.9726C6.02122 8.6584 11.9632 5.68811 16.3956 7.45795C17.8997 8.05859 18.8354 9.02655 19.7911 10.2724C20.8665 11.647 21.7576 13.1569 22.4415 14.7626C22.854 13.3093 23.4561 11.6793 23.9268 10.2314L27.5294 -0.752986H30.4747ZM28.2286 22.9833C27.212 23.0939 26.3521 23.459 25.6895 24.2695C23.4548 27.0033 26.2405 30.1521 28.4044 31.8212C30.3734 33.34 32.9597 34.942 35.5284 34.8583C36.625 34.6987 37.4574 34.3791 38.1388 33.4511C40.5615 30.1533 36.3562 26.3677 33.8038 24.748C32.3318 23.8139 29.9888 22.7746 28.2286 22.9833ZM16.7657 14.2724C15.0398 13.006 12.3053 11.4022 10.127 11.5585C9.34482 11.6285 8.53788 11.8872 7.95223 12.4218C5.12144 15.0059 7.77032 18.5692 10.0157 20.3818C12.0695 22.0397 14.721 23.5921 17.4161 23.4404C18.4902 23.2711 19.4066 22.8634 20.046 21.9511C22.0929 19.0304 18.9824 15.899 16.7657 14.2724Z";
         var stage = document.getElementById("stage");
         var NS = "http://www.w3.org/2000/svg";
         var E = {}; // elements
@@ -69,7 +75,7 @@
         var ease = {
           expoOut: gsap.parseEase("expo.out"), expoIn: gsap.parseEase("expo.in"), expoInOut: gsap.parseEase("expo.inOut"),
           backOut: gsap.parseEase("back.out(2.2)"), powIn: gsap.parseEase("power2.in"), powOut: gsap.parseEase("power3.out"),
-          sine: gsap.parseEase("sine.inOut"),
+          sine: gsap.parseEase("sine.inOut"), zoomIn: gsap.parseEase("power2.in"),
         };
         var clamp = function (x, a, b) { return Math.min(b === undefined ? 1 : b, Math.max(a === undefined ? 0 : a, x)); };
         var P = function (t, s, d) { return clamp((t - s) / d); };
@@ -94,7 +100,7 @@
             k.wc = k.el.offsetWidth; k.el.style.display = d; }); if (rw) rw.style.display = rwd; }
         // kinetic word: Anton, centred at cx, its baseline box bottom at `bottom`
         function kword(id, text, size, opts) {
-          opts = opts || {}; var e = el("div", "k"); e.textContent = text; e.style.fontSize = size + "px";
+          opts = opts || {}; var e = el("div", "k"); e.textContent = text; e.setAttribute("data-layout-allow-overlap", ""); // tight-leaded stacks are intentional e.style.fontSize = size + "px";
           var k = { el: e, h: size * 1.0, size: size, maxSize: size, fitW: opts.fitW, text: text, cx: opts.cx === undefined ? W / 2 : opts.cx,
             bottom: opts.bottom, color: opts.color || INK };
           Object.defineProperty(k, "w", { get: function () { return k.wc || 0; } });
@@ -219,14 +225,29 @@
           marker("hl", wobbleLine(250, 840, 1240, 8, 13), YELLOW, 120, { z: 12, blend: "multiply" });
           // S8 logo
           coin("cl");
-          var mk = el("img"); mk.id = "mark"; mk.src = "assets/img/dcard-mark.svg"; E.mark = { el: mk };
+          var mk = el("div"); mk.innerHTML = MARK_SVG.replace(/CLIPID/g, "clipA"); mk = mk.firstChild; mk.id = "mark"; E.mark = { el: mk };
           var ww = el("div"); ww.id = "wordWrap"; var wd = el("div", "", ww); wd.id = "word"; wd.textContent = "Dcard"; E.word = { el: ww, inner: wd };
           note("n8", ["har bir xariddan", "ko'proq foyda."], 92, BLUE);
+          // S9 the app's close animation: pattern of white glyphs + yellow sparkles, then the lockup on blue
+          var pat = svgEl("svg", { id: "pattern", class: "layer", width: W, height: H, viewBox: "0 0 " + W + " " + H }, stage);
+          var defs = svgEl("defs", {}, pat);
+          svgEl("path", { id: "glyph", d: GLYPH_D, fill: "#ffffff" }, defs);
+          svgEl("path", { id: "spark", d: "M0 -17 C2 -4 4 -2 17 0 C4 2 2 4 0 17 C-2 4 -4 2 -17 0 C-4 -2 -2 -4 0 -17Z", fill: YELLOW }, defs);
+          E.pattern = { el: pat, items: [] };
+          for (var r = -1; r <= 10; r++) for (var cc = -1; cc <= 6; cc++) {
+            var gx = 40 + cc * 200, gy = 0 + r * 200;
+            [[gx, gy, "glyph"], [gx - 100 + 100, gy + 100 + 0, "spark"]].forEach(function (it, k) {
+              var x = k ? gx + 165 : gx + 45, y = k ? gy + 175 : gy + 70; // glyph centre / sparkle in the gap
+              var u = svgEl("use", { href: "#" + it[2] }, pat);
+              E.pattern.items.push({ u: u, x: x, y: y, kind: it[2], d: Math.hypot(x - W / 2, y - H / 2) }); });
+          }
+          var m2 = el("div"); m2.innerHTML = MARK_SVG.replace(/CLIPID/g, "clipB"); m2 = m2.firstChild; m2.id = "mark2"; E.mark2 = { el: m2 };
+          var w2 = el("div"); w2.id = "word2Wrap"; var w2i = el("div", "", w2); w2i.id = "word2"; w2i.textContent = "Dcard"; E.word2 = { el: w2, inner: w2i };
           var ft = el("div"); ft.id = "footer"; ft.textContent = "iOS va Android uchun"; E.footer = { el: ft };
         }
 
         // ---------------------------------------------------------------- render(t): every style derives from t alone
-        var WORDW = 0, FOOTW = 400;
+        var WORDW = 0, FOOTW = 400, WORD2W = 0;
         function R(t) {
           var dark = t >= C.dark && t < C.light;
           document.getElementById("bg").style.background = dark ? CHAR : CANVAS;
@@ -310,26 +331,43 @@
             if (t >= 11.42) { show(E.hl, 1); setMarker(E.hl, ease.powOut(P(t, 11.42, 0.32))); var fh = fallAway(E.hl, t, C.s7Exit + 0.1, 0); E.hl.el.style.transform = "translateY(" + (fh ? fh.dy : 0) + "px)"; }
           }
           // ---------- S8 coin drops, becomes the mark; wordmark wipes out from behind it
-          if (t >= C.logoDrop) {
-            var MK = 220, gap = 34, ww = WORDW, wipe = ease.expoOut(P(t, C.wordWipe, 0.5));
+          if (t >= C.logoDrop && t < C.zoomEnd) {
+            var MK = 220, gap = 34, ww = WORDW, wipe = ease.expoOut(P(t, C.wordWipe, 0.5)) * (1 - ease.expoIn(P(t, C.retract, 0.22)));
             var rowW = MK + (gap + ww) * wipe, mx = W / 2 - rowW / 2, mBottom = 980;
             if (t < C.logoLand + 0.05) { var D = 1120, dur = C.logoLand - C.logoDrop, gg = 2 * D / (dur * dur), tau = Math.min(t - C.logoDrop, dur), cy = mBottom - 75 - D + 0.5 * gg * tau * tau;
               var str2 = 1 + Math.min(0.5, gg * tau / 9000), sqk = t > C.logoLand ? squash(t - C.logoLand, 0.45) : [1 / Math.sqrt(str2), str2];
               var cl = E.cl; show(cl, 1); cl.el.style.transformOrigin = "50% 100%"; cl.el.style.transform = "translate(" + (W / 2 - 75) + "px," + (cy - 75) + "px) scale(" + sqk[0] + "," + sqk[1] + ")"; }
-            if (t >= C.logoLand) { var ms = spring(t - C.logoLand, 2.6, 0.38), sq = squash(t - C.logoLand - 0.02, 0.18); show(E.mark, 1);
-              E.mark.el.style.transform = "translate(" + mx + "px," + (mBottom - MK) + "px) scale(" + lerp(0.5, 1, ms) * sq[0] + "," + lerp(0.5, 1, ms) * sq[1] + ")"; }
+            if (t >= C.logoLand && t < C.zoomEnd) { var ms = spring(t - C.logoLand, 2.6, 0.38), sq = squash(t - C.logoLand - 0.02, 0.18); show(E.mark, 1);
+              if (t < C.zoom) E.mark.el.style.transform = "translate(" + (mx + MK / 2) + "px," + mBottom + "px) scale(" + lerp(0.5, 1, ms) * sq[0] + "," + lerp(0.5, 1, ms) * sq[1] + ") translate(" + (-MK / 2) + "px," + (-MK) + "px)";
+              else { var z = Math.exp(ease.zoomIn(P(t, C.zoom, C.zoomEnd - C.zoom)) * Math.log(240)); // one primary move: push into the mark's blue
+                E.mark.el.style.transform = "translate(" + (mx + MK / 2) + "px," + (mBottom - MK / 2) + "px) scale(" + z + ") translate(" + (-MK / 2) + "px," + (-MK / 2) + "px)"; } }
             if (wipe > 0) { show(E.word, 1); var wr = E.word.el; wr.style.width = (ww * wipe + 6) + "px"; wr.style.height = "230px";
               wr.style.transform = "translate(" + (mx + MK + gap) + "px," + (mBottom - 205) + "px)"; E.word.inner.style.transform = "translateX(" + (-ww * (1 - wipe)) + "px)"; }
             if (t >= 13.2) { var n8 = E.n8; show(n8, 1); setNote(n8, P(t, 13.2, 0.95)); n8.el.style.transform = "translate(" + (W - n8.w) / 2 + "px,1060px) rotate(-2deg)"; }
-            if (t >= C.footer) { var fs = spring(t - C.footer, 3, 0.5); show(E.footer, 1); var fw = FOOTW; E.footer.el.style.transform = "translate(" + (W - fw) / 2 + "px,1640px) scale(" + fs + ")"; }
+          }
+          // ---------- S9 the app's own close animation
+          if (t >= C.zoomEnd) {
+            document.getElementById("bg").style.background = BLUE; document.getElementById("grain").style.opacity = 0.12;
+            show(E.pattern, 1); var drift = (t - C.pattern) * 26, cr = ease.expoOut(P(t, C.clear, 0.45)) * 560;
+            E.pattern.items.forEach(function (it) {
+              var s = spring(t - (C.pattern + (it.d / 1150) * 0.5), 2.8, 0.5);
+              if (it.d < 560) s *= 1 - ease.expoIn(P(t, C.clear + (it.d / 560) * 0.3, 0.2));   // the centre clears for the lockup
+              var sc = it.kind === "glyph" ? 150 / 45 : 1, k = Math.max(0, s);
+              it.u.style.display = k > 0.001 ? "" : "none";
+              it.u.setAttribute("transform", "translate(" + (it.x - drift) + "," + (it.y - drift) + ") scale(" + (sc * k) + ")" + (it.kind === "glyph" ? " translate(-22.5,-22.5)" : "")); });
+            if (t >= C.lockup) { var lm = spring(t - C.lockup, 2.6, 0.42), lw = ease.expoOut(P(t, C.lockup + 0.15, 0.5)), MK2 = 200, g2 = 30, rw = MK2 + (g2 + WORD2W) * lw, lx = W / 2 - rw / 2, ly = 1000;
+              show(E.mark2, 1); E.mark2.el.style.transform = "translate(" + (lx + MK2 / 2) + "px," + ly + "px) scale(" + (lm * MK2 / 220) + ") translate(-110px,-220px)";
+              if (lw > 0) { show(E.word2, 1); E.word2.el.style.width = (WORD2W * lw + 6) + "px"; E.word2.el.style.height = "215px";
+                E.word2.el.style.transform = "translate(" + (lx + MK2 + g2) + "px," + (ly - 188) + "px)"; E.word2.inner.style.transform = "translateX(" + (-WORD2W * (1 - lw)) + "px)"; } }
+            if (t >= C.footer) { var fs = spring(t - C.footer, 3, 0.5); show(E.footer, 1); E.footer.el.style.transform = "translate(" + (W - FOOTW) / 2 + "px,1110px) scale(" + fs + ")"; }
           }
         }
 
         // ---------------------------------------------------------------- timeline
         var tl = gsap.timeline({ paused: true });
         build();
-        document.fonts.ready.then(function () { refit(); E.word.el.style.display = ""; E.footer.el.style.display = ""; WORDW = E.word.inner.offsetWidth; FOOTW = E.footer.el.offsetWidth; R(tl.time()); });
-        refit(); E.word.el.style.display = ""; E.footer.el.style.display = ""; WORDW = E.word.inner.offsetWidth; FOOTW = E.footer.el.offsetWidth;
+        document.fonts.ready.then(function () { refit(); E.word.el.style.display = ""; E.footer.el.style.display = ""; E.word2.el.style.display = ""; WORDW = E.word.inner.offsetWidth; FOOTW = E.footer.el.offsetWidth; WORD2W = E.word2.inner.offsetWidth; R(tl.time()); });
+        refit(); E.word.el.style.display = ""; E.footer.el.style.display = ""; E.word2.el.style.display = ""; WORDW = E.word.inner.offsetWidth; FOOTW = E.footer.el.offsetWidth; WORD2W = E.word2.inner.offsetWidth;
         tl.to({ v: 0 }, { v: 1, duration: C.dur, ease: "none" }, 0); // the clock: every pose is R(time)
         tl.eventCallback("onUpdate", function () { R(tl.time()); });
         R(0);

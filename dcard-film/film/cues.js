@@ -2,7 +2,7 @@
 // tools/score.py reads the same file (via node) for music + SFX placement.
 (function (root) {
   var CUES = {
-    dur: 15,
+    dur: 17.2,
     // hard background switches
     dark: 5.2,
     light: 8.7,
@@ -36,7 +36,14 @@
     logoDrop: 12.3,
     logoLand: 12.62,
     wordWipe: 12.78,
-    footer: 14.3,
+    // S9 the app's own close animation: mark zooms into the blue, pattern spreads, lockup
+    retract: 14.2,
+    zoom: 14.34,
+    zoomEnd: 14.98,
+    pattern: 15.08,
+    clear: 15.8,
+    lockup: 16.0,
+    footer: 16.45,
   };
   if (typeof module !== "undefined") module.exports = CUES;
   else root.CUES = CUES;
