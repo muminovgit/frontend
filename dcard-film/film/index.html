@@ -294,10 +294,12 @@
           // ---------- S6 places: a reel through a fixed window, one vertical move per word
           if (t >= C.light && t < C.verbs[0] - 0.05) {
             var win = E.reelWin; show(win, 1); win.el.style.top = "780px"; win.el.style.height = "360px";
-            E.reel.forEach(function (k, i) { var a = C.reel[i], b = C.reel[i + 1] || 99; if (t < a || t > b + 0.17) return; show(k, 1);
-              var inK = ease.expoOut(P(t, a, 0.26)), outK = ease.expoIn(P(t, b - 0.0, 0.16)), y = lerp(380, 20, inK) - outK * 380;
-              var vel = (1 - inK) * 1.0 + outK; k.el.style.transformOrigin = "50% 50%";
-              k.el.style.transform = "translate(" + (W - k.w) / 2 + "px," + y + "px) scale(" + (1 - vel * 0.08) + "," + (1 + vel * 0.25) + ")"; });
+            // slot reel: words sit on a fixed 400px pitch, so two words can never overlap; smear follows reel speed
+            var idx = function (tt) { var v = 0; for (var j = 1; j < C.reel.length; j++) v += ease.expoOut(P(tt, C.reel[j], 0.3)); return v - (1 - ease.expoOut(P(tt, C.reel[0], 0.3))); };
+            var pos = idx(t), vel = Math.abs(pos - idx(t - 1 / 60)) * 60;
+            E.reel.forEach(function (k, i) { var y = 20 + (i - pos) * 400; if (y < -400 || y > 400 || t < C.reel[0]) return; show(k, 1);
+              var st = Math.min(0.45, vel * 0.06); k.el.style.transformOrigin = "50% 50%";
+              k.el.style.transform = "translate(" + (W - k.w) / 2 + "px," + y + "px) scale(" + (1 / Math.sqrt(1 + st)) + "," + (1 + st) + ")"; });
             if (t >= 8.78) { var n6 = E.n6; show(n6, 1); setNote(n6, P(t, 8.78, 0.62)); n6.el.style.transform = "translate(" + (W - n6.w) / 2 + "px,560px) rotate(-2deg)"; }
           }
           // ---------- S7 three verbs

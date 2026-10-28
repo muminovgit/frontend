@@ -108,12 +108,13 @@ mix = np.tanh(mix / np.abs(mix).max() * 1.2) / np.tanh(1.2) * 0.9
 pre = os.path.join(FILM, "assets/audio/premaster.wav")
 with wave.open(pre, "wb") as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes((mix * 32767).astype("<i2").tobytes())
-# two-pass loudnorm -> -14 LUFS, -2 dBTP (re-measured after AAC by tools/measure.sh)
-target = float(sys.argv[1]) if len(sys.argv) > 1 else -14.0
-r = subprocess.run(["ffmpeg", "-hide_banner", "-i", pre, "-af", f"loudnorm=I={target}:TP=-2.5:LRA=11:print_format=json", "-f", "null", "-"], capture_output=True, text=True).stderr
-j = json.loads(r[r.rfind("{"):r.rfind("}") + 1])
-af = (f"loudnorm=I={target}:TP=-2.5:LRA=11:measured_I={j['input_i']}:measured_TP={j['input_tp']}:measured_LRA={j['input_lra']}"
-      f":measured_thresh={j['input_thresh']}:offset={j['target_offset']}:linear=true")
+# mastering: measured static gain to the loudness target, then a 4x-oversampled peak limiter
+# (AAC adds inter-sample overshoot, so the limiter leaves headroom for <= -2 dBTP after encode).
+# tools/master.py iterates the gain against the encoded AAC until it reads -14 LUFS.
+gain = float(sys.argv[1]) if len(sys.argv) > 1 else 0.0
+r = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-i", pre, "-af", "ebur128", "-f", "null", "-"], capture_output=True, text=True).stderr
+I = float([l for l in r.splitlines() if l.strip().startswith("I:")][-1].split()[1])
+af = f"volume={-14.0 - I + gain:.2f}dB,aresample=192000,alimiter=limit=0.56:attack=1:release=60:level=0,aresample=48000"
 subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", pre, "-af", af, "-ar", str(SR), os.path.join(FILM, "assets/audio/score.wav")], check=True)
 os.remove(pre)
 print("score.wav written; sfx hits:", len(HITS))
