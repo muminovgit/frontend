@@ -101,3 +101,12 @@ Eslatma: ofis serverdan `roster.json` ni oladi, shuning uchun `index.html` ni fa
   "Hujjatlar (saqlangan)" ro'yxatida 💾 belgisi bilan qoladi va ochiladi. **⬇ Hammasi** barchasini bitta .md fayl qiladi.
 - **Server fayli:** server hujjat, loyiha va qaror jurnalini `DATA_DIR/state.json` ga yozadi (standart `./data`). Railway'da deploy dan keyin ham qolishi uchun
   servisga **Volume** ulang (Railway → servis → ⌘K / Add → Volume, mount path `/data`) va Variables ga `DATA_DIR=/data` qo'ying.
+
+## Skill'lar va asboblar
+Har bir xodim o'z skill'lari (ish usullari) va asboblari bilan ishlaydi. Xodimni (shaklini) bossangiz, profili, asboblari va skill'lari ochiladi.
+- **Skill'lar:** `skills/<id>.md` fayllari (32 ta): sarlavha (`title`), tavsif (`desc`) va ish usuli. Masalan: Manbalarni uchburchaklash, Raqobatchi tahlili, Pozitsiyalash,
+  Matn formulalari, Kashfiyot savollari (SPIN), E'tirozlar bilan ishlash (LAER), Pre-mortem, Da'volarni isbotlash, Qaror memosi, Dalil darajalari.
+  Xodimga biriktirish: `roster.json` → `skills: [...]`. Yangi skill qo'shish: yangi `.md` fayl yozing va xodimning `skills` ro'yxatiga id ni qo'shing. Skill matni xodimning system prompt'iga qo'shiladi.
+- **Asboblar** (`roster.json` → `tools`): `web_search` (veb-qidiruv), `web_fetch` (aniq sahifani o'qish), `code_exec` (hisob-kitobni kod bilan bajarish; Dilnoza va Otabek).
+  Asbob ishlamasa (masalan Console'da yoqilmagan), xodim asbobsiz davom etadi va logga yozadi.
+- Tokenlar: skill'lar prompt'ni uzaytiradi (har xodimga taxminan 400–700 token). Arzonlashtirish uchun kamroq skill biriktiring yoki `AGENT_MODEL` ni o'zgartiring.

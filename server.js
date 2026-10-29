@@ -70,6 +70,7 @@ http.createServer(async (req, res) => {
     }
 
     if (req.method === 'GET' && url.pathname === '/roster.json') return json(res, 200, roster);
+    if (req.method === 'GET' && url.pathname === '/skills.json') return json(res, 200, Object.fromEntries(Object.entries(ai.skills).map(([k, v]) => [k, { title: v.title, desc: v.desc, body: v.body }])));
 
     // To'liq loyiha: Tadqiqot -> Marketing -> Sotuv -> Risk -> Nazorat
     if (req.method === 'POST' && url.pathname === '/case') {

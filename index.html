@@ -111,6 +111,11 @@
     .emp.typing .arL { animation: typeA .28s ease-in-out infinite; } .emp.typing .arR { animation: typeA .28s .14s ease-in-out infinite; }
     @keyframes typeA { 50% { transform: rotate(-14deg); } }
     .emp.boss .nm { background: #7c3aed; }
+    .emp:not(.boss) .char { cursor: pointer; } .emp:not(.boss) .char:hover { filter: brightness(1.12) drop-shadow(0 0 5px #fff8); }
+    #modal .box.isprof .mh button:not(#mClose) { display: none; }
+    .prof { display: flex; gap: 18px; align-items: center; margin-bottom: 8px; } .prof .pc { flex: 0 0 auto; } .prof .pc svg { width: 84px; height: 151px; }
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .sk { border: 1px solid var(--line); border-radius: 8px; padding: 6px 12px; margin: 6px 0; } .sk summary { cursor: pointer; line-height: 1.5; } .sk summary span { color: var(--muted); font-size: .85em; }
 
     /* ---- yon panel ---- */
     aside { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; max-height: 900px; overflow: auto; }
@@ -203,7 +208,7 @@ const PALS = {
 let PAL_KEY = 'claude'; try { PAL_KEY = localStorage.getItem('pal') || 'claude'; } catch {}
 const PAL = PALS[PAL_KEY] || PALS.claude; document.documentElement.dataset.pal = PALS[PAL_KEY] ? PAL_KEY : 'claude';
 
-const S = { e: {}, emps: [], queue: [], results: [], journal: [], cases: {}, shipped: 0, err: 0, live: false, ai: false, roster: null };
+const S = { skills: {}, e: {}, emps: [], queue: [], results: [], journal: [], cases: {}, shipped: 0, err: 0, live: false, ai: false, roster: null };
 const KEY = new URLSearchParams(location.search).get('key') || '';
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const NAME = id => (S.e[id] ? S.e[id].def.name : id);
@@ -466,6 +471,7 @@ function makeEmp(def, desk, extra = {}) {
     <div class="tagbox"><span class="nm">${esc(def.name)}</span><span class="tk">${esc(def.title)}</span><div class="pb"><div></div></div></div>
     <div class="bubble"></div><div class="char">${svgChar(def.look)}</div></div>`);
   stage.appendChild(e.el);
+  if (!extra.boss) { const ch = e.el.querySelector('.char'); ch.title = `${def.name}: ${(def.skills || []).length} skill — bosib ko'ring`; ch.addEventListener('click', () => openProfile(def.id)); }
   const wide = extra.boss ? 148 : 108;
   e.desk = el(`<div class="desk${extra.boss ? ' boss' : ''}" style="left:${TX + desk - 52 + (extra.boss ? -20 : 0)}px;top:${SEAT(f) - 62}px;z-index:${SEAT(f) + 1}">
     <svg width="${wide}" height="62" viewBox="0 0 ${wide} 62">
@@ -751,7 +757,18 @@ async function archive(r) {
   } catch {}
 }
 const allDocs = () => { const items = S.results.map(r => ({ ...r })); ARC.forEach(a => { if (!items.find(x => x.id === a.id)) items.push({ id: a.id, agent: a.agent, task: a.task, status: a.status, saved: true }); }); return items; };
+function openProfile(id) {
+  const e = S.e[id]; if (!e || id === 'boss') return; const d = e.def; CUR = null;
+  const names = { web_search: '🔎 Veb-qidiruv', web_fetch: '🌐 Sahifani o\'qish', code_exec: '🧮 Kod bilan hisoblash' };
+  const tools = (d.tools || []).map(t => names[t]).filter(Boolean).concat(['💬 Hamkasbdan so\'rash']);
+  const sk = (d.skills || []).map(k => S.skills[k]).filter(Boolean), fl = S.roster.floors.find(f => f.id === d.floor);
+  $('mTitle').textContent = `${d.name} — ${d.title}`;
+  $('mText').innerHTML = `<div class="prof"><div class="pc">${svgChar(d.look, { noShadow: true })}</div><div><div class="talkh">${fl.emoji} ${fl.n}-qavat · ${esc(fl.name)}</div><p>${esc(d.persona)}</p><div class="chips">${tools.map(t => `<span class="chip">${t}</span>`).join('')}</div></div></div>
+    <h3>Skill'lar (${sk.length})</h3>` + (sk.map(k => `<details class="sk"><summary><b>${esc(k.title)}</b> <span>— ${esc(k.desc)}</span></summary>${md(k.body)}</details>`).join('') || '<p>Skill biriktirilmagan.</p>');
+  document.querySelector('#modal .box').classList.add('isprof'); setModal(true); $('mText').scrollTop = 0;
+}
 async function openResult(id, title) {
+  document.querySelector('#modal .box').classList.remove('isprof');
   $('mTitle').textContent = title; $('mText').textContent = 'Yuklanmoqda…'; setModal(true); CUR = null;
   try {
     const j = await fetchResult(id); CUR = { title, text: j.text || '', talk: j.talk || [] };
@@ -876,6 +893,7 @@ function fit() { const w = $('wrap').clientWidth, k = Math.min(1, w / 1000); sta
 addEventListener('resize', fit); fit();
 
 (async function init() {
+  try { S.skills = await (await fetch('/skills.json')).json(); } catch { S.skills = {}; }
   try { S.roster = await (await fetch('/roster.json')).json(); }
   catch { stage.innerHTML = '<div style="padding:40px;font-size:18px">Serverni ishga tushiring: <code>node server.js</code>, so\'ng <code>http://localhost:3000</code> ni oching.</div>'; return; }
   buildCity(); buildTower();

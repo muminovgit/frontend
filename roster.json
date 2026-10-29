@@ -43,7 +43,6 @@
       "floor": "research",
       "slot": 0,
       "title": "Bosh tadqiqotchi",
-      "web": true,
       "look": {
         "shape": "spark",
         "color": "#D97757",
@@ -66,6 +65,17 @@
         "Bozor hajmini tekshirish",
         "Manbalarni solishtirish",
         "Gipoteza yozish"
+      ],
+      "skills": [
+        "source-triangulation",
+        "hypothesis-card",
+        "web-audit",
+        "competitor-teardown",
+        "evidence-grading"
+      ],
+      "tools": [
+        "web_search",
+        "web_fetch"
       ]
     },
     {
@@ -74,7 +84,6 @@
       "floor": "research",
       "slot": 1,
       "title": "Trend skaneri",
-      "web": true,
       "look": {
         "shape": "star",
         "color": "#F2B84B",
@@ -97,6 +106,15 @@
         "Trend qidiruv",
         "Yangiliklar skaneri",
         "Raqobatchi kuzatuvi"
+      ],
+      "skills": [
+        "trend-scan",
+        "source-triangulation",
+        "competitor-teardown"
+      ],
+      "tools": [
+        "web_search",
+        "web_fetch"
       ]
     },
     {
@@ -105,7 +123,6 @@
       "floor": "research",
       "slot": 2,
       "title": "Ma'lumotlar tahlilchisi",
-      "web": false,
       "look": {
         "shape": "hex",
         "color": "#3FA796",
@@ -128,6 +145,15 @@
         "Ma'lumotni tozalash",
         "Segmentlarni hisoblash",
         "Jadval tayyorlash"
+      ],
+      "skills": [
+        "market-sizing",
+        "data-hygiene",
+        "okr-kpi",
+        "pipeline-forecast"
+      ],
+      "tools": [
+        "code_exec"
       ]
     },
     {
@@ -136,7 +162,6 @@
       "floor": "marketing",
       "slot": 0,
       "title": "Marketing direktori",
-      "web": true,
       "look": {
         "shape": "gem",
         "color": "#B04A8F",
@@ -159,6 +184,16 @@
         "Pozitsiyalash",
         "Kampaniya g'oyasi",
         "Brend xabari"
+      ],
+      "skills": [
+        "positioning",
+        "messaging-house",
+        "brand-voice",
+        "content-calendar"
+      ],
+      "tools": [
+        "web_search",
+        "web_fetch"
       ]
     },
     {
@@ -167,7 +202,6 @@
       "floor": "marketing",
       "slot": 1,
       "title": "Kontent yozuvchi",
-      "web": false,
       "look": {
         "shape": "flower",
         "color": "#E58FA8",
@@ -190,7 +224,13 @@
         "Blog post",
         "Email ketma-ketligi",
         "Reels ssenariy"
-      ]
+      ],
+      "skills": [
+        "copy-frameworks",
+        "brand-voice",
+        "email-sequence"
+      ],
+      "tools": []
     },
     {
       "id": "sardor",
@@ -198,7 +238,6 @@
       "floor": "marketing",
       "slot": 2,
       "title": "SMM va reklama",
-      "web": false,
       "look": {
         "shape": "bubble",
         "color": "#4C8BF5",
@@ -221,7 +260,14 @@
         "Reklama matnlari",
         "Kontent kalendari",
         "Hashtag tadqiqoti"
-      ]
+      ],
+      "skills": [
+        "social-formats",
+        "ad-experiments",
+        "copy-frameworks",
+        "content-calendar"
+      ],
+      "tools": []
     },
     {
       "id": "rustam",
@@ -229,7 +275,6 @@
       "floor": "sales",
       "slot": 0,
       "title": "Sotuv boshlig'i",
-      "web": true,
       "look": {
         "shape": "triangle",
         "color": "#2F9E6B",
@@ -252,6 +297,16 @@
         "Sotuv rejasi",
         "Pipeline tahlili",
         "Taklif strukturasi"
+      ],
+      "skills": [
+        "icp-definition",
+        "pipeline-forecast",
+        "objection-handling",
+        "pricing-packaging"
+      ],
+      "tools": [
+        "web_search",
+        "web_fetch"
       ]
     },
     {
@@ -260,7 +315,6 @@
       "floor": "sales",
       "slot": 1,
       "title": "Outreach (SDR)",
-      "web": true,
       "look": {
         "shape": "cloud",
         "color": "#7CC4E8",
@@ -283,6 +337,15 @@
         "Lead qidiruv",
         "Outreach xabarlari",
         "Follow-up"
+      ],
+      "skills": [
+        "cold-outreach",
+        "spin-discovery",
+        "icp-definition"
+      ],
+      "tools": [
+        "web_search",
+        "web_fetch"
       ]
     },
     {
@@ -291,7 +354,6 @@
       "floor": "sales",
       "slot": 2,
       "title": "Muzokarachi",
-      "web": false,
       "look": {
         "shape": "cube",
         "color": "#6B7A99",
@@ -314,6 +376,15 @@
         "Narx modeli",
         "Muzokara rejasi",
         "E'tirozlar javobi"
+      ],
+      "skills": [
+        "negotiation",
+        "pricing-packaging",
+        "budget-sanity",
+        "objection-handling"
+      ],
+      "tools": [
+        "code_exec"
       ]
     },
     {
@@ -322,7 +393,6 @@
       "floor": "risk",
       "slot": 0,
       "title": "Risk tahlilchisi",
-      "web": false,
       "look": {
         "shape": "shield",
         "color": "#C23B4B",
@@ -345,7 +415,15 @@
         "Xatarlar xaritasi",
         "Da'volarni tekshirish",
         "Eng yomon holat"
-      ]
+      ],
+      "skills": [
+        "pre-mortem",
+        "fmea-lite",
+        "budget-sanity",
+        "claim-substantiation",
+        "red-team"
+      ],
+      "tools": []
     },
     {
       "id": "timur",
@@ -353,7 +431,6 @@
       "floor": "risk",
       "slot": 1,
       "title": "Qoidalar va huquq",
-      "web": false,
       "look": {
         "shape": "pill",
         "color": "#2F3E5C",
@@ -376,7 +453,13 @@
         "Reklama da'volari tekshiruvi",
         "Shaxsiy ma'lumot sharhi",
         "Shartnoma ro'yxati"
-      ]
+      ],
+      "skills": [
+        "claim-substantiation",
+        "privacy-checklist",
+        "legal-regulatory-scan"
+      ],
+      "tools": []
     },
     {
       "id": "madina",
@@ -384,7 +467,6 @@
       "floor": "control",
       "slot": 0,
       "title": "Direktor (Nazorat)",
-      "web": false,
       "look": {
         "shape": "blob",
         "color": "#6C5BC9",
@@ -407,7 +489,14 @@
         "Hisobotlarni o'qish",
         "Qaror jurnali",
         "Haftalik sharh"
-      ]
+      ],
+      "skills": [
+        "decision-memo",
+        "red-team",
+        "evidence-grading",
+        "okr-kpi"
+      ],
+      "tools": []
     }
   ]
 }
