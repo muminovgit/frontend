@@ -81,7 +81,7 @@
       border: 3px solid #374151; border-radius: 4px; }
     #human .m:nth-child(1) { left: 14px; } #human .m:nth-child(2) { left: 85px; } #human .m:nth-child(3) { left: 156px; }
     #me { position: absolute; left: 480px; top: 474px; font-size: 34px; margin: -22px 0 0 -17px; z-index: 4; }
-    #queue { position: absolute; left: 480px; top: 395px; width: 250px; margin-left: -125px;
+    #queue { position: absolute; left: 480px; top: 362px; max-height: 108px; overflow-y: auto; width: 250px; margin-left: -125px;
       background: var(--card); border: 2px dashed var(--wait); border-radius: 10px; padding: 6px 8px; font-size: .72rem; }
     #queue h4 { margin: 0 0 4px; font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; color: var(--wait); }
     .qi { display: flex; align-items: center; gap: 6px; padding: 3px 0; border-top: 1px solid var(--line); }
@@ -133,7 +133,7 @@ const AGENTS = [
   { id: 'coder',    name: 'Dasturchi',   emoji: '🤖', x: 150, y: 290, tasks: ['Bug fix', 'Yangi funksiya', 'Code review'] },
   { id: 'support',  name: 'Support',     emoji: '🎧', x: 810, y: 290, tasks: ['Ticket javob', 'FAQ yangilash', 'Shikoyat'] },
 ];
-const QUEUE_POS = { x: 480, y: 370 };
+const QUEUE_POS = { x: 480, y: 335 };
 
 /* ---- Holat ---- */
 const stage = document.getElementById('stage');
@@ -183,9 +183,10 @@ function setProgress(st, v) { st.progress = v; st.desk.querySelector('.bar div')
 const API = {
   start(id, task)    { const st = S.a[id]; if (!st) return; st.task = task; setProgress(st, 0); setState(st, 'working', task); say(st, 'Boshladim'); log(`${st.def.name}: «${task}» boshlandi`, '▶️'); },
   progress(id, v)    { const st = S.a[id]; if (st) setProgress(st, v); },
-  needApproval(id)   {
+  needApproval(id, task, e) {
     const st = S.a[id]; if (!st) return;
-    const item = { id: Date.now() + Math.random(), agent: id, task: st.task };
+    if (task && e) st.task = task;
+    const item = { id: (e && e.itemId) || Date.now() + Math.random(), agent: id, task: st.task || 'vazifa' };
     S.queue.push(item); st.pending = item;
     setState(st, 'walking'); const slot = S.queue.length - 1;
     place(st, { x: QUEUE_POS.x - 90 + (slot % 5) * 45, y: QUEUE_POS.y + Math.floor(slot / 5) * 40 });
@@ -203,11 +204,19 @@ const API = {
   error(id, msg)     { const st = S.a[id]; if (!st) return; S.err++; setState(st, 'error', msg || 'Xato'); say(st, 'Xato!'); log(`${st.def.name}: ${msg || 'xato'}`, '⚠️'); setTimeout(() => API.idle(id), 3000); },
   done(id)           { const st = S.a[id]; if (!st) return; S.shipped++; setState(st, 'done', 'Tayyor ✔'); log(`${st.def.name}: «${st.task}» tayyor`, '✅'); setTimeout(() => API.idle(id), 2000); },
   idle(id)           { const st = S.a[id]; if (!st) return; st.task = null; setProgress(st, 0); setState(st, 'idle', 'kutmoqda'); },
-  event(e)           { const f = API[e.type]; if (f && e.agent) f.call(API, e.agent, e.task ?? e.value ?? e.message); },
+  event(e)           {
+    if (e.type === 'decide') return API.decide(e.itemId, e.ok);
+    const f = API[e.type]; if (f && e.agent) f.call(API, e.agent, e.task ?? e.value ?? e.message, e);
+  },
 };
 window.AgentOffice = API;
 
 /* ---- Render ---- */
+/* Jonli rejimda qaror serverga yuboriladi, server hammaga (va kutayotgan agentga) tarqatadi */
+function choose(id, ok) {
+  if (!S.live) return API.decide(id, ok);
+  fetch('/decision', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ itemId: id, ok }) });
+}
 function render() {
   $('sShipped').textContent = S.shipped;
   $('sErr').textContent = S.err;
@@ -218,8 +227,8 @@ function render() {
   S.queue.forEach(it => {
     const row = document.createElement('div'); row.className = 'qi';
     row.innerHTML = `<span>${S.a[it.agent].def.emoji} ${it.task}</span>`;
-    const ok = Object.assign(document.createElement('button'), { textContent: '✓', className: 'ok', onclick: () => API.decide(it.id, true) });
-    const no = Object.assign(document.createElement('button'), { textContent: '✕', className: 'no', onclick: () => API.decide(it.id, false) });
+    const ok = Object.assign(document.createElement('button'), { textContent: '✓', className: 'ok', onclick: () => choose(it.id, true) });
+    const no = Object.assign(document.createElement('button'), { textContent: '✕', className: 'no', onclick: () => choose(it.id, false) });
     row.append(ok, no); q.appendChild(row);
   });
 }
@@ -240,7 +249,7 @@ function tick() {
       }
     }
   });
-  if ($('auto').checked && S.queue.length) API.decide(S.queue[0].id, true);
+  if ($('auto').checked && S.queue.length) choose(S.queue[0].id, true);
 }
 setInterval(tick, 700);
 $('pause').onclick = e => { S.paused = !S.paused; e.target.textContent = S.paused ? '▶ Davom' : '⏸ Pauza'; };
@@ -249,6 +258,13 @@ $('pause').onclick = e => { S.paused = !S.paused; e.target.textContent = S.pause
    Server shunday JSON yuborsin: {"type":"start","agent":"coder","task":"Bug fix"}
    type: start | progress | needApproval | error | done | idle */
 const qs = new URLSearchParams(location.search);
+/* Server.js bilan ochilganda (http://localhost:3000) avtomatik jonli rejim */
+fetch('/ping').then(r => r.ok && r.json()).then(j => {
+  if (!j || !j.office) return;
+  S.live = true; S.paused = true; $('pause').style.display = 'none';
+  const es = new EventSource('/events'); es.onmessage = m => API.event(JSON.parse(m.data));
+  es.onopen = () => log('Serverga ulandi', '🔌');
+}).catch(() => {});
 if (qs.get('ws')) { S.paused = true; const ws = new WebSocket(qs.get('ws')); ws.onmessage = m => API.event(JSON.parse(m.data)); }
 if (qs.get('sse')) { S.paused = true; const es = new EventSource(qs.get('sse')); es.onmessage = m => API.event(JSON.parse(m.data)); }
 

@@ -1,0 +1,2 @@
+{ "name": "agent-office", "version": "1.0.0", "private": true,
+  "scripts": { "start": "node server.js", "demo": "node agents/demo.js" } }
