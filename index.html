@@ -3,358 +3,626 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agent Ofis</title>
+  <title>Silikon Minora</title>
   <style>
     :root {
-      --bg: #e9e4da; --floor: #f4efe6; --ink: #2b2b33; --muted: #7a7a85;
-      --card: #ffffff; --line: #d9d2c3;
-      --work: #3b82f6; --wait: #f59e0b; --done: #22c55e; --err: #ef4444; --idle: #9ca3af;
+      --bg: #cfe3f2; --ink: #1f2430; --muted: #6b7280; --card: #ffffff; --line: #d6dde6;
+      --work: #3b82f6; --wait: #f59e0b; --done: #22c55e; --err: #ef4444;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--ink);
-      font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
-    header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
-      justify-content: space-between; padding: 14px 16px; }
+    body { margin: 0; background: #e9eef4; color: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 14px 16px 8px; }
     header h1 { font-size: 1.1rem; margin: 0; display: flex; align-items: center; gap: 8px; }
-    .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--done);
-      box-shadow: 0 0 0 4px #22c55e33; animation: pulse 1.6s infinite; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--done); box-shadow: 0 0 0 4px #22c55e33; animation: pulse 1.6s infinite; }
     @keyframes pulse { 50% { box-shadow: 0 0 0 7px #22c55e00; } }
     .stats { display: flex; gap: 8px; flex-wrap: wrap; }
-    .stat { background: var(--card); border: 1px solid var(--line); border-radius: 10px;
-      padding: 6px 12px; min-width: 92px; }
+    .stat { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 6px 12px; min-width: 92px; }
     .stat b { display: block; font-size: 1.25rem; }
     .stat span { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
     .controls { display: flex; gap: 8px; align-items: center; font-size: .85rem; }
-    button { font: inherit; border: 1px solid var(--line); background: var(--card); color: var(--ink);
-      border-radius: 8px; padding: 6px 12px; cursor: pointer; }
-    button:hover { border-color: #aaa; }
+    button { font: inherit; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+    button:hover { border-color: #9aa5b5; }
     button.ok { background: var(--done); color: #fff; border-color: var(--done); }
     button.no { background: var(--err); color: #fff; border-color: var(--err); }
 
-    #taskbar { display: none; gap: 8px; padding: 0 16px 12px; flex-wrap: wrap; }
+    #taskbar { display: none; gap: 8px; padding: 0 16px 10px; flex-wrap: wrap; }
     #taskbar.on { display: flex; }
     #taskbar select, #taskbar input { font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; background: var(--card); color: var(--ink); }
     #taskbar input { flex: 1; min-width: 220px; }
     #taskbar button { background: var(--work); color: #fff; border-color: var(--work); }
+
+    #pipe { display: none; align-items: center; gap: 6px; padding: 0 16px 10px; flex-wrap: wrap; font-size: .8rem; }
+    #pipe.on { display: flex; }
+    .chip { padding: 4px 10px; border-radius: 999px; background: #fff; border: 1px solid var(--line); color: var(--muted); }
+    .chip.running { border-color: var(--work); color: var(--work); animation: pulse2 1.2s infinite; }
+    .chip.review { border-color: var(--wait); color: #b45309; background: #fffbeb; }
+    .chip.done { border-color: var(--done); color: #15803d; background: #f0fdf4; }
+    .chip.rejected, .chip.error { border-color: var(--err); color: var(--err); background: #fef2f2; }
+    .chip.skipped { opacity: .45; }
+    @keyframes pulse2 { 50% { background: #eff6ff; } }
+    #pipeInfo { color: var(--muted); margin-left: 6px; max-width: 360px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .badge { padding: 3px 10px; border-radius: 6px; font-weight: 700; color: #fff; }
+    .badge.GO { background: var(--done); } .badge.WAIT { background: var(--wait); } .badge.REJECT { background: var(--err); }
+
+    main { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 12px; padding: 0 16px 16px; }
+    @media (max-width: 1000px) { main { grid-template-columns: 1fr; } }
+    #wrap { border-radius: 14px; overflow: hidden; position: relative; border: 1px solid var(--line); background: #8fc3ea; }
+    #stage { position: relative; width: 1000px; height: 860px; transform-origin: 0 0; overflow: hidden;
+      background: linear-gradient(#7db9ea 0%, #bfe0f6 55%, #e8f4fb 78%); }
+
+    /* ---- shahar fon ---- */
+    .sun { position: absolute; left: 880px; top: 24px; width: 54px; height: 54px; border-radius: 50%; background: #ffe58a; box-shadow: 0 0 40px 12px #ffe58a99; }
+    .cloud { position: absolute; height: 22px; border-radius: 22px; background: #ffffffcc; animation: drift linear infinite; }
+    .cloud::before { content: ''; position: absolute; left: 14px; top: -10px; width: 30px; height: 26px; border-radius: 50%; background: inherit; }
+    @keyframes drift { from { transform: translateX(-120px); } to { transform: translateX(1100px); } }
+    .bgb { position: absolute; background: linear-gradient(#8fa4bf, #7a8fab); border-radius: 3px 3px 0 0; }
+    .bgb i { position: absolute; width: 5px; height: 6px; background: #dbe7f5; opacity: .85; }
+    .ground { position: absolute; left: 0; right: 0; top: 770px; bottom: 0; background: #6b7280; }
+    .walk { position: absolute; left: 0; right: 0; top: 770px; height: 26px; background: #b9c1cc; border-top: 4px solid #98a2b0; }
+    .road-line { position: absolute; left: 0; right: 0; top: 826px; height: 4px; background: repeating-linear-gradient(90deg, #f4f4f4 0 28px, transparent 28px 56px); opacity: .7; }
+    .car { position: absolute; top: 808px; width: 56px; height: 20px; border-radius: 8px 12px 4px 4px; animation: drive linear infinite; }
+    .car::before { content: ''; position: absolute; left: 12px; top: -10px; width: 30px; height: 12px; border-radius: 8px 8px 0 0; background: inherit; filter: brightness(1.15); }
+    .car::after { content: ''; position: absolute; left: 6px; bottom: -4px; width: 10px; height: 10px; border-radius: 50%; background: #222; box-shadow: 34px 0 #222; }
+    @keyframes drive { from { transform: translateX(-100px); } to { transform: translateX(1080px); } }
+    .tree { position: absolute; top: 740px; width: 34px; height: 30px; border-radius: 50%; background: #4caf72; }
+    .tree::after { content: ''; position: absolute; left: 15px; top: 26px; width: 5px; height: 14px; background: #7a5230; }
+
+    /* ---- minora ---- */
+    #roof { position: absolute; left: 90px; top: 40px; width: 820px; height: 30px; background: #3d4660; border-radius: 10px 10px 0 0; }
+    #roof b { position: absolute; left: 0; right: 0; text-align: center; top: 6px; color: #e8ecff; font-size: .78rem; letter-spacing: .35em; }
+    #antenna { position: absolute; left: 480px; top: 6px; width: 4px; height: 36px; background: #3d4660; }
+    #antenna::after { content: ''; position: absolute; left: -3px; top: -6px; width: 10px; height: 10px; border-radius: 50%; background: #ff4d4d; animation: blink 1.4s infinite; }
+    @keyframes blink { 50% { opacity: .2; } }
+    .floor { position: absolute; width: 740px; height: 140px; overflow: hidden; border-bottom: 4px solid #2a3042; }
+    .floor .wall { position: absolute; inset: 0 0 28px 0; }
+    .floor .carpet { position: absolute; left: 0; right: 0; bottom: 0; height: 28px; }
+    .floor .win { position: absolute; top: 14px; width: 92px; height: 58px; border: 4px solid #f5f7fa; border-radius: 4px;
+      background: linear-gradient(#8ccaf3, #d4ecfb); box-shadow: inset 0 0 0 1px #0002; }
+    .floor .win::after { content: ''; position: absolute; left: 22px; top: 12px; width: 36px; height: 12px; border-radius: 12px; background: #fff; opacity: .85; }
+    .floor .light { position: absolute; top: 0; width: 70px; height: 5px; background: #fff8d6; border-radius: 0 0 6px 6px; box-shadow: 0 6px 18px 6px #fff4b855; }
+    .floorsign { position: absolute; left: 4px; width: 92px; padding: 6px 4px; text-align: center; font-size: .66rem; font-weight: 700; letter-spacing: .05em; color: #fff; border-radius: 6px; line-height: 1.25; }
+    .floorsign span { display: block; font-size: 1.15rem; }
+    #shaft { position: absolute; left: 840px; top: 70px; width: 60px; height: 700px; background: linear-gradient(90deg, #4b5368, #39405a); z-index: 1; }
+    .sdoor { position: absolute; width: 46px; height: 112px; border: 2px solid #8a93aa; background: #2b3144; border-radius: 3px; }
+    #cabin { position: absolute; left: 847px; width: 46px; height: 110px; z-index: 2; background: linear-gradient(#c9d6ea, #a9b8d0); border: 2px solid #eef3fb; border-radius: 4px; }
+    #cabin::before { content: '▲▼'; position: absolute; top: 3px; left: 0; right: 0; text-align: center; font-size: 8px; color: #2a3042; }
+
+    .item { position: absolute; }
+    .desk { position: absolute; width: 104px; height: 40px; }
+    .desk .top { position: absolute; inset: 0; border-radius: 5px 5px 2px 2px; background: linear-gradient(#d8b48a, #c49a6c); border-top: 3px solid #e6c9a3; box-shadow: 0 3px 0 #0003; }
+    .desk .mon { position: absolute; left: 8px; top: -26px; width: 44px; height: 28px; background: #12151f; border: 3px solid #2f3646; border-radius: 3px; overflow: hidden; }
+    .desk .mon i { display: block; height: 2px; margin: 4px 4px 0; background: #38bdf8; opacity: 0; border-radius: 2px; }
+    .desk.work .mon i { opacity: .9; animation: type 1s steps(2) infinite; }
+    .desk.work .mon i:nth-child(2) { width: 60%; animation-delay: .3s; } .desk.work .mon i:nth-child(3) { width: 40%; animation-delay: .6s; }
+    .desk .cup { position: absolute; right: 10px; top: -10px; width: 9px; height: 10px; background: #fff; border-radius: 0 0 3px 3px; border: 1px solid #bbb; }
+    @keyframes type { 50% { opacity: .2; } }
+    .desk.boss { width: 140px; } .desk.boss .mon { width: 34px; left: 6px; } .desk.boss .mon.m2 { left: 50px; } .desk.boss .mon.m3 { left: 94px; }
+
+    /* ---- xodimlar ---- */
+    .emp { position: absolute; width: 34px; height: 62px; transform: translate(-50%, -100%); }
+    .emp .char { position: relative; width: 34px; height: 62px; }
+    .emp.left .char { transform: scaleX(-1); }
+    .char i, .char b { position: absolute; display: block; }
+    .char .head { left: 9px; top: 0; width: 16px; height: 16px; border-radius: 50%; background: var(--skin); z-index: 3; }
+    .char .eyes { left: 3px; top: 7px; width: 2px; height: 2px; border-radius: 50%; background: #222; box-shadow: 8px 0 #222; }
+    .char .hair { left: -1px; top: -3px; width: 18px; height: 9px; background: var(--hair); border-radius: 9px 9px 2px 2px; }
+    .hs-long .hair::before, .hs-bob .hair::before { content: ''; position: absolute; left: 0; top: 7px; width: 3px; height: 14px; background: var(--hair); box-shadow: 15px 0 var(--hair); }
+    .hs-bob .hair::before { height: 9px; }
+    .hs-bun .hair::after { content: ''; position: absolute; left: 5px; top: -8px; width: 8px; height: 8px; border-radius: 50%; background: var(--hair); }
+    .hs-spiky .hair { height: 12px; top: -7px; border-radius: 0; clip-path: polygon(0 100%, 8% 0, 24% 60%, 40% 0, 56% 60%, 72% 0, 88% 60%, 100% 100%); }
+    .hs-messy .hair { height: 11px; top: -6px; border-radius: 6px; clip-path: polygon(0 100%, 4% 20%, 20% 50%, 35% 0, 55% 40%, 75% 5%, 92% 40%, 100% 100%); }
+    .hs-slick .hair { height: 7px; border-radius: 9px 9px 0 0; }
+    .hs-side .hair { border-radius: 9px 3px 2px 6px; }
+    .hs-pony .hair::after { content: ''; position: absolute; left: 14px; top: 3px; width: 6px; height: 12px; border-radius: 50%; background: var(--hair); }
+    .char .torso { left: 7px; top: 15px; width: 20px; height: 24px; border-radius: 6px 6px 3px 3px; background: var(--shirt); z-index: 2; }
+    .char .armL, .char .armR { top: 17px; width: 5px; height: 18px; background: var(--shirt); border-radius: 3px; transform-origin: 50% 2px; filter: brightness(.92); z-index: 2; }
+    .char .armL { left: 2px; } .char .armR { left: 27px; }
+    .char .legL, .char .legR { top: 38px; width: 7px; height: 22px; background: var(--pants); border-radius: 2px 2px 3px 3px; border-bottom: 3px solid #1a1a1a; transform-origin: 50% 2px; z-index: 1; }
+    .char .legL { left: 9px; } .char .legR { left: 18px; }
+    .char .acc { z-index: 4; }
+    .acc-glasses .acc { left: 9px; top: 6px; width: 16px; height: 5px; border: 1.5px solid #222; border-radius: 3px; background: #ffffff44; }
+    .acc-headphones .acc { left: 6px; top: -3px; width: 22px; height: 14px; border: 3px solid #222; border-bottom: none; border-radius: 12px 12px 0 0; }
+    .acc-headphones .acc::before, .acc-headphones .acc::after { content: ''; position: absolute; top: 8px; width: 5px; height: 8px; background: #222; border-radius: 2px; }
+    .acc-headphones .acc::before { left: -4px; } .acc-headphones .acc::after { right: -4px; }
+    .acc-tie .acc { left: 15px; top: 17px; width: 4px; height: 16px; background: #c0392b; clip-path: polygon(0 0, 100% 0, 85% 100%, 15% 100%); }
+    .acc-cap .acc { left: 6px; top: -4px; width: 22px; height: 8px; background: #222; border-radius: 10px 10px 0 0; }
+    .acc-cap .acc::after { content: ''; position: absolute; right: -6px; bottom: 0; width: 9px; height: 3px; background: #222; border-radius: 2px; }
+    .acc-scarf .acc { left: 7px; top: 14px; width: 20px; height: 5px; background: #e84393; border-radius: 3px; }
+    .emp .tagbox { position: absolute; left: 50%; bottom: 66px; transform: translateX(-50%); text-align: center; white-space: nowrap; pointer-events: none; }
+    .emp .nm { display: inline-block; font-size: 10px; font-weight: 700; color: #fff; background: #1f2430cc; padding: 1px 6px; border-radius: 6px; }
+    .emp .tk { display: block; font-size: 9px; color: #1f2430; background: #ffffffdd; border-radius: 4px; padding: 0 4px; margin-top: 1px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
+    .emp .pb { display: none; height: 3px; width: 44px; margin: 2px auto 0; background: #0003; border-radius: 2px; overflow: hidden; }
+    .emp .pb div { height: 100%; width: 0; background: var(--work); transition: width .3s; }
+    .emp.working .pb { display: block; }
+    .emp .bubble { position: absolute; left: 50%; bottom: 100px; transform: translateX(-50%); background: #fff; color: #1f2430; border: 1px solid #c8d0dc; font-size: 10px; padding: 3px 8px; border-radius: 9px; max-width: 170px; width: max-content; white-space: normal; line-height: 1.25; text-align: center;
+      opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 1000; box-shadow: 0 2px 6px #0002; }
+    .emp.say .bubble { opacity: 1; }
+    .emp.working .nm { background: var(--work); } .emp.waiting .nm { background: var(--wait); } .emp.done .nm { background: var(--done); } .emp.error .nm { background: var(--err); }
+    .emp.waiting .char { animation: bob 1s ease-in-out infinite; }
+    @keyframes bob { 50% { transform: translateY(-3px); } }
+    .emp.walking .char { animation: bob2 .38s ease-in-out infinite; }
+    .emp.left.walking .char { animation: bob2l .38s ease-in-out infinite; }
+    @keyframes bob2 { 50% { transform: translateY(-2px); } } @keyframes bob2l { 0%,100% { transform: scaleX(-1); } 50% { transform: scaleX(-1) translateY(-2px); } }
+    .emp.walking .legL, .emp.walking .armR { animation: swingA .38s ease-in-out infinite; }
+    .emp.walking .legR, .emp.walking .armL { animation: swingB .38s ease-in-out infinite; }
+    @keyframes swingA { 0%,100% { transform: rotate(-26deg); } 50% { transform: rotate(26deg); } }
+    @keyframes swingB { 0%,100% { transform: rotate(26deg); } 50% { transform: rotate(-26deg); } }
+    .emp.typing .armL { animation: typeA .28s ease-in-out infinite; } .emp.typing .armR { animation: typeA .28s .14s ease-in-out infinite; }
+    @keyframes typeA { 50% { transform: rotate(-22deg) translateY(-2px); } }
+    .emp.boss .nm { background: #7c3aed; }
+
+    /* ---- yon panel ---- */
+    aside { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px; max-height: 900px; overflow: auto; }
+    aside h3 { margin: 12px 0 6px; font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+    aside h3:first-child { margin-top: 0; }
+    .qi, .res, .jr { display: flex; align-items: center; gap: 6px; padding: 5px 0; border-top: 1px solid var(--line); font-size: .78rem; }
+    .qi span, .res span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .qi button, .res button { padding: 1px 7px; font-size: .75rem; }
+    .empty { color: var(--muted); font-size: .78rem; padding: 4px 0; }
+    .res small, .jr small { color: var(--muted); display: block; white-space: normal; }
+    .jr { align-items: flex-start; } .jr .badge { font-size: .65rem; padding: 2px 6px; }
+    #log { list-style: none; padding: 0; margin: 0; font-size: .75rem; }
+    #log li { padding: 4px 0; border-top: 1px solid var(--line); display: flex; gap: 6px; }
+    #log time { color: var(--muted); font-variant-numeric: tabular-nums; }
     #modal { position: fixed; inset: 0; background: #0008; display: none; place-items: center; z-index: 50; padding: 16px; }
     #modal.on { display: grid; }
-    #modal .box { background: var(--card); border-radius: 14px; max-width: 760px; width: 100%; max-height: 85vh; display: flex; flex-direction: column; }
-    #modal header { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+    #modal .box { background: var(--card); border-radius: 14px; max-width: 800px; width: 100%; max-height: 85vh; display: flex; flex-direction: column; }
+    #modal .mh { padding: 12px 16px; border-bottom: 1px solid var(--line); }
     #modal pre { margin: 0; padding: 16px; overflow: auto; white-space: pre-wrap; word-break: break-word; font: .85rem/1.5 system-ui, sans-serif; }
-    .res { padding: 6px 0; border-top: 1px solid var(--line); font-size: .78rem; display: flex; gap: 6px; align-items: center; }
-    .res span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .res small { color: var(--muted); }
-    main { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 12px; padding: 0 16px 16px; }
-    @media (max-width: 960px) { main { grid-template-columns: 1fr; } }
-    #wrap { background: var(--floor); border: 1px solid var(--line); border-radius: 14px;
-      overflow: hidden; position: relative; }
-    #stage { position: relative; width: 960px; height: 690px; transform-origin: 0 0;
-      background:
-        linear-gradient(#0000000a 1px, transparent 1px) 0 0 / 40px 40px,
-        linear-gradient(90deg, #0000000a 1px, transparent 1px) 0 0 / 40px 40px, var(--floor); }
-    #belt { position: absolute; left: 40px; right: 40px; top: 205px; height: 22px; border-radius: 11px;
-      background: repeating-linear-gradient(90deg, #4b5563 0 18px, #565e6b 18px 36px);
-      animation: belt 1.2s linear infinite; opacity: .85; }
-    @keyframes belt { to { background-position: 36px 0; } }
-    .zone { position: absolute; font-size: .65rem; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
-
-    .desk { position: absolute; width: 150px; margin-left: -75px; text-align: center; }
-    .desk .top { background: #c8a27a; border: 2px solid #a8814f; border-radius: 8px; height: 46px;
-      position: relative; box-shadow: 0 4px 0 #a8814f55; }
-    .desk .mon { position: absolute; left: 50%; top: -22px; width: 54px; height: 34px; margin-left: -27px;
-      background: #111827; border: 3px solid #374151; border-radius: 4px; overflow: hidden; }
-    .desk .mon i { display: block; height: 3px; margin: 4px 4px 0; background: #38bdf8; opacity: .0; border-radius: 2px; }
-    .desk.working .mon i { opacity: .9; animation: type 1s steps(2) infinite; }
-    .desk.working .mon i:nth-child(2) { animation-delay: .3s; width: 60%; }
-    .desk.working .mon i:nth-child(3) { animation-delay: .6s; width: 40%; }
-    @keyframes type { 50% { opacity: .2; } }
-    .desk .label { margin-top: 6px; font-size: .75rem; font-weight: 600; }
-    .desk .task { font-size: .65rem; color: var(--muted); min-height: 1.6em; line-height: 1.2; }
-    .desk .bar { height: 5px; border-radius: 3px; background: #0000001a; margin: 4px 14px 0; overflow: hidden; }
-    .desk .bar div { height: 100%; width: 0; background: var(--work); transition: width .3s; }
-
-    .agent { position: absolute; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%;
-      display: grid; place-items: center; font-size: 22px; background: var(--card); border: 3px solid var(--idle);
-      transition: left 1.4s ease-in-out, top 1.4s ease-in-out, border-color .3s; z-index: 5; }
-    .agent.working { border-color: var(--work); }
-    .agent.walking { border-color: var(--wait); }
-    .agent.waiting { border-color: var(--wait); animation: bob 1s ease-in-out infinite; }
-    .agent.done { border-color: var(--done); }
-    .agent.error { border-color: var(--err); }
-    @keyframes bob { 50% { transform: translateY(-4px); } }
-    .agent .bubble { position: absolute; top: -26px; left: 50%; transform: translateX(-50%);
-      background: #111827; color: #fff; font-size: .65rem; padding: 2px 6px; border-radius: 6px; white-space: nowrap;
-      opacity: 0; transition: opacity .25s; pointer-events: none; }
-    .agent.show .bubble { opacity: 1; }
-
-    #human { position: absolute; left: 480px; top: 600px; width: 230px; margin-left: -115px; text-align: center; }
-    #human .top { background: #c8a27a; border: 2px solid #a8814f; border-radius: 8px; height: 50px; position: relative;
-      box-shadow: 0 4px 0 #a8814f55; }
-    #human .m { position: absolute; top: -26px; width: 60px; height: 38px; background: #111827;
-      border: 3px solid #374151; border-radius: 4px; }
-    #human .m:nth-child(1) { left: 14px; } #human .m:nth-child(2) { left: 85px; } #human .m:nth-child(3) { left: 156px; }
-    #me { position: absolute; left: 480px; top: 554px; font-size: 34px; margin: -22px 0 0 -17px; z-index: 4; }
-    #queue { position: absolute; left: 480px; top: 442px; max-height: 108px; overflow-y: auto; width: 250px; margin-left: -125px;
-      background: var(--card); border: 2px dashed var(--wait); border-radius: 10px; padding: 6px 8px; font-size: .72rem; }
-    #queue h4 { margin: 0 0 4px; font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; color: var(--wait); }
-    .qi { display: flex; align-items: center; gap: 6px; padding: 3px 0; border-top: 1px solid var(--line); }
-    .qi span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .qi button { padding: 1px 7px; font-size: .75rem; }
-    #queue .empty { color: var(--muted); padding: 4px 0; }
-
-    aside { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px;
-      max-height: 640px; overflow: auto; }
-    aside h3 { margin: 0 0 8px; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
-    #log { list-style: none; padding: 0; margin: 0; font-size: .78rem; }
-    #log li { padding: 5px 0; border-top: 1px solid var(--line); display: flex; gap: 6px; }
-    #log time { color: var(--muted); font-variant-numeric: tabular-nums; }
   </style>
 </head>
 <body>
   <header>
-    <h1><span class="dot"></span> Agent Ofis <small style="color:var(--muted);font-weight:400">24/7</small></h1>
+    <h1><span class="dot"></span> Silikon Minora <small style="color:var(--muted);font-weight:400">24/7</small></h1>
     <div class="stats">
       <div class="stat"><b id="sShipped">0</b><span>Tayyor</span></div>
       <div class="stat"><b id="sActive">0</b><span>Ishlayapti</span></div>
       <div class="stat"><b id="sQueue">0</b><span>Tasdiq kutmoqda</span></div>
       <div class="stat"><b id="sErr">0</b><span>Xato</span></div>
     </div>
-    <div class="controls">
-      <label><input type="checkbox" id="auto"> Avto-tasdiq</label>
-      <button id="pause">⏸ Pauza</button>
-    </div>
+    <div class="controls"><label><input type="checkbox" id="auto"> Avto-tasdiq</label></div>
   </header>
 
   <div id="taskbar">
     <select id="tAgent"></select>
-    <input id="tText" maxlength="4000" placeholder="Agentga vazifa yozing… (masalan: Toshkentdagi kofe-shop bozorini tahlil qil)">
-    <button id="tGo">▶ Vazifa ber</button>
+    <input id="tText" maxlength="4000">
+    <button id="tGo"></button>
   </div>
-  <div id="modal"><div class="box"><header><b id="mTitle"></b> <button id="mClose" style="float:right">Yopish</button></header><pre id="mText"></pre></div></div>
+  <div id="pipe"></div>
+  <div id="modal"><div class="box"><div class="mh"><b id="mTitle"></b> <button id="mClose" style="float:right">Yopish</button></div><pre id="mText"></pre></div></div>
 
   <main>
-    <div id="wrap"><div id="stage">
-      <div id="belt"></div>
-      <div class="zone" style="left:420px;top:232px">Vazifalar oqimi →</div>
-      <div id="queue"><h4>👤 Tasdiq navbati</h4><div id="qlist"></div></div>
-      <div id="me">🧑‍💻</div>
-      <div id="human"><div class="top"><div class="m"></div><div class="m"></div><div class="m"></div></div>
-        <div style="font-size:.75rem;font-weight:600;margin-top:6px">Siz (Boss)</div></div>
-    </div></div>
-    <aside><h3 id="resH" style="display:none">Natijalar</h3><div id="results"></div><h3>Jonli log</h3><ul id="log"></ul></aside>
+    <div id="wrap"><div id="stage"></div></div>
+    <aside>
+      <h3>Tasdiq navbati</h3><div id="qlist"></div>
+      <h3 id="resH" style="display:none">Natijalar</h3><div id="results"></div>
+      <h3 id="jrH" style="display:none">Qaror jurnali <button id="csv" style="float:right;padding:0 6px;font-size:.7rem">CSV</button></h3><div id="journal"></div>
+      <h3>Jonli log</h3><ul id="log"></ul>
+    </aside>
   </main>
 
 <script>
-/* ---- Sozlamalar: agentlarni shu yerda o'zgartiring ---- */
-const AGENTS = [
-  { id: 'manager',  name: 'Menejer',     emoji: '🧭', x: 480, y: 290, tasks: ['Haftalik reja', 'Kampaniya koordinatsiyasi', 'Hisobot yig\'ish'] },
-  { id: 'research', name: 'Tadqiqotchi', emoji: '🔎', x: 150, y: 90,  tasks: ['Bozor tahlili', 'Raqobatchilar', 'Trend qidiruv'] },
-  { id: 'writer',   name: 'Kontent',     emoji: '✍️', x: 480, y: 90,  tasks: ['Blog post', 'Email kampaniya', 'Reels ssenariy'] },
-  { id: 'sales',    name: 'Sotuv',       emoji: '💰', x: 810, y: 90,  tasks: ['Lead topish', 'Taklif yuborish', 'Follow-up'] },
-  { id: 'coder',    name: 'Dasturchi',   emoji: '🤖', x: 150, y: 290, tasks: ['Bug fix', 'Yangi funksiya', 'Code review'] },
-  { id: 'support',  name: 'Support',     emoji: '🎧', x: 810, y: 290, tasks: ['Ticket javob', 'FAQ yangilash', 'Shikoyat'] },
-];
-const QUEUE_POS = { x: 480, y: 415 };
-
-/* ---- Holat ---- */
-const stage = document.getElementById('stage');
-const S = { results: [], shipped: 0, err: 0, queue: [], paused: false, a: {} };
+/* ======================= O'LCHAMLAR ======================= */
+const TX = 100, TY = 70, FW = 140;          // minora chap/yuqori, qavat balandligi
+const DOOR_X = TX + 770;                     // lift eshigi
 const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
 const rnd = (a, b) => a + Math.random() * (b - a);
-const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const Y = n => TY + (5 - n) * FW;            // qavat tepasi (n = 1..5)
+const LANE = n => Y(n) + 130;                // yurish chizig'i
+const SEAT = n => Y(n) + 112;                // o'tirish chizig'i
+const DESK_X = [110, 270, 430];
+const THEMES = {
+  research:  { wall: ['#eaf0ff', '#dbe4ff'], carpet: '#b8c7f5', accent: '#4c6ef5' },
+  marketing: { wall: ['#fff0f6', '#ffe0ec'], carpet: '#f7b6cf', accent: '#e64980' },
+  sales:     { wall: ['#fff9db', '#fff0b3'], carpet: '#f5d56b', accent: '#e8890c' },
+  risk:      { wall: ['#e6ebef', '#d3dbe2'], carpet: '#9aa7b3', accent: '#d63031' },
+  control:   { wall: ['#efe9fb', '#ded3f6'], carpet: '#a78bda', accent: '#7048e8' },
+};
+
+const S = { e: {}, emps: [], queue: [], results: [], journal: [], cases: {}, shipped: 0, err: 0, live: false, ai: false, roster: null };
+const KEY = new URLSearchParams(location.search).get('key') || '';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const NAME = id => (S.e[id] ? S.e[id].def.name : id);
+const stage = $('stage');
 
 function log(text, icon = '•') {
-  const li = document.createElement('li');
-  const t = new Date().toLocaleTimeString('uz', { hour12: false });
-  li.innerHTML = `<time>${t}</time><span>${icon} ${text}</span>`;
-  $('log').prepend(li);
-  while ($('log').children.length > 60) $('log').lastChild.remove();
+  const li = document.createElement('li'), t = new Date().toLocaleTimeString('uz', { hour12: false });
+  li.innerHTML = `<time>${t}</time><span>${icon} ${esc(text)}</span>`;
+  $('log').prepend(li); while ($('log').children.length > 80) $('log').lastChild.remove();
 }
 
-/* ---- Agentlarni chizish ---- */
-AGENTS.forEach(def => {
-  const desk = document.createElement('div');
-  desk.className = 'desk'; desk.style.left = def.x + 'px'; desk.style.top = def.y + 'px';
-  desk.innerHTML = `<div class="top"><div class="mon"><i></i><i></i><i></i></div></div>
-    <div class="label">${def.name}</div><div class="task">kutmoqda</div><div class="bar"><div></div></div>`;
-  stage.appendChild(desk);
-  const el = document.createElement('div');
-  el.className = 'agent'; el.innerHTML = `${def.emoji}<span class="bubble"></span>`;
-  stage.appendChild(el);
-  const st = { def, desk, el, state: 'idle', task: null, progress: 0, home: { x: def.x, y: def.y - 48 }, pending: null, talkN: 0, sub: false };
-  S.a[def.id] = st;
-  place(st, st.home);
-});
+/* ======================= SAHNA ======================= */
+function el(html) { const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
 
-function place(st, p) { st.el.style.left = p.x + 'px'; st.el.style.top = p.y + 'px'; }
-function say(st, text, ms = 2200) {
-  const b = st.el.querySelector('.bubble'); b.textContent = text; st.el.classList.add('show');
-  clearTimeout(st._bt); st._bt = setTimeout(() => st.el.classList.remove('show'), ms);
+function buildCity() {
+  stage.appendChild(el('<div class="sun"></div>'));
+  [[40, 60, 70], [300, 30, 95], [620, 90, 80], [760, 50, 110]].forEach(([l, t, d]) =>
+    stage.appendChild(el(`<div class="cloud" style="left:${l}px;top:${t}px;width:${70 + (l % 40)}px;animation-duration:${d}s;animation-delay:-${l / 8}s"></div>`)));
+  // fon binolari (silikon shahar)
+  [[0, 90, 420], [48, 60, 360], [96, 40, 470], [915, 70, 430], [950, 50, 360], [900, 28, 480]].forEach(([l, w, h]) => {
+    let win = ''; for (let i = 0; i < 26; i++) win += `<i style="left:${6 + (i % 4) * 14}px;top:${10 + Math.floor(i / 4) * 22}px;${Math.random() < .35 ? 'opacity:.2' : ''}"></i>`;
+    stage.appendChild(el(`<div class="bgb" style="left:${l}px;top:${770 - h}px;width:${w}px;height:${h}px">${win}</div>`));
+  });
+  stage.appendChild(el('<div class="ground"></div>')); stage.appendChild(el('<div class="walk"></div>')); stage.appendChild(el('<div class="road-line"></div>'));
+  ['#e74c3c', '#3498db', '#f1c40f', '#2ecc71'].forEach((c, i) => stage.appendChild(el(`<div class="car" style="background:${c};animation-duration:${9 + i * 3}s;animation-delay:-${i * 3}s"></div>`)));
+  [20, 70, 905, 955].forEach(x => stage.appendChild(el(`<div class="tree" style="left:${x}px"></div>`)));
+  stage.appendChild(el('<div id="roof"><b>SILIKON MINORA</b></div>')); stage.appendChild(el('<div id="antenna"></div>'));
 }
-function setState(st, state, taskText) {
-  st.state = state;
-  st.el.className = 'agent ' + state + (st.el.classList.contains('show') ? ' show' : '');
-  st.desk.classList.toggle('working', state === 'working');
-  if (taskText !== undefined) st.desk.querySelector('.task').textContent = taskText;
+
+const DECOR = {
+  research: () => `
+    <div class="item" style="left:8px;top:22px;width:46px;height:90px;background:#8a6a4a;border:3px solid #6b4f35;border-radius:3px">
+      ${[0, 1, 2, 3].map(r => `<div style="position:absolute;left:2px;right:2px;top:${6 + r * 21}px;height:14px;background:repeating-linear-gradient(90deg,#e55039 0 5px,#4a69bd 5px 10px,#78e08f 10px 15px,#f6b93b 15px 20px)"></div>`).join('')}</div>
+    <div class="item" style="left:318px;top:16px;width:130px;height:72px;background:#fff;border:4px solid #b8c0cc;border-radius:4px">
+      <svg viewBox="0 0 120 60" width="122" height="64"><polyline points="6,48 28,36 46,42 66,20 86,28 112,8" fill="none" stroke="#4c6ef5" stroke-width="3"/><circle cx="66" cy="20" r="3" fill="#e64980"/><text x="8" y="14" font-size="9" fill="#555">Bozor tahlili</text></svg></div>
+    <div class="item" style="left:468px;top:24px;font-size:26px">🌐</div>`,
+  marketing: () => `
+    <div class="item" style="left:8px;top:20px;font-size:30px">📸</div>
+    <div class="item" style="left:318px;top:16px;width:130px;height:72px;background:#fff;border:4px solid #e6c0d2;border-radius:4px;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding:4px">
+      ${['#ff6b6b', '#ffd93d', '#6bcB77', '#4d96ff', '#c77dff', '#ff9f43', '#00cec9', '#fd79a8'].map(c => `<div style="background:${c};border-radius:2px"></div>`).join('')}</div>
+    <div class="item" style="left:468px;top:22px;padding:2px 8px;border:2px solid #ff4fa3;color:#ff4fa3;border-radius:6px;font-weight:800;font-size:13px;text-shadow:0 0 8px #ff4fa3">IDEA</div>`,
+  sales: () => `
+    <div class="item" style="left:8px;top:20px;font-size:30px">🎯</div>
+    <div class="item" style="left:318px;top:16px;width:130px;height:72px;background:#1b2030;border:4px solid #424a62;border-radius:4px">
+      ${[44, 30, 52, 20].map((h, i) => `<div style="position:absolute;left:${14 + i * 28}px;bottom:6px;width:16px;height:${h}px;background:${['#22c55e', '#3b82f6', '#f59e0b', '#a855f7'][i]}"></div>`).join('')}
+      <div style="position:absolute;right:6px;top:2px;font-size:14px">🏆</div></div>
+    <div class="item" style="left:468px;top:26px;font-size:24px">🔔</div>`,
+  risk: () => `
+    <div class="item" style="left:8px;top:22px;width:40px;height:90px;background:#3b4350;border:3px solid #232a35;border-radius:3px">
+      ${[0, 1, 2, 3, 4, 5].map(r => `<div style="position:absolute;left:4px;right:4px;top:${5 + r * 14}px;height:9px;background:#232a35"><i style="position:absolute;right:3px;top:3px;width:3px;height:3px;border-radius:50%;background:${r % 2 ? '#22c55e' : '#ef4444'};animation:blink ${1 + r * .3}s infinite"></i></div>`).join('')}</div>
+    <div class="item" style="left:340px;top:14px;font-size:62px;filter:drop-shadow(0 2px 4px #0003)">🛡️</div>
+    <div class="item" style="left:0;right:0;bottom:28px;height:5px;background:repeating-linear-gradient(135deg,#f1c40f 0 10px,#2d3436 10px 20px)"></div>`,
+  control: () => `
+    <div class="item" style="left:430px;top:12px;width:150px;height:76px;background:#12151f;border:4px solid #3b4260;border-radius:4px;overflow:hidden">
+      ${[[6, 40], [24, 26], [40, 48], [60, 20], [78, 36], [96, 30], [114, 44]].map(([l, h]) => `<div style="position:absolute;left:${l}px;bottom:0;width:14px;height:${h}px;background:#3b5bdb"><i style="position:absolute;left:3px;top:4px;width:3px;height:3px;background:#ffe066"></i></div>`).join('')}</div>
+    <div class="item" style="left:8px;top:24px;font-size:28px">🏆</div>
+    <div class="item" style="left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,#c9a227,#fff2a8,#c9a227)"></div>`,
+};
+const AMENITY = () => `
+  <div class="item" style="left:548px;top:60px;width:26px;height:52px;background:#2f3646;border-radius:4px;color:#fff;font-size:15px;text-align:center;line-height:26px">☕<i style="position:absolute;left:6px;bottom:6px;width:14px;height:6px;background:#8b5a2b;border-radius:2px"></i></div>
+  <div class="item" style="left:600px;top:56px;width:24px;height:56px;background:#dff3ff;border:2px solid #9ccbe8;border-radius:5px;text-align:center;font-size:14px;line-height:30px">💧</div>
+  <div class="item" style="left:636px;top:74px;font-size:26px">🪴</div>
+  <div class="item" style="left:666px;top:84px;width:62px;height:28px;background:linear-gradient(#7c8da6,#667895);border-radius:10px 10px 4px 4px"></div>
+  <div class="item" style="left:662px;top:70px;width:12px;height:42px;background:#667895;border-radius:6px"></div>`;
+
+function buildTower() {
+  S.roster.floors.forEach(f => {
+    const t = THEMES[f.id], top = Y(f.n);
+    stage.appendChild(el(`<div class="floor" id="floor-${f.id}" style="left:${TX}px;top:${top}px;border-bottom-color:${t.accent}">
+      <div class="wall" style="background:linear-gradient(${t.wall[0]},${t.wall[1]})"></div>
+      ${[70, 240, 410, 580].map(x => `<div class="win" style="left:${x}px"></div>`).join('')}
+      ${[100, 300, 500].map(x => `<div class="light" style="left:${x}px"></div>`).join('')}
+      <div class="carpet" style="background:repeating-linear-gradient(90deg,${t.carpet} 0 40px,${t.carpet}cc 40px 80px)"></div>
+      ${DECOR[f.id]()}${AMENITY()}</div>`));
+    stage.appendChild(el(`<div class="floorsign" style="top:${top + 40}px;background:${t.accent}"><span>${f.emoji}</span>${f.n} · ${f.name.toUpperCase()}</div>`));
+  });
+  stage.appendChild(el('<div id="shaft"></div>'));
+  S.roster.floors.forEach(f => stage.appendChild(el(`<div class="sdoor" style="left:${TX + 740 + 7}px;top:${Y(f.n) + 16}px;z-index:1"></div>`)));
+  stage.appendChild(el('<div id="cabin"></div>'));
+}
+
+function charHTML(l) {
+  return `<div class="char hs-${l.style} acc-${l.acc}" style="--skin:${l.skin};--hair:${l.hair};--shirt:${l.shirt};--pants:${l.pants}">
+    <i class="armL"></i><i class="legL"></i><i class="torso"></i><i class="legR"></i><i class="armR"></i>
+    <i class="head"><b class="hair"></b><b class="eyes"></b></i><i class="acc"></i></div>`;
+}
+
+function makeEmp(def, desk, extra = {}) {
+  const f = S.roster.floors.find(x => x.id === def.floor).n;
+  const hx = TX + desk + 22;                                  // stol yonida o'tirish
+  const e = Object.assign({ def, id: def.id, f, home: { f, x: hx, y: SEAT(f) }, x: hx, y: SEAT(f), sitting: true,
+    state: 'idle', mode: 'idle', task: null, progress: 0, pending: 0, q: Promise.resolve(), talkN: 0, sub: false, item: null, tok: 0 }, extra);
+  e.el = el(`<div class="emp" style="left:${e.x}px;top:${e.y}px;z-index:${SEAT(f)}">
+    <div class="tagbox"><span class="nm">${esc(def.name)}</span><span class="tk">${esc(def.title)}</span><div class="pb"><div></div></div></div>
+    <div class="bubble"></div>${charHTML(def.look)}</div>`);
+  stage.appendChild(e.el);
+  e.desk = el(`<div class="desk${extra.boss ? ' boss' : ''}" style="left:${TX + desk - 52 + (extra.boss ? -18 : 0)}px;top:${SEAT(f) - 40}px;z-index:${SEAT(f) + 1}">
+    <div class="top"></div><div class="mon"><i></i><i></i><i></i></div>${extra.boss ? '<div class="mon m2"><i></i></div><div class="mon m3"><i></i></div>' : '<div class="cup"></div>'}</div>`);
+  stage.appendChild(e.desk);
+  return e;
+}
+
+/* ======================= HARAKAT MOTORI ======================= */
+function say(e, text, ms = 2600) {
+  const b = e.el.querySelector('.bubble'); b.textContent = text; e.el.classList.add('say');
+  clearTimeout(e._bt); e._bt = setTimeout(() => e.el.classList.remove('say'), ms);
+}
+function setState(e, state, taskText) {
+  e.state = state;
+  ['working', 'waiting', 'done', 'error', 'typing'].forEach(c => e.el.classList.remove(c));
+  if (state !== 'idle' && state !== 'walking') e.el.classList.add(state);
+  e.desk.classList.toggle('work', state === 'working');
+  if (state === 'working' && e.sitting) e.el.classList.add('typing');
+  if (taskText !== undefined) e.el.querySelector('.tk').textContent = taskText || e.def.title;
   render();
 }
-function setProgress(st, v) { st.progress = v; st.desk.querySelector('.bar div').style.width = (v * 100) + '%'; }
+function setProgress(e, v) { e.progress = v; e.el.querySelector('.pb div').style.width = (v * 100) + '%'; }
+function enqueue(e, fn) { e.pending++; e.q = e.q.then(fn).catch(err => console.error(err)).finally(() => { e.pending--; }); return e.q; }
+const alive = e => e.mode === 'idle';
 
-/* ---- Hodisalar API (haqiqiy agentlarni ulash uchun) ---- */
+function go(e, x, y, z) {
+  return new Promise(res => {
+    const dx = x - e.x, dy = y - e.y, d = Math.hypot(dx, dy);
+    if (d < 1) return res();
+    const dur = d / (100 * e.def.traits.speed);
+    e.el.style.transition = `left ${dur}s linear, top ${dur}s linear`;
+    e.el.classList.add('walking'); e.el.classList.remove('typing');
+    if (Math.abs(dx) > 2) e.el.classList.toggle('left', dx < 0);
+    e.x = x; e.y = y; e.el.style.zIndex = z || Math.round(y);
+    e.el.style.left = x + 'px'; e.el.style.top = y + 'px';
+    setTimeout(() => { e.el.classList.remove('walking'); res(); }, dur * 1000 + 40);
+  });
+}
+
+/* lift: bitta kabina, navbat bilan */
+const ELEV = { f: 1, lock: Promise.resolve() };
+const cabinTop = n => Y(n) + 18;
+function moveCabin(n, dur) {
+  const c = $('cabin'); c.style.transition = `top ${dur}s ease-in-out`; c.style.top = cabinTop(n) + 'px'; ELEV.f = n; return sleep(dur * 1000 + 60);
+}
+function ride(e, to) {
+  const job = ELEV.lock.then(async () => {
+    if (ELEV.f !== e.f) await moveCabin(e.f, Math.abs(ELEV.f - e.f) * .7 + .25);
+    await sleep(250);
+    const dur = Math.abs(to - e.f) * .8 + .3;
+    e.el.style.zIndex = 900;
+    e.el.style.transition = `top ${dur}s ease-in-out`; e.y = LANE(to); e.f = to; e.el.style.top = e.y + 'px';
+    await moveCabin(to, dur);
+    e.el.style.zIndex = Math.round(e.y);
+    await sleep(200);
+  });
+  ELEV.lock = job.catch(() => {});
+  return job;
+}
+
+async function standUp(e) { if (e.sitting) { e.sitting = false; await go(e, e.x, LANE(e.f)); } }
+async function goTo(e, n, x) {                         // istalgan qavatdagi chizig'ga borish
+  await standUp(e);
+  if (e.f !== n) { await go(e, DOOR_X, LANE(e.f)); await ride(e, n); }
+  await go(e, x, LANE(n));
+}
+async function goSeat(e) {
+  await goTo(e, e.home.f, e.home.x);
+  await go(e, e.home.x, SEAT(e.home.f), SEAT(e.home.f)); e.sitting = true; e.el.classList.remove('left');
+  if (e.state === 'working') e.el.classList.add('typing');
+}
+const spotX = (n, name) => TX + ({ coffee: 560, cooler: 612, board: n === 5 ? 490 : 350, sofa: 690, window: 200 }[name]);
+async function goNear(e, other) {
+  const side = e.home.x <= other.home.x ? -46 : 46;
+  await goTo(e, other.home.f, other.home.x + side);
+  e.el.classList.toggle('left', side > 0);
+}
+
+/* ======================= O'Z HAYOTI (xarakter) ======================= */
+async function idleStep(e) {
+  const t = e.def.traits;
+  const w = [['stay', Math.max(.15, 1.1 - t.wander)], ['quote', .7], ['coffee', t.coffee], ['cooler', .25], ['chat', t.chat], ['board', t.wander * .5], ['sofa', t.wander * .3], ['window', t.wander * .3]];
+  let r = Math.random() * w.reduce((a, b) => a + b[1], 0), act = 'stay';
+  for (const [k, v] of w) { if ((r -= v) <= 0) { act = k; break; } }
+  if (act === 'stay') return sleep(rnd(1500, 3500));
+  if (act === 'quote') return say(e, pick(e.def.lines), 3200);
+  if (['coffee', 'cooler', 'board', 'sofa', 'window'].includes(act)) {
+    await goTo(e, e.f, spotX(e.f, act));
+    if (!alive(e)) return;
+    say(e, { coffee: '☕ Mmm…', cooler: '💧', board: pick(e.def.lines), sofa: '😮‍💨 Dam olaman', window: '🌆 Manzara zo\'r' }[act], 3000);
+    await sleep(rnd(2500, 4500));
+    if (alive(e)) await goSeat(e);
+    return;
+  }
+  if (act === 'chat') {
+    const free = S.emps.filter(o => o !== e && o.id !== 'boss' && o.mode === 'idle');
+    const same = free.filter(o => o.home.f === e.home.f);
+    const mate = (Math.random() < .8 && same.length) ? pick(same) : pick(free);
+    if (!mate) return;
+    await goNear(e, mate); if (!alive(e)) return;
+    say(e, pick(['Salom, ' + mate.def.name + '!', 'Bir daqiqa vaqtingiz bormi?', 'Ko\'ryapsizmi, nima bo\'ldi?']), 2600);
+    await sleep(1200); say(mate, pick(mate.def.lines), 2600);
+    await sleep(rnd(2200, 3500));
+    if (alive(e)) await goSeat(e);
+  }
+}
+function startLife(e) {
+  (async function loop() {
+    for (;;) {
+      await sleep(rnd(3500, 9000) / (0.6 + e.def.traits.wander));
+      if (!alive(e) || e.pending > 0) continue;
+      await enqueue(e, () => idleStep(e));
+    }
+  })();
+}
+
+/* ======================= HODISALAR ======================= */
+const QX = k => TX + 385 + k * 30;
+function releaseSub(e) { e.sub = false; e.mode = 'idle'; setProgress(e, 0); setState(e, 'idle', ''); }
+function requeue() {
+  S.queue.forEach((q, k) => { const e = S.e[q.agent]; if (e && e.state === 'waiting') enqueue(e, () => goTo(e, 5, QX(k))); });
+}
 const API = {
-  start(id, task)    { const st = S.a[id]; if (!st) return; st.sub = false; st.task = task; setProgress(st, 0); setState(st, 'working', task); say(st, 'Boshladim'); log(`${st.def.name}: «${task}» boshlandi`, '▶️'); },
-  progress(id, v)    { const st = S.a[id]; if (st) setProgress(st, v); },
-  needApproval(id, task, e) {
-    const st = S.a[id]; if (!st) return;
-    if (task && e) st.task = task;
-    const item = { id: (e && e.itemId) || Date.now() + Math.random(), agent: id, task: st.task || 'vazifa', resultId: e && e.resultId };
-    S.queue.push(item); st.pending = item;
-    setState(st, 'walking'); const slot = S.queue.length - 1;
-    place(st, { x: QUEUE_POS.x - 90 + (slot % 5) * 45, y: QUEUE_POS.y + Math.floor(slot / 5) * 40 });
-    setTimeout(() => { if (st.pending === item) { setState(st, 'waiting'); say(st, 'Tasdiq kerak!', 4000); } }, 1400);
-    log(`${st.def.name}: «${st.task}» tasdiq kutmoqda`, '🙋');
+  start(id, task) {
+    const e = S.e[id]; if (!e) return;
+    e.mode = 'busy'; e.sub = false; e.task = task; setProgress(e, 0); setState(e, 'working', task);
+    say(e, pick(['Boshladim', 'Ishga tushdim', 'Ko\'rib chiqaman']), 2200);
+    log(`${e.def.name}: «${task}» boshlandi`, '▶️');
+    enqueue(e, () => goSeat(e));
+  },
+  progress(id, v) { const e = S.e[id]; if (e) setProgress(e, v); },
+  needApproval(id, task, ev) {
+    const e = S.e[id]; if (!e) return;
+    if (task && ev) e.task = task;
+    const item = { id: (ev && ev.itemId) || String(Math.random()), agent: id, task: e.task || 'vazifa', resultId: ev && ev.resultId };
+    S.queue.push(item); e.item = item; e.mode = 'busy';
+    setState(e, 'walking');
+    const slot = S.queue.length - 1;
+    enqueue(e, async () => { await goTo(e, 5, QX(slot)); if (e.item === item) { setState(e, 'waiting'); say(e, '🙋 Tasdiq kerak!', 4500); } });
+    log(`${e.def.name}: «${item.task}» tasdiq kutmoqda`, '🙋');
   },
   decide(itemId, ok) {
     const i = S.queue.findIndex(q => q.id === itemId); if (i < 0) return;
-    const [item] = S.queue.splice(i, 1); const st = S.a[item.agent]; st.pending = null;
-    S.queue.forEach((q, k) => { const s = S.a[q.agent]; if (s.state === 'waiting') place(s, { x: QUEUE_POS.x - 90 + (k % 5) * 45, y: QUEUE_POS.y + Math.floor(k / 5) * 40 }); });
-    place(st, st.home);
-    if (ok) { S.shipped++; setState(st, 'done', 'Tayyor ✔'); say(st, 'Rahmat!'); log(`«${item.task}» tasdiqlandi`, '✅'); setTimeout(() => API.idle(st.def.id), 2500); }
-    else { setProgress(st, 0.4); setState(st, 'working', item.task + ' (qayta)'); say(st, 'Qayta qilaman'); log(`«${item.task}» rad etildi`, '↩️'); st.redo = true; }
-  },
-  log(id, msg)       { const st = S.a[id]; if (st) log(`${st.def.name}: ${msg}`, '🧮'); },
-  result(id, task, e) {
-    const i = S.results.findIndex(r => r.id === e.resultId);
-    const r = { id: e.resultId, agent: e.agent, task: e.task, status: e.status };
-    if (i < 0) S.results.unshift(r); else S.results[i] = r;
-    renderResults();
-  },
-  talk(id, msg, e) {
-    const from = S.a[id], to = S.a[e.to]; if (!from || !to) return;
-    const snip = String(e.message || '').replace(/\s+/g, ' ');
-    if (e.kind === 'ask') {
-      from.talkN++;
-      place(from, { x: to.home.x + (from.home.x <= to.home.x ? -48 : 48), y: to.home.y + 24 });
-      say(from, `→ ${to.def.name}: ${snip.slice(0, 34)}…`, 5000);
-      if (to.state === 'idle') { to.sub = true; setProgress(to, 0.5); setState(to, 'working', 'So\'rov: ' + snip.slice(0, 28)); }
-      log(`${from.def.name} → ${to.def.name}: ${snip.slice(0, 140)}`, '💬');
+    const [item] = S.queue.splice(i, 1); const e = S.e[item.agent]; e.item = null;
+    requeue();
+    if (ok) {
+      S.shipped++; setState(e, 'done', 'Tayyor ✔'); say(e, 'Rahmat!', 2000); log(`«${item.task}» tasdiqlandi`, '✅');
+      enqueue(e, () => goSeat(e));
+      const t = ++e.tok; setTimeout(() => { if (e.tok === t && e.state === 'done') { e.mode = 'idle'; setProgress(e, 0); setState(e, 'idle', ''); } }, 3500);
     } else {
-      say(from, `↩ ${snip.slice(0, 34)}…`, 4000);
-      log(`${from.def.name} → ${to.def.name} (javob): ${snip.slice(0, 140)}`, '↩️');
-      if (from.sub) { from.sub = false; API.idle(from.def.id); }
-      to.talkN = Math.max(0, to.talkN - 1);
-      if (to.talkN === 0 && to.state !== 'walking' && to.state !== 'waiting') place(to, to.home);
+      setProgress(e, .4); setState(e, 'working', item.task + ' (qayta)'); say(e, 'Qayta qilaman', 2200); log(`«${item.task}» rad etildi`, '↩️');
+      enqueue(e, () => goSeat(e));
     }
   },
-  error(id, msg)     { const st = S.a[id]; if (!st) return; S.err++; setState(st, 'error', msg || 'Xato'); say(st, 'Xato!'); log(`${st.def.name}: ${msg || 'xato'}`, '⚠️'); setTimeout(() => API.idle(id), 3000); },
-  done(id)           { const st = S.a[id]; if (!st) return; S.shipped++; setState(st, 'done', 'Tayyor ✔'); log(`${st.def.name}: «${st.task}» tayyor`, '✅'); setTimeout(() => API.idle(id), 2000); },
-  idle(id)           { const st = S.a[id]; if (!st) return; st.task = null; setProgress(st, 0); setState(st, 'idle', 'kutmoqda'); },
-  event(e)           {
-    if (e.type === 'decide') return API.decide(e.itemId, e.ok);
-    const f = API[e.type]; if (f && e.agent) f.call(API, e.agent, e.task ?? e.value ?? e.message, e);
+  error(id, msg) {
+    const e = S.e[id]; if (!e) return; S.err++; setState(e, 'error', msg || 'Xato'); say(e, 'Xato!', 3000);
+    log(`${e.def.name}: ${msg || 'xato'}`, '⚠️'); enqueue(e, () => goSeat(e));
+    const t = ++e.tok; setTimeout(() => { if (e.tok === t) { e.mode = 'idle'; setState(e, 'idle', ''); } }, 3500);
+  },
+  done(id) {
+    const e = S.e[id]; if (!e) return; S.shipped++; setState(e, 'done', 'Tayyor ✔'); log(`${e.def.name}: «${e.task}» tayyor`, '✅');
+    const t = ++e.tok; setTimeout(() => { if (e.tok === t) { e.mode = 'idle'; setProgress(e, 0); setState(e, 'idle', ''); } }, 2500);
+  },
+  idle(id) { const e = S.e[id]; if (!e) return; e.tok++; e.mode = 'idle'; setProgress(e, 0); setState(e, 'idle', ''); },
+  log(id, msg) { const e = S.e[id]; if (e) log(`${e.def.name}: ${msg}`, '🧮'); },
+  talk(id, msg, ev) {
+    const from = S.e[id], to = S.e[ev.to]; if (!from || !to) return;
+    const snip = String(ev.message || '').replace(/\s+/g, ' ');
+    if (ev.kind === 'ask' || ev.kind === 'handoff') {
+      const handoff = ev.kind === 'handoff';
+      from.talkN++;
+      enqueue(from, async () => {
+        await goNear(from, to); say(from, handoff ? '📄 ' + snip.slice(0, 40) : `→ ${to.def.name}: ${snip.slice(0, 40)}…`, 5000);
+        if (handoff) { say(to, '👍 Qabul qildim', 3000); await sleep(1800); from.talkN = Math.max(0, from.talkN - 1); await goSeat(from); }
+      });
+      if (!handoff && to.mode === 'idle') { to.mode = 'busy'; to.sub = true; setProgress(to, .5); setState(to, 'working', 'So\'rov: ' + snip.slice(0, 26)); enqueue(to, () => goSeat(to)); }
+      log(`${from.def.name} → ${to.def.name}${handoff ? ' (topshirdi)' : ''}: ${snip.slice(0, 140)}`, handoff ? '📄' : '💬');
+    } else {
+      say(from, `↩ ${snip.slice(0, 44)}…`, 4200);
+      log(`${from.def.name} → ${to.def.name} (javob): ${snip.slice(0, 140)}`, '↩️');
+      if (from.sub) releaseSub(from);
+      to.talkN = Math.max(0, to.talkN - 1);
+      if (to.talkN === 0 && to.state !== 'walking' && to.state !== 'waiting') enqueue(to, () => goSeat(to));
+    }
+  },
+  result(id, task, ev) {
+    const i = S.results.findIndex(r => r.id === ev.resultId), r = { id: ev.resultId, agent: ev.agent, task: ev.task, status: ev.status };
+    if (i < 0) S.results.unshift(r); else S.results[i] = r; renderResults();
+  },
+  case(id, task, ev) { S.cases[ev.caseId] = ev; renderPipe(ev); },
+  journal(id, task, ev) { if (!S.journal.find(j => j.caseId === ev.caseId && j.time === ev.time)) S.journal.unshift(ev); renderJournal(); },
+  event(ev) {
+    if (ev.type === 'decide') return API.decide(ev.itemId, ev.ok);
+    const f = API[ev.type]; if (f && ev.type !== 'event' && (ev.agent || ev.type === 'case' || ev.type === 'journal')) f.call(API, ev.agent, ev.task ?? ev.value ?? ev.message, ev);
   },
 };
 window.AgentOffice = API;
 
-/* ---- Natijalar va vazifa berish (haqiqiy AI rejimi) ---- */
+/* ======================= PANELLAR ======================= */
 const STATUS = { working: '⏳ ishlayapti', review: '👁 tasdiq kutadi', approved: '✅ tasdiqlandi', rejected: '↩️ rad etildi', expired: '⌛ muddati o\'tdi', error: '⚠️ xato' };
-function renderResults() {
-  $('resH').style.display = S.results.length ? '' : 'none';
-  const box = $('results'); box.innerHTML = '';
-  S.results.forEach(r => {
-    const row = document.createElement('div'); row.className = 'res';
-    const a = S.a[r.agent];
-    row.innerHTML = `<span>${a ? a.def.emoji : ''} ${esc(r.task)}<br><small>${STATUS[r.status] || r.status}</small></span>`;
-    row.appendChild(Object.assign(document.createElement('button'), { textContent: 'Ko\'rish', onclick: () => openResult(r.id, r.task) }));
-    box.appendChild(row);
-  });
-}
-const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const NAME = id => (S.a[id] ? S.a[id].def.name : id);
-async function openResult(id, title) {
-  $('mTitle').textContent = title; $('mText').textContent = 'Yuklanmoqda…'; $('modal').classList.add('on');
-  try { const r = await fetch('/result/' + id + '?key=' + encodeURIComponent(KEY)); const j = await r.json();
-    const talk = (j.talk || []).map(t => `💬 ${NAME(t.from)} → ${NAME(t.to)}: ${t.ask}\n↩️ ${NAME(t.to)}: ${t.reply == null ? '(kutilmoqda…)' : t.reply}`).join('\n\n');
-    $('mText').textContent = (talk ? 'HAMKASBLAR MULOQOTI\n\n' + talk + '\n\n──────── YAKUNIY NATIJA ────────\n\n' : '') + (j.text || '(bo\'sh)'); }
-  catch { $('mText').textContent = 'Yuklab bo\'lmadi'; }
-}
-$('mClose').onclick = () => $('modal').classList.remove('on');
-$('modal').onclick = e => { if (e.target === $('modal')) $('modal').classList.remove('on'); };
-function setupTaskbar() {
-  $('tAgent').innerHTML = AGENTS.map(a => `<option value="${a.id}">${a.emoji} ${a.name}</option>`).join('');
-  $('taskbar').classList.add('on');
-  const go = async () => {
-    const task = $('tText').value.trim(); if (!task) return;
-    const r = await fetch('/task?key=' + encodeURIComponent(KEY), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ agent: $('tAgent').value, task }) });
-    const j = await r.json();
-    if (j.ok) $('tText').value = ''; else log(j.error || 'Xato', '⚠️');
-  };
-  $('tGo').onclick = go; $('tText').onkeydown = e => { if (e.key === 'Enter') go(); };
-}
-
-/* ---- Render ---- */
-/* Jonli rejimda qaror serverga yuboriladi, server hammaga (va kutayotgan agentga) tarqatadi */
-const KEY = new URLSearchParams(location.search).get('key') || '';
 function choose(id, ok) {
   if (!S.live) return API.decide(id, ok);
   fetch('/decision?key=' + encodeURIComponent(KEY), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ itemId: id, ok }) });
 }
 function render() {
-  $('sShipped').textContent = S.shipped;
-  $('sErr').textContent = S.err;
-  $('sQueue').textContent = S.queue.length;
-  $('sActive').textContent = Object.values(S.a).filter(a => a.state === 'working').length;
+  $('sShipped').textContent = S.shipped; $('sErr').textContent = S.err; $('sQueue').textContent = S.queue.length;
+  $('sActive').textContent = S.emps.filter(a => a.state === 'working').length;
   const q = $('qlist'); q.innerHTML = '';
   if (!S.queue.length) q.innerHTML = '<div class="empty">Hozircha bo\'sh 🎉</div>';
   S.queue.forEach(it => {
     const row = document.createElement('div'); row.className = 'qi';
-    row.innerHTML = `<span>${S.a[it.agent].def.emoji} ${it.task}</span>`;
-    if (it.resultId) row.insertBefore(Object.assign(document.createElement('button'), { textContent: '👁', title: 'Natijani ko\'rish', onclick: () => openResult(it.resultId, it.task) }), row.firstChild.nextSibling);
-    const ok = Object.assign(document.createElement('button'), { textContent: '✓', className: 'ok', onclick: () => choose(it.id, true) });
-    const no = Object.assign(document.createElement('button'), { textContent: '✕', className: 'no', onclick: () => choose(it.id, false) });
-    row.append(ok, no); q.appendChild(row);
+    row.innerHTML = `<span>${esc(NAME(it.agent))}: ${esc(it.task)}</span>`;
+    if (it.resultId) row.appendChild(Object.assign(document.createElement('button'), { textContent: '👁', title: 'Natijani ko\'rish', onclick: () => openResult(it.resultId, it.task) }));
+    row.appendChild(Object.assign(document.createElement('button'), { textContent: '✓', className: 'ok', onclick: () => choose(it.id, true) }));
+    row.appendChild(Object.assign(document.createElement('button'), { textContent: '✕', className: 'no', onclick: () => choose(it.id, false) }));
+    q.appendChild(row);
   });
 }
-
-/* ---- Demo simulyatsiya (haqiqiy ulanmaguncha) ---- */
-function tick() {
-  if (S.paused) return;
-  Object.values(S.a).forEach(st => {
-    if (st.state === 'idle' && Math.random() < 0.25) API.start(st.def.id, pick(st.def.tasks));
-    else if (st.state === 'working') {
-      const p = Math.min(1, st.progress + rnd(0.03, 0.09)); setProgress(st, p);
-      if (p >= 1) {
-        const r = Math.random();
-        if (r < 0.07) API.error(st.def.id, 'API xatosi');
-        else if (r < 0.65 && !st.redo) API.needApproval(st.def.id);
-        else { st.redo = false; API.done(st.def.id); }
-        st.redo = false;
-      }
-    }
+function renderResults() {
+  $('resH').style.display = S.results.length ? '' : 'none';
+  const box = $('results'); box.innerHTML = '';
+  S.results.slice(0, 14).forEach(r => {
+    const row = document.createElement('div'); row.className = 'res';
+    row.innerHTML = `<span>${esc(NAME(r.agent))}: ${esc(r.task)}<small>${STATUS[r.status] || r.status}</small></span>`;
+    row.appendChild(Object.assign(document.createElement('button'), { textContent: 'Ko\'rish', onclick: () => openResult(r.id, r.task) }));
+    box.appendChild(row);
   });
-  if ($('auto').checked && S.queue.length) choose(S.queue[0].id, true);
 }
-setInterval(tick, 700);
-$('pause').onclick = e => { S.paused = !S.paused; e.target.textContent = S.paused ? '▶ Davom' : '⏸ Pauza'; };
+function renderPipe(c) {
+  const p = $('pipe'); p.classList.add('on');
+  p.innerHTML = `<b>${esc(c.caseId)}</b>` + S.roster.floors.map(f => `<span class="chip ${c.stages[f.id] || ''}">${f.emoji} ${f.name.split(' ')[0]}</span>`).join('→') +
+    `<span id="pipeInfo">${esc(c.brief)}</span>` + (c.decision ? `<span class="badge ${c.decision}">${c.decision}</span>` : '');
+}
+function renderJournal() {
+  $('jrH').style.display = S.journal.length ? '' : 'none';
+  const box = $('journal'); box.innerHTML = '';
+  S.journal.slice(0, 12).forEach(j => {
+    const row = document.createElement('div'); row.className = 'jr';
+    row.innerHTML = `<span class="badge ${j.decision}">${j.decision}</span><span><b>${esc(j.caseId)}</b> ${esc(j.brief)}<small>${esc(j.reason)} → ${esc(j.next)}</small></span>`;
+    box.appendChild(row);
+  });
+}
+$('csv').onclick = () => {
+  const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+  const rows = [['Loyiha', 'Vaqt', 'Qaror', 'Sabab', 'Keyingi harakat', 'Brief']].concat(S.journal.map(j => [j.caseId, j.time, j.decision, j.reason, j.next, j.brief]));
+  Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([rows.map(r => r.map(q).join(',')).join('\n')], { type: 'text/csv' })), download: 'qaror-jurnali.csv' }).click();
+};
+async function openResult(id, title) {
+  $('mTitle').textContent = title; $('mText').textContent = 'Yuklanmoqda…'; $('modal').classList.add('on');
+  try {
+    const j = await (await fetch('/result/' + id + '?key=' + encodeURIComponent(KEY))).json();
+    const talk = (j.talk || []).map(t => `💬 ${NAME(t.from)} → ${NAME(t.to)}: ${t.ask}\n↩️ ${NAME(t.to)}: ${t.reply == null ? '(kutilmoqda…)' : t.reply}`).join('\n\n');
+    $('mText').textContent = (talk ? 'HAMKASBLAR MULOQOTI\n\n' + talk + '\n\n──────── NATIJA ────────\n\n' : '') + (j.text || '(bo\'sh)');
+  } catch { $('mText').textContent = 'Yuklab bo\'lmadi'; }
+}
+$('mClose').onclick = () => $('modal').classList.remove('on');
+$('modal').onclick = e => { if (e.target === $('modal')) $('modal').classList.remove('on'); };
 
-/* ---- Haqiqiy backend: ?ws=wss://... yoki ?sse=https://... ----
-   Server shunday JSON yuborsin: {"type":"start","agent":"coder","task":"Bug fix"}
-   type: start | progress | needApproval | error | done | idle */
-const qs = new URLSearchParams(location.search);
-/* Server.js bilan ochilganda (http://localhost:3000) avtomatik jonli rejim */
-fetch('/ping').then(r => r.ok && r.json()).then(j => {
-  if (!j || !j.office) return;
-  S.live = true; S.paused = true; if (j.ai) { setupTaskbar(); log('Haqiqiy AI rejimi: ' + j.model, '🧠'); } $('pause').style.display = 'none';
-  const es = new EventSource('/events?key=' + encodeURIComponent(KEY)); es.onmessage = m => API.event(JSON.parse(m.data));
-  es.onopen = () => log('Serverga ulandi', '🔌');
-}).catch(() => {});
-if (qs.get('ws')) { S.paused = true; const ws = new WebSocket(qs.get('ws')); ws.onmessage = m => API.event(JSON.parse(m.data)); }
-if (qs.get('sse')) { S.paused = true; const es = new EventSource(qs.get('sse')); es.onmessage = m => API.event(JSON.parse(m.data)); }
+function setupTaskbar() {
+  const sel = $('tAgent');
+  sel.innerHTML = '<option value="__case">🏢 Butun minora (to\'liq loyiha)</option>' +
+    S.roster.floors.map(f => `<optgroup label="${f.emoji} ${f.n}-qavat · ${f.name}">` +
+      S.roster.employees.filter(e => e.floor === f.id).map(e => `<option value="${e.id}">${esc(e.name)} — ${esc(e.title)}</option>`).join('') + '</optgroup>').join('');
+  const upd = () => {
+    const c = sel.value === '__case';
+    $('tText').placeholder = c ? 'Loyiha brief\'i: g\'oya, mahsulot yoki maqsadni yozing (masalan: Toshkentda yangi kofe-shop ochyapmiz)…' : 'Xodimga vazifa yozing…';
+    $('tGo').textContent = c ? '▶ Loyihani boshlash' : '▶ Vazifa ber';
+  };
+  sel.onchange = upd; upd();
+  $('taskbar').classList.add('on');
+  const goTask = async () => {
+    const text = $('tText').value.trim(); if (!text) return;
+    const c = sel.value === '__case';
+    const r = await fetch((c ? '/case' : '/task') + '?key=' + encodeURIComponent(KEY), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(c ? { brief: text } : { agent: sel.value, task: text }) });
+    const j = await r.json();
+    if (j.ok) $('tText').value = ''; else log(j.error || 'Xato', '⚠️');
+  };
+  $('tGo').onclick = goTask; $('tText').onkeydown = e => { if (e.key === 'Enter') goTask(); };
+}
 
-/* ---- Ekranga moslash ---- */
-function fit() { const w = $('wrap').clientWidth, k = Math.min(1, w / 960); stage.style.transform = `scale(${k})`; $('wrap').style.height = 690 * k + 'px'; }
+setInterval(() => { if ($('auto').checked && S.queue.length) choose(S.queue[0].id, true); }, 1500);
+
+/* ======================= ISHGA TUSHIRISH ======================= */
+function fit() { const w = $('wrap').clientWidth, k = Math.min(1, w / 1000); stage.style.transform = `scale(${k})`; $('wrap').style.height = 860 * k + 'px'; }
 addEventListener('resize', fit); fit();
-render(); log('Ofis ochildi', '🏢');
+
+(async function init() {
+  try { S.roster = await (await fetch('/roster.json')).json(); }
+  catch { stage.innerHTML = '<div style="padding:40px;font-size:18px">Serverni ishga tushiring: <code>node server.js</code>, so\'ng <code>http://localhost:3000</code> ni oching.</div>'; return; }
+  buildCity(); buildTower();
+  S.roster.employees.forEach(d => { const e = makeEmp(d, DESK_X[d.slot] ?? 110); S.e[d.id] = e; S.emps.push(e); });
+  // Boss (siz) — penthouse
+  const boss = makeEmp({ id: 'boss', name: 'Siz (Boss)', floor: 'control', title: 'Boss', look: { skin: '#e8b48a', hair: '#222222', style: 'short', shirt: '#111827', pants: '#111827', acc: 'tie' }, traits: { speed: 1, coffee: 0, chat: 0, wander: 0 }, lines: [] }, 300, { boss: true });
+  boss.el.classList.add('boss'); S.e.boss = boss; S.emps.push(boss);
+  S.emps.forEach(e => { if (e.id !== 'boss') startLife(e); });
+  $('cabin').style.top = cabinTop(1) + 'px';
+  render(); log('Minora ochildi', '🏢');
+  try {
+    const j = await (await fetch('/ping')).json();
+    if (j && j.office) {
+      S.live = true; if (j.ai) { S.ai = true; setupTaskbar(); log('Haqiqiy AI rejimi: ' + j.model, '🧠'); }
+      const es = new EventSource('/events?key=' + encodeURIComponent(KEY)); es.onmessage = m => API.event(JSON.parse(m.data));
+      es.onopen = () => log('Serverga ulandi', '🔌');
+    }
+  } catch {}
+})();
 </script>
 </body>
 </html>

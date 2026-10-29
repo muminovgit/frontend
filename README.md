@@ -1,4 +1,4 @@
-# Agent Ofis
+# Silikon Minora (Agent Ofis)
 
 Agentlaringiz ishini vizual ko'rish uchun ofis paneli: har bir agent o'z stolida ishlaydi,
 tasdiq kerak bo'lsa sizning navbatingizga keladi, siz ✓ / ✕ bosasiz.
@@ -67,3 +67,24 @@ Vazifani odatda **🧭 Menejer**ga bering — u o'zi kerakli hamkasblarni jalb q
 
 Xarajat nazorati (Railway Variables): `MAX_TALK_CALLS` (bitta vazifada jami hamkasb so'rovlari, default 8),
 `MAX_TALK_DEPTH` (so'rov zanjiri chuqurligi, default 2). Har so'rov alohida API chaqiruvi — muloqot ko'p bo'lsa, xarajat ham ko'p.
+
+## Silikon Minora — qavatlar, xodimlar, loyiha jarayoni
+Bitta bino, 5 qavat, 12 ta xodim (har birining o'z xarakteri, tashqi ko'rinishi va odatlari — `roster.json`). Xodimlar stolda ishlaydi,
+kofe-mashinaga, suv avtomatiga, doskaga boradi, bir-biri bilan suhbatlashadi, qavatlararo **lift**da yuradi.
+
+| Qavat | Xodimlar |
+|---|---|
+| 5 · Nazorat (Penthouse) | Madina (direktor) + siz (Boss) |
+| 4 · Risk va Sifat | Kamola (risk), Timur (qoidalar/huquq) |
+| 3 · Sotuv | Rustam (boshliq), Nigora (outreach), Otabek (muzokarachi) |
+| 2 · Marketing | Jasur (direktor), Malika (kontent), Sardor (SMM) |
+| 1 · Tadqiqot | Aziza (bosh tadqiqotchi), Bobur (skaner), Dilnoza (ma'lumotlar) |
+
+**To'liq loyiha** (vazifa panelida "🏢 Butun minora"): brief yozasiz → Tadqiqot → Marketing → Sotuv → Risk → Nazorat.
+Har qavat yozma HANDOFF beradi (topilmalar, noma'lumlar, qaror GO/WAIT/REJECT), siz har bosqichni ko'rib tasdiqlaysiz (✓/✕),
+dalil yetishmasa jarayon WAIT bilan to'xtaydi, Nazorat yakuniy qaror beradi va **Qaror jurnali**ga yoziladi (CSV yuklab olinadi).
+Mantiq TOWER qo'llanmasiga asoslangan: bosqichma-bosqich, dalil-asosli, odam tasdig'i bilan; hech qanday tashqi amal bajarilmaydi.
+Bitta xodimga alohida vazifa ham berish mumkin; xodimlar `ask_teammate` orqali bir-biridan yordam so'raydi.
+Loyiha = 5 birlik (`MAX_TASKS_PER_DAY`, default 40), bitta bosqichda hamkasb so'rovlari `MAX_TALK_CALLS` (default 6).
+Claude Code hook'i endi `dilnoza` stolida ko'rinadi (`node agents/install-hook.js <xodim-id>` bilan o'zgartiring).
+Eslatma: ofis serverdan `roster.json` ni oladi, shuning uchun `index.html` ni faqat fayl sifatida ochib bo'lmaydi — `node server.js` kerak.

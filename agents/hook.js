@@ -3,7 +3,7 @@
 // Env: OFFICE_URL (https://....up.railway.app), OFFICE_TOKEN, OFFICE_AGENT (default: coder)
 const fs = require('fs'), os = require('os'), path = require('path');
 const BASE = (process.env.OFFICE_URL || 'http://localhost:3000').replace(/\/$/, '');
-const AGENT = process.env.OFFICE_AGENT || 'coder';
+const AGENT = process.env.OFFICE_AGENT || 'dilnoza';
 const headers = { 'content-type': 'application/json', ...(process.env.OFFICE_TOKEN && { authorization: `Bearer ${process.env.OFFICE_TOKEN}` }) };
 const send = e => fetch(`${BASE}/event`, { method: 'POST', headers, body: JSON.stringify({ agent: AGENT, ...e }), signal: AbortSignal.timeout(4000) }).catch(() => {});
 

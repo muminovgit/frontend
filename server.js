@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const ai = require('./ai-agents');
+const roster = require('./roster.json');
 
 const PORT = process.env.PORT || 3000;
 const TOKEN = process.env.OFFICE_TOKEN || ''; // ixtiyoriy: agentlar uchun maxfiy kalit
@@ -28,7 +29,7 @@ function remember(e) {
   if (e.type === 'needApproval') pending[e.itemId] = e;
 }
 
-const emit = e => { if (e.agent) lastReal[e.agent] = Date.now(); remember(e); broadcast(e); };
+const emit = e => { remember(e); broadcast(e); };   // lastReal faqat tashqi POST /event da belgilanadi
 
 function body(req) {
   return new Promise((ok, fail) => {
@@ -68,7 +69,17 @@ http.createServer(async (req, res) => {
       return;
     }
 
-    // Haqiqiy AI agentga vazifa berish (brauzerdan)
+    if (req.method === 'GET' && url.pathname === '/roster.json') return json(res, 200, roster);
+
+    // To'liq loyiha: Tadqiqot -> Marketing -> Sotuv -> Risk -> Nazorat
+    if (req.method === 'POST' && url.pathname === '/case') {
+      if (!authed(req, url)) return json(res, 401, { error: 'token' });
+      const { brief } = await body(req);
+      const r = ai.startCase({ brief, emit, waitDecision });
+      return json(res, r.code, r);
+    }
+
+    // Haqiqiy AI xodimga vazifa berish (brauzerdan)
     if (req.method === 'POST' && url.pathname === '/task') {
       if (!authed(req, url)) return json(res, 401, { error: 'token' });
       const { agent, task } = await body(req);
@@ -116,8 +127,6 @@ http.createServer(async (req, res) => {
   } catch (err) { json(res, 500, { error: String(err) }); }
 }).listen(PORT, () => console.log(`Agent Ofis: http://localhost:${PORT}`));
 
-// ---- Ichki demo agentlar (DEMO=0 bilan o'chiriladi) ----
-// Hamma stol ishlab tursin; haqiqiy agent ulansa, shu stol uchun demo to'xtaydi.
 // Kutilgan qarorni kutadi: 'approved' | 'rejected' | 'expired'
 async function waitDecision(itemId, ms) {
   const until = Date.now() + ms;
@@ -127,15 +136,23 @@ async function waitDecision(itemId, ms) {
   return 'expired';
 }
 
-const DEMO = [
-  ['research', ['Bozor tahlili', 'Raqobatchilar', 'Trend qidiruv']],
-  ['writer',   ['Blog post', 'Email kampaniya', 'Reels ssenariy']],
-  ['sales',    ['Lead topish', 'Taklif yuborish', 'Follow-up']],
-  ['coder',    ['Bug fix', 'Yangi funksiya', 'Code review']],
-  ['support',  ['Ticket javob', 'FAQ yangilash', 'Shikoyat']],
-];
+// ---- Ichki demo xodimlar (DEMO=0 bilan o'chiriladi) ----
+// Hamma qavat tirik tursin; haqiqiy agent ulansa, shu xodim uchun demo to'xtaydi.
+const DEMO = roster.employees.map(e => [e.id, e.demo]);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const real = a => Date.now() - (lastReal[a] || 0) < 120000;
+
+// Demo: xodimlar bir-biriga gap aytib boradi
+async function demoTalk(from) {
+  await sleep(2000 + Math.random() * 4000);
+  const others = roster.employees.filter(e => e.id !== from);
+  const to = others[Math.floor(Math.random() * others.length)].id;
+  const asks = ['Shu raqamni tekshirib bera olasizmi?', 'Hisobot tayyormi?', 'Bir daqiqaga ko\'rib chiqing.', 'Fikringiz qanday?'];
+  const replies = ['Hozir qarayman.', 'Ha, tayyor.', 'Manbasini yuboraman.', 'Kelishdik.'];
+  emit({ type: 'talk', agent: from, to, kind: 'ask', message: asks[Math.floor(Math.random() * asks.length)] });
+  await sleep(3500 + Math.random() * 2000);
+  emit({ type: 'talk', agent: to, to: from, kind: 'reply', message: replies[Math.floor(Math.random() * replies.length)] });
+}
 
 async function demoAgent(agent, tasks) {
   await sleep(Math.random() * 5000);
@@ -143,11 +160,12 @@ async function demoAgent(agent, tasks) {
     if (real(agent)) { await sleep(5000); continue; }
     const task = tasks[Math.floor(Math.random() * tasks.length)];
     emit({ type: 'start', agent, task });
+    if (Math.random() < 0.4) demoTalk(agent);
     for (let p = 0.1; p <= 1.001 && !real(agent); p += 0.1) { await sleep(700 + Math.random() * 1100); emit({ type: 'progress', agent, value: Math.min(p, 1) }); }
     if (real(agent)) continue;
     const r = Math.random();
     if (r < 0.06) emit({ type: 'error', agent, message: 'API xatosi' });
-    else if (r < 0.6) {
+    else if (r < 0.22) {
       const itemId = crypto.randomUUID();
       emit({ type: 'needApproval', agent, task, itemId });
       const until = Date.now() + 10 * 60000;       // siz bosmasangiz 10 daqiqadan keyin o'zi davom etadi
