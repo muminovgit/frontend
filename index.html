@@ -165,7 +165,7 @@
     <div id="wrap"><div id="stage"></div></div>
     <aside>
       <h3>Tasdiq navbati</h3><div id="qlist"></div>
-      <h3 id="resH" style="display:none">Natijalar</h3><div id="results"></div>
+      <h3 id="resH" style="display:none">Hujjatlar (saqlangan) <button id="arcAll" style="float:right;padding:0 6px;font-size:.7rem">⬇ Hammasi</button></h3><div id="results" style="max-height:320px;overflow-y:auto"></div>
       <h3 id="jrH" style="display:none">Qaror jurnali <button id="csv" style="float:right;padding:0 6px;font-size:.7rem">CSV</button></h3><div id="journal"></div>
       <h3>Jonli log</h3><ul id="log"></ul>
     </aside>
@@ -210,7 +210,7 @@ const stage = $('stage');
 function log(text, icon = '•') {
   const li = document.createElement('li'), t = new Date().toLocaleTimeString('uz', { hour12: false });
   li.innerHTML = `<time>${t}</time><span>${icon} ${esc(text)}</span>`;
-  $('log').prepend(li); while ($('log').children.length > 80) $('log').lastChild.remove();
+  $('log').prepend(li); while ($('log').children.length > 250) $('log').lastChild.remove();
 }
 
 /* ======================= SAHNA ======================= */
@@ -659,6 +659,7 @@ const API = {
   result(id, task, ev) {
     const i = S.results.findIndex(r => r.id === ev.resultId), r = { id: ev.resultId, agent: ev.agent, task: ev.task, status: ev.status };
     if (i < 0) S.results.unshift(r); else S.results[i] = r; renderResults();
+    if (['review', 'approved', 'rejected', 'expired', 'interrupted'].includes(ev.status)) archive(r);
   },
   case(id, task, ev) { S.cases[ev.caseId] = ev; renderPipe(ev); },
   journal(id, task, ev) { if (!S.journal.find(j => j.caseId === ev.caseId && j.time === ev.time)) S.journal.unshift(ev); renderJournal(); },
@@ -670,7 +671,7 @@ const API = {
 window.AgentOffice = API;
 
 /* ======================= PANELLAR ======================= */
-const STATUS = { working: '⏳ ishlayapti', review: '👁 tasdiq kutadi', approved: '✅ tasdiqlandi', rejected: '↩️ rad etildi', expired: '⌛ muddati o\'tdi', error: '⚠️ xato' };
+const STATUS = { interrupted: '⛔ to\'xtatilgan (matn saqlangan)', working: '⏳ ishlayapti', review: '👁 tasdiq kutadi', approved: '✅ tasdiqlandi', rejected: '↩️ rad etildi', expired: '⌛ muddati o\'tdi', error: '⚠️ xato' };
 function choose(id, ok) {
   if (!S.live) return API.decide(id, ok);
   fetch('/decision?key=' + encodeURIComponent(KEY), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ itemId: id, ok }) });
@@ -690,11 +691,12 @@ function render() {
   });
 }
 function renderResults() {
-  $('resH').style.display = S.results.length ? '' : 'none';
+  const items = allDocs();
+  $('resH').style.display = items.length ? '' : 'none';
   const box = $('results'); box.innerHTML = '';
-  S.results.slice(0, 14).forEach(r => {
+  items.slice(0, 60).forEach(r => {
     const row = document.createElement('div'); row.className = 'res';
-    row.innerHTML = `<span>${esc(NAME(r.agent))}: ${esc(r.task)}<small>${STATUS[r.status] || r.status}</small></span>`;
+    row.innerHTML = `<span>${esc(NAME(r.agent))}: ${esc(r.task)}<small>${r.saved ? '💾 ' : ''}${STATUS[r.status] || r.status}</small></span>`;
     row.appendChild(Object.assign(document.createElement('button'), { textContent: 'Ko\'rish', onclick: () => openResult(r.id, r.task) }));
     box.appendChild(row);
   });
@@ -721,7 +723,32 @@ $('csv').onclick = () => {
 let CUR = null;                                   // ochiq natija: { title, text, talk }
 const talkText = talk => (talk || []).map(t => `💬 ${NAME(t.from)} → ${NAME(t.to)}: ${t.ask}\n↩️ ${NAME(t.to)}: ${t.reply == null ? '(kutilmoqda…)' : t.reply}`).join('\n\n');
 function setModal(on) { $('modal').classList.toggle('on', on); document.body.classList.toggle('noscroll', on); }
-async function fetchResult(id) { return await (await fetch('/result/' + id + '?key=' + encodeURIComponent(KEY))).json(); }
+/* ---- brauzer arxivi: hujjatlar server qayta ishga tushsa ham yo'qolmaydi ---- */
+let ARC = []; try { ARC = JSON.parse(localStorage.getItem('arc2') || '[]'); } catch {}
+function saveArc() {
+  try { ARC.length = Math.min(ARC.length, 120); localStorage.setItem('arc2', JSON.stringify(ARC)); }
+  catch { try { ARC.length = Math.max(5, Math.floor(ARC.length / 2)); localStorage.setItem('arc2', JSON.stringify(ARC)); } catch {} }
+}
+async function fetchResult(id) {
+  try {
+    const r = await fetch('/result/' + id + '?key=' + encodeURIComponent(KEY)); const j = await r.json();
+    if (!j.error) return j;
+  } catch {}
+  const a = ARC.find(x => x.id === id);
+  if (a) return { text: a.text, talk: a.talk, saved: true };
+  throw new Error('topilmadi');
+}
+async function archive(r) {
+  const old = ARC.find(a => a.id === r.id);
+  if (old && old.status === r.status && old.text) return;
+  try {
+    const j = await fetchResult(r.id); if (j.saved) return;
+    const rec = { id: r.id, agent: r.agent, task: r.task, status: r.status, time: old ? old.time : Date.now(), text: j.text || '', talk: j.talk || [] };
+    if (old) ARC[ARC.indexOf(old)] = rec; else ARC.unshift(rec);
+    saveArc(); renderResults();
+  } catch {}
+}
+const allDocs = () => { const items = S.results.map(r => ({ ...r })); ARC.forEach(a => { if (!items.find(x => x.id === a.id)) items.push({ id: a.id, agent: a.agent, task: a.task, status: a.status, saved: true }); }); return items; };
 async function openResult(id, title) {
   $('mTitle').textContent = title; $('mText').textContent = 'Yuklanmoqda…'; setModal(true); CUR = null;
   try {
@@ -730,6 +757,12 @@ async function openResult(id, title) {
     $('mText').innerHTML = (t ? '<div class="talkh">Hamkasblar muloqoti</div>' + t + '<hr>' : '') + md(j.text || '(bo\'sh)'); $('mText').scrollTop = 0;
   } catch { $('mText').textContent = 'Yuklab bo\'lmadi'; }
 }
+$('arcAll').onclick = () => {
+  const docs = ARC.slice().reverse(); if (!docs.length) return;
+  const txt = docs.map(d => `# ${d.task} — ${NAME(d.agent)}\n\n_${new Date(d.time).toLocaleString('uz')} · ${STATUS[d.status] || d.status}_\n\n` + (d.talk && d.talk.length ? '## Hamkasblar muloqoti\n\n' + talkText(d.talk) + '\n\n## Natija\n\n' : '') + d.text).join('\n\n---\n\n');
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([txt], { type: 'text/markdown;charset=utf-8' })), download: 'silikon-minora-hujjatlar.md' });
+  document.body.appendChild(a); a.click(); a.remove();
+};
 $('mClose').onclick = () => setModal(false);
 $('modal').onclick = e => { if (e.target === $('modal')) setModal(false); };
 addEventListener('keydown', e => { if (e.key === 'Escape') setModal(false); });
@@ -798,7 +831,7 @@ $('mCopy').onclick = async () => {
 };
 async function caseToPdf(caseId) {                // butun loyiha: barcha bosqichlar + qaror, bitta PDF
   const c = S.cases[caseId]; if (!c) return;
-  const stages = S.results.filter(r => String(r.task).startsWith(caseId + ' ·')).reverse();
+  const stages = allDocs().filter(r => String(r.task).startsWith(caseId + ' ·')).reverse();
   const secs = [];
   for (const r of stages) { try { const j = await fetchResult(r.id); secs.push({ h: r.task.replace(caseId + ' · ', '') + ' — ' + NAME(r.agent), text: j.text, talk: j.talk }); } catch {} }
   const jr = S.journal.find(j => j.caseId === caseId);
@@ -846,7 +879,7 @@ addEventListener('resize', fit); fit();
   boss.el.classList.add('boss'); S.e.boss = boss; S.emps.push(boss);
   S.emps.forEach(e => { if (e.id !== 'boss') startLife(e); });
   $('cabin').style.top = cabinTop(1) + 'px';
-  render(); log('Minora ochildi', '🏢');
+  render(); renderResults(); log('Minora ochildi' + (ARC.length ? ` · ${ARC.length} ta saqlangan hujjat` : ''), '🏢');
   try {
     const j = await (await fetch('/ping')).json();
     if (j && j.office) {

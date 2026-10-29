@@ -95,3 +95,9 @@ Eslatma: ofis serverdan `roster.json` ni oladi, shuning uchun `index.html` ni fa
 - Tepadagi **Rang** menyusi: *Iliq* (standart), *Shisha*, *Kechki shahar* (yulduzlar, oy, yonib turgan oynalar). Tanlov brauzerda eslab qolinadi.
 - Natija oynasi (👁 / "Ko'rish") uzun matnni formatlab (sarlavha, jadval, ro'yxat, kod) ko'rsatadi va aylanadi. Tugmalar: **📄 PDF** (chop etish oynasida
   "PDF sifatida saqlash" ni tanlang), **⬇ .md**, **📋 Nusxa**. Loyiha jarayonida pipeline panelidagi **📄 Loyiha PDF** barcha bosqichlar, muloqot va yakuniy qarorni bitta PDF qiladi.
+
+## Hujjatlar saqlanishi
+- **Brauzer arxivi (avtomatik):** har bir tayyor hujjat (natija, muloqot) brauzeringizda ham saqlanadi. Server o'chib qayta yoqilsa yoki deploy bo'lsa ham
+  "Hujjatlar (saqlangan)" ro'yxatida 💾 belgisi bilan qoladi va ochiladi. **⬇ Hammasi** barchasini bitta .md fayl qiladi.
+- **Server fayli:** server hujjat, loyiha va qaror jurnalini `DATA_DIR/state.json` ga yozadi (standart `./data`). Railway'da deploy dan keyin ham qolishi uchun
+  servisga **Volume** ulang (Railway → servis → ⌘K / Add → Volume, mount path `/data`) va Variables ga `DATA_DIR=/data` qo'ying.

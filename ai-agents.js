@@ -3,6 +3,8 @@
 // qarorlar GO / WAIT / REJECT, dalil yetishmasa WAIT, bosqichlar orasida odam (Boss) tasdig'i, qaror jurnali.
 // Xodimlar faqat MATN tayyorlaydi (tashqi tizimga hech narsa yubormaydi).
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 const Anthropic = require('@anthropic-ai/sdk');
 const roster = require('./roster.json');
 
@@ -69,11 +71,40 @@ const askTool = self => ({
 const results = new Map();   // resultId -> { id, agent, task, text, status, talk }
 const cases = new Map();     // caseId -> case meta
 const journal = [];          // qaror jurnali
-const busy = new Set();
-let day = '', used = 0, caseSeq = 0;
+let day = '', used = 0, caseSeq = 0, dirty = false;
 
-const meta = r => ({ type: 'result', resultId: r.id, agent: r.agent, task: r.task, status: r.status });
-const caseMeta = c => ({ type: 'case', caseId: c.id, brief: c.brief, stage: c.stage, status: c.status, decision: c.decision, stages: c.stages });
+// ---- Saqlash: hujjatlar server qayta ishga tushsa ham qoladi ----
+// Railway'da deploy dan keyin ham saqlanishi uchun Volume ulang va DATA_DIR=/data qo'ying (README).
+const DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
+const FILE = path.join(DIR, 'state.json');
+function load() {
+  try {
+    const st = JSON.parse(fs.readFileSync(FILE, 'utf8'));
+    (st.results || []).forEach(r => { if (r.status === 'working' || r.status === 'review') r.status = 'interrupted'; results.set(r.id, r); });
+    (st.cases || []).forEach(c => {
+      if (c.status === 'running') { c.status = 'stopped'; Object.keys(c.stages).forEach(k => { if (['running', 'review'].includes(c.stages[k])) c.stages[k] = 'error'; }); }
+      cases.set(c.id, c);
+    });
+    journal.push(...(st.journal || [])); caseSeq = st.caseSeq || 0;
+    console.log(`Saqlangan holat yuklandi: ${results.size} hujjat, ${journal.length} qaror (${FILE})`);
+  } catch (e) { if (e.code !== 'ENOENT') console.error('Holatni o\'qib bo\'lmadi:', e.message); }
+}
+function save() {
+  if (!dirty) return; dirty = false;
+  try {
+    fs.mkdirSync(DIR, { recursive: true });
+    const tmp = FILE + '.tmp';
+    fs.writeFileSync(tmp, JSON.stringify({ results: [...results.values()], cases: [...cases.values()], journal, caseSeq }));
+    fs.renameSync(tmp, FILE);
+  } catch (e) { console.error('Saqlab bo\'lmadi:', e.message); }
+}
+setInterval(save, 3000).unref();
+for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => { dirty = true; save(); process.exit(0); });
+load();
+const busy = new Set();
+
+const meta = r => (dirty = true, { type: 'result', resultId: r.id, agent: r.agent, task: r.task, status: r.status });
+const caseMeta = c => (dirty = true, { type: 'case', caseId: c.id, brief: c.brief, stage: c.stage, status: c.status, decision: c.decision, stages: c.stages });
 const list = () => [...results.values()].map(meta).concat([...cases.values()].map(caseMeta), journal.map(j => ({ type: 'journal', ...j })));
 const getResult = id => { const r = results.get(id); return r && { text: r.text, talk: r.talk }; };
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -151,8 +182,8 @@ async function generate(ctx, agent, messages, opts) {
 // Bitta ish bosqichi: yozadi -> Boss ko'radi -> tasdiq / qayta urinish (2 martagacha)
 async function runWork({ agent, stage, title, input, emit, waitDecision, onStatus }) {
   const res = { id: crypto.randomUUID(), agent, task: title, text: '', status: 'working', talk: [] };
-  results.set(res.id, res);
-  while (results.size > 40) results.delete(results.keys().next().value);
+  results.set(res.id, res); dirty = true;
+  while (results.size > 120) results.delete(results.keys().next().value);
   const ctx = { emit, calls: 0, talk: res.talk, threads: {}, inTok: 0, outTok: 0 };
   const short = title.slice(0, 60);
   try {
@@ -251,7 +282,7 @@ async function runCase({ id, brief, emit, waitDecision }) {
     }
     c.decision = decision; c.status = 'done'; push();
     const row = { caseId: id, time: new Date().toISOString(), decision, reason, next, brief: brief.slice(0, 100) };
-    journal.unshift(row); journal.length = Math.min(journal.length, 50);
+    journal.unshift(row); journal.length = Math.min(journal.length, 200); dirty = true;
     emit({ type: 'journal', ...row });
   } catch (err) {
     c.status = 'error'; push(); console.error('[case] xato:', err);
