@@ -17,6 +17,8 @@ function broadcast(e) {
   clients.forEach(res => res.write(line));
 }
 
+const lastReal = {};    // agent -> haqiqiy hodisa vaqti (demo shu stolni 2 daqiqa tegmaydi)
+
 function remember(e) {
   if (!e.agent) return;
   if (e.type === 'start') last[e.agent] = { start: e, progress: null };
@@ -68,6 +70,7 @@ http.createServer(async (req, res) => {
       const e = await body(req);
       if (!e.type) return json(res, 400, { error: 'type kerak' });
       if (e.type === 'needApproval') e.itemId = crypto.randomUUID();
+      if (e.agent) lastReal[e.agent] = Date.now();
       remember(e); broadcast(e);
       return json(res, 200, { ok: true, itemId: e.itemId });
     }
@@ -94,3 +97,40 @@ http.createServer(async (req, res) => {
     json(res, 404, { error: 'yo\'q' });
   } catch (err) { json(res, 500, { error: String(err) }); }
 }).listen(PORT, () => console.log(`Agent Ofis: http://localhost:${PORT}`));
+
+// ---- Ichki demo agentlar (DEMO=0 bilan o'chiriladi) ----
+// Hamma stol ishlab tursin; haqiqiy agent ulansa, shu stol uchun demo to'xtaydi.
+const DEMO = [
+  ['research', ['Bozor tahlili', 'Raqobatchilar', 'Trend qidiruv']],
+  ['writer',   ['Blog post', 'Email kampaniya', 'Reels ssenariy']],
+  ['sales',    ['Lead topish', 'Taklif yuborish', 'Follow-up']],
+  ['coder',    ['Bug fix', 'Yangi funksiya', 'Code review']],
+  ['support',  ['Ticket javob', 'FAQ yangilash', 'Shikoyat']],
+];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const real = a => Date.now() - (lastReal[a] || 0) < 120000;
+const emit = e => { remember(e); broadcast(e); };
+
+async function demoAgent(agent, tasks) {
+  await sleep(Math.random() * 5000);
+  for (;;) {
+    if (real(agent)) { await sleep(5000); continue; }
+    const task = tasks[Math.floor(Math.random() * tasks.length)];
+    emit({ type: 'start', agent, task });
+    for (let p = 0.1; p <= 1.001 && !real(agent); p += 0.1) { await sleep(700 + Math.random() * 1100); emit({ type: 'progress', agent, value: Math.min(p, 1) }); }
+    if (real(agent)) continue;
+    const r = Math.random();
+    if (r < 0.06) emit({ type: 'error', agent, message: 'API xatosi' });
+    else if (r < 0.6) {
+      const itemId = crypto.randomUUID();
+      emit({ type: 'needApproval', agent, task, itemId });
+      const until = Date.now() + 10 * 60000;       // siz bosmasangiz 10 daqiqadan keyin o'zi davom etadi
+      while (!decisions[itemId] && pending[itemId] && Date.now() < until) await sleep(500);
+      if (pending[itemId]) { delete pending[itemId]; broadcast({ type: 'decide', itemId, ok: true }); continue; }
+      if (decisions[itemId] === 'rejected') continue;   // rad etildi -> qayta urinadi
+      emit({ type: 'done', agent });
+    } else emit({ type: 'done', agent });
+    await sleep(3000 + Math.random() * 5000);
+  }
+}
+if (process.env.DEMO !== '0') DEMO.forEach(([a, t]) => demoAgent(a, t));

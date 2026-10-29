@@ -39,3 +39,7 @@ Server boshqa joyda bo'lsa `OFFICE_URL` / `OFFICE_TOKEN` env larini qo'ying (Rai
 3. Ofis: `https://xxx.up.railway.app/?key=KALIT`
 4. Hook ni shu serverga ulash:
    `OFFICE_URL=https://xxx.up.railway.app OFFICE_TOKEN=KALIT node agents/install-hook.js coder`
+
+## Ichki demo agentlar
+Server ishga tushganda 5 ta agent o'zi ishlab turadi (ofis doim tirik). Haqiqiy hodisa (hook, curl, n8n) kelgan stol
+2 daqiqa demo'dan chiqadi. O'chirish: `DEMO=0 node server.js` (Railway Variables ga `DEMO=0`).
