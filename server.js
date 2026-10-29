@@ -168,7 +168,7 @@ async function demoAgent(agent, tasks) {
     else if (r < 0.22) {
       const itemId = crypto.randomUUID();
       emit({ type: 'needApproval', agent, task, itemId });
-      const until = Date.now() + 10 * 60000;       // siz bosmasangiz 10 daqiqadan keyin o'zi davom etadi
+      const until = Date.now() + 25000;           // demo: siz bosmasangiz 25 soniyadan keyin o'zi davom etadi
       while (!decisions[itemId] && pending[itemId] && Date.now() < until) await sleep(500);
       if (pending[itemId]) { delete pending[itemId]; broadcast({ type: 'decide', itemId, ok: true }); continue; }
       if (decisions[itemId] === 'rejected') continue;   // rad etildi -> qayta urinadi

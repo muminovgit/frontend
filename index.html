@@ -47,94 +47,51 @@
     main { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 12px; padding: 0 16px 16px; }
     @media (max-width: 1000px) { main { grid-template-columns: 1fr; } }
     #wrap { border-radius: 14px; overflow: hidden; position: relative; border: 1px solid var(--line); background: #8fc3ea; }
-    #stage { position: relative; width: 1000px; height: 860px; transform-origin: 0 0; overflow: hidden;
-      background: linear-gradient(#7db9ea 0%, #bfe0f6 55%, #e8f4fb 78%); }
+    #stage { position: relative; width: 1000px; height: 1090px; transform-origin: 0 0; overflow: hidden; background: #9ed8f6; }
 
     /* ---- shahar fon ---- */
-    .sun { position: absolute; left: 880px; top: 24px; width: 54px; height: 54px; border-radius: 50%; background: #ffe58a; box-shadow: 0 0 40px 12px #ffe58a99; }
-    .cloud { position: absolute; height: 22px; border-radius: 22px; background: #ffffffcc; animation: drift linear infinite; }
-    .cloud::before { content: ''; position: absolute; left: 14px; top: -10px; width: 30px; height: 26px; border-radius: 50%; background: inherit; }
-    @keyframes drift { from { transform: translateX(-120px); } to { transform: translateX(1100px); } }
-    .bgb { position: absolute; background: linear-gradient(#8fa4bf, #7a8fab); border-radius: 3px 3px 0 0; }
-    .bgb i { position: absolute; width: 5px; height: 6px; background: #dbe7f5; opacity: .85; }
-    .ground { position: absolute; left: 0; right: 0; top: 770px; bottom: 0; background: #6b7280; }
-    .walk { position: absolute; left: 0; right: 0; top: 770px; height: 26px; background: #b9c1cc; border-top: 4px solid #98a2b0; }
-    .road-line { position: absolute; left: 0; right: 0; top: 826px; height: 4px; background: repeating-linear-gradient(90deg, #f4f4f4 0 28px, transparent 28px 56px); opacity: .7; }
-    .car { position: absolute; top: 808px; width: 56px; height: 20px; border-radius: 8px 12px 4px 4px; animation: drive linear infinite; }
-    .car::before { content: ''; position: absolute; left: 12px; top: -10px; width: 30px; height: 12px; border-radius: 8px 8px 0 0; background: inherit; filter: brightness(1.15); }
-    .car::after { content: ''; position: absolute; left: 6px; bottom: -4px; width: 10px; height: 10px; border-radius: 50%; background: #222; box-shadow: 34px 0 #222; }
-    @keyframes drive { from { transform: translateX(-100px); } to { transform: translateX(1080px); } }
-    .tree { position: absolute; top: 740px; width: 34px; height: 30px; border-radius: 50%; background: #4caf72; }
-    .tree::after { content: ''; position: absolute; left: 15px; top: 26px; width: 5px; height: 14px; background: #7a5230; }
+    .citywrap { position: absolute; inset: 0; }
+    .sun { position: absolute; left: 870px; top: 34px; width: 58px; height: 58px; border-radius: 50%; background: #fff3b0; box-shadow: 0 0 50px 16px #fff3b0aa; }
+    .cloud { position: absolute; height: 22px; border-radius: 22px; background: #ffffffd0; animation: drift linear infinite; }
+    .cloud::before { content: ''; position: absolute; left: 14px; top: -10px; width: 32px; height: 26px; border-radius: 50%; background: inherit; }
+    @keyframes drift { from { transform: translateX(-140px); } to { transform: translateX(1120px); } }
+    .tag { position: absolute; padding: 5px 12px 5px 9px; font-size: 10.5px; font-weight: 700; letter-spacing: .1em; color: #e8f6ff; background: #0d2338e8; border: 1px solid var(--tg, #37e0ff); border-radius: 3px 12px 12px 3px; z-index: 2000;
+      box-shadow: 0 0 12px color-mix(in srgb, var(--tg, #37e0ff) 45%, transparent), inset 0 0 8px #37e0ff22; white-space: nowrap; }
+    .tag b { color: var(--tg, #37e0ff); margin-right: 8px; }
+    .pod { position: absolute; left: 0; animation: drive linear infinite; z-index: 5; }
+    .pod.rev { animation-direction: reverse; } .pod.rev svg { transform: scaleX(-1); }
+    @keyframes drive { from { transform: translateX(-120px); } to { transform: translateX(1100px); } }
+    .ped { position: absolute; left: 0; z-index: 6; animation: stroll linear infinite; transform-origin: 0 0; }
+    .ped .char { width: 40px; height: 72px; transform: scale(.62); transform-origin: 0 100%; margin-top: -45px; }
+    .ped.rev { animation-direction: reverse; } .ped.rev .char { transform: scale(-.62, .62); }
+    @keyframes stroll { from { transform: translateX(-60px); } to { transform: translateX(1050px); } }
+    .glare { position: absolute; z-index: 1500; pointer-events: none; background: linear-gradient(115deg, #ffffff00 20%, #ffffff26 32%, #ffffff00 44%, #ffffff00 62%, #ffffff1c 70%, #ffffff00 80%); mix-blend-mode: screen; }
 
     /* ---- minora ---- */
-    #roof { position: absolute; left: 90px; top: 40px; width: 820px; height: 30px; background: #3d4660; border-radius: 10px 10px 0 0; }
-    #roof b { position: absolute; left: 0; right: 0; text-align: center; top: 6px; color: #e8ecff; font-size: .78rem; letter-spacing: .35em; }
-    #antenna { position: absolute; left: 480px; top: 6px; width: 4px; height: 36px; background: #3d4660; }
-    #antenna::after { content: ''; position: absolute; left: -3px; top: -6px; width: 10px; height: 10px; border-radius: 50%; background: #ff4d4d; animation: blink 1.4s infinite; }
-    @keyframes blink { 50% { opacity: .2; } }
-    .floor { position: absolute; width: 740px; height: 140px; overflow: hidden; border-bottom: 4px solid #2a3042; }
-    .floor .wall { position: absolute; inset: 0 0 28px 0; }
-    .floor .carpet { position: absolute; left: 0; right: 0; bottom: 0; height: 28px; }
-    .floor .win { position: absolute; top: 14px; width: 92px; height: 58px; border: 4px solid #f5f7fa; border-radius: 4px;
-      background: linear-gradient(#8ccaf3, #d4ecfb); box-shadow: inset 0 0 0 1px #0002; }
-    .floor .win::after { content: ''; position: absolute; left: 22px; top: 12px; width: 36px; height: 12px; border-radius: 12px; background: #fff; opacity: .85; }
-    .floor .light { position: absolute; top: 0; width: 70px; height: 5px; background: #fff8d6; border-radius: 0 0 6px 6px; box-shadow: 0 6px 18px 6px #fff4b855; }
-    .floorsign { position: absolute; left: 4px; width: 92px; padding: 6px 4px; text-align: center; font-size: .66rem; font-weight: 700; letter-spacing: .05em; color: #fff; border-radius: 6px; line-height: 1.25; }
-    .floorsign span { display: block; font-size: 1.15rem; }
-    #shaft { position: absolute; left: 840px; top: 70px; width: 60px; height: 700px; background: linear-gradient(90deg, #4b5368, #39405a); z-index: 1; }
-    .sdoor { position: absolute; width: 46px; height: 112px; border: 2px solid #8a93aa; background: #2b3144; border-radius: 3px; }
-    #cabin { position: absolute; left: 847px; width: 46px; height: 110px; z-index: 2; background: linear-gradient(#c9d6ea, #a9b8d0); border: 2px solid #eef3fb; border-radius: 4px; }
+    .floor { position: absolute; width: 740px; height: 140px; overflow: hidden; }
+    #shaft { position: absolute; left: 840px; top: 190px; width: 60px; height: 700px; background: linear-gradient(90deg, #5a6482, #3f4766); z-index: 1; border-left: 2px solid #ffffff55; }
+    .sdoor { position: absolute; width: 46px; height: 112px; border: 2px solid #9aa4be; background: linear-gradient(#2e3550, #232942); border-radius: 3px; }
+    #cabin { position: absolute; left: 847px; width: 46px; height: 110px; z-index: 2; background: linear-gradient(#d7e3f3, #aebfd8); border: 2px solid #f2f6fc; border-radius: 4px; box-shadow: 0 0 12px #8fd0f066; }
     #cabin::before { content: '▲▼'; position: absolute; top: 3px; left: 0; right: 0; text-align: center; font-size: 8px; color: #2a3042; }
-
-    .item { position: absolute; }
-    .desk { position: absolute; width: 104px; height: 40px; }
-    .desk .top { position: absolute; inset: 0; border-radius: 5px 5px 2px 2px; background: linear-gradient(#d8b48a, #c49a6c); border-top: 3px solid #e6c9a3; box-shadow: 0 3px 0 #0003; }
-    .desk .mon { position: absolute; left: 8px; top: -26px; width: 44px; height: 28px; background: #12151f; border: 3px solid #2f3646; border-radius: 3px; overflow: hidden; }
-    .desk .mon i { display: block; height: 2px; margin: 4px 4px 0; background: #38bdf8; opacity: 0; border-radius: 2px; }
-    .desk.work .mon i { opacity: .9; animation: type 1s steps(2) infinite; }
-    .desk.work .mon i:nth-child(2) { width: 60%; animation-delay: .3s; } .desk.work .mon i:nth-child(3) { width: 40%; animation-delay: .6s; }
-    .desk .cup { position: absolute; right: 10px; top: -10px; width: 9px; height: 10px; background: #fff; border-radius: 0 0 3px 3px; border: 1px solid #bbb; }
-    @keyframes type { 50% { opacity: .2; } }
-    .desk.boss { width: 140px; } .desk.boss .mon { width: 34px; left: 6px; } .desk.boss .mon.m2 { left: 50px; } .desk.boss .mon.m3 { left: 94px; }
+    .led { animation: blink 1.4s infinite; } @keyframes blink { 50% { opacity: .25; } }
+    .chair { position: absolute; width: 40px; height: 64px; pointer-events: none; }
+    .desk { position: absolute; height: 62px; pointer-events: none; }
+    .desk .ln { opacity: .15; } .desk.work .ln { opacity: .95; animation: type 1s steps(2) infinite; } .desk.work .ln:nth-child(2) { animation-delay: .3s; } .desk.work .ln:nth-child(3) { animation-delay: .6s; }
+    @keyframes type { 50% { opacity: .25; } }
 
     /* ---- xodimlar ---- */
-    .emp { position: absolute; width: 34px; height: 62px; transform: translate(-50%, -100%); }
-    .emp .char { position: relative; width: 34px; height: 62px; }
+    .emp { position: absolute; width: 40px; height: 72px; transform: translate(-50%, -100%); }
+    .emp .char { position: relative; width: 40px; height: 72px; }
     .emp.left .char { transform: scaleX(-1); }
-    .char i, .char b { position: absolute; display: block; }
-    .char .head { left: 9px; top: 0; width: 16px; height: 16px; border-radius: 50%; background: var(--skin); z-index: 3; }
-    .char .eyes { left: 3px; top: 7px; width: 2px; height: 2px; border-radius: 50%; background: #222; box-shadow: 8px 0 #222; }
-    .char .hair { left: -1px; top: -3px; width: 18px; height: 9px; background: var(--hair); border-radius: 9px 9px 2px 2px; }
-    .hs-long .hair::before, .hs-bob .hair::before { content: ''; position: absolute; left: 0; top: 7px; width: 3px; height: 14px; background: var(--hair); box-shadow: 15px 0 var(--hair); }
-    .hs-bob .hair::before { height: 9px; }
-    .hs-bun .hair::after { content: ''; position: absolute; left: 5px; top: -8px; width: 8px; height: 8px; border-radius: 50%; background: var(--hair); }
-    .hs-spiky .hair { height: 12px; top: -7px; border-radius: 0; clip-path: polygon(0 100%, 8% 0, 24% 60%, 40% 0, 56% 60%, 72% 0, 88% 60%, 100% 100%); }
-    .hs-messy .hair { height: 11px; top: -6px; border-radius: 6px; clip-path: polygon(0 100%, 4% 20%, 20% 50%, 35% 0, 55% 40%, 75% 5%, 92% 40%, 100% 100%); }
-    .hs-slick .hair { height: 7px; border-radius: 9px 9px 0 0; }
-    .hs-side .hair { border-radius: 9px 3px 2px 6px; }
-    .hs-pony .hair::after { content: ''; position: absolute; left: 14px; top: 3px; width: 6px; height: 12px; border-radius: 50%; background: var(--hair); }
-    .char .torso { left: 7px; top: 15px; width: 20px; height: 24px; border-radius: 6px 6px 3px 3px; background: var(--shirt); z-index: 2; }
-    .char .armL, .char .armR { top: 17px; width: 5px; height: 18px; background: var(--shirt); border-radius: 3px; transform-origin: 50% 2px; filter: brightness(.92); z-index: 2; }
-    .char .armL { left: 2px; } .char .armR { left: 27px; }
-    .char .legL, .char .legR { top: 38px; width: 7px; height: 22px; background: var(--pants); border-radius: 2px 2px 3px 3px; border-bottom: 3px solid #1a1a1a; transform-origin: 50% 2px; z-index: 1; }
-    .char .legL { left: 9px; } .char .legR { left: 18px; }
-    .char .acc { z-index: 4; }
-    .acc-glasses .acc { left: 9px; top: 6px; width: 16px; height: 5px; border: 1.5px solid #222; border-radius: 3px; background: #ffffff44; }
-    .acc-headphones .acc { left: 6px; top: -3px; width: 22px; height: 14px; border: 3px solid #222; border-bottom: none; border-radius: 12px 12px 0 0; }
-    .acc-headphones .acc::before, .acc-headphones .acc::after { content: ''; position: absolute; top: 8px; width: 5px; height: 8px; background: #222; border-radius: 2px; }
-    .acc-headphones .acc::before { left: -4px; } .acc-headphones .acc::after { right: -4px; }
-    .acc-tie .acc { left: 15px; top: 17px; width: 4px; height: 16px; background: #c0392b; clip-path: polygon(0 0, 100% 0, 85% 100%, 15% 100%); }
-    .acc-cap .acc { left: 6px; top: -4px; width: 22px; height: 8px; background: #222; border-radius: 10px 10px 0 0; }
-    .acc-cap .acc::after { content: ''; position: absolute; right: -6px; bottom: 0; width: 9px; height: 3px; background: #222; border-radius: 2px; }
-    .acc-scarf .acc { left: 7px; top: 14px; width: 20px; height: 5px; background: #e84393; border-radius: 3px; }
-    .emp .tagbox { position: absolute; left: 50%; bottom: 66px; transform: translateX(-50%); text-align: center; white-space: nowrap; pointer-events: none; }
-    .emp .nm { display: inline-block; font-size: 10px; font-weight: 700; color: #fff; background: #1f2430cc; padding: 1px 6px; border-radius: 6px; }
-    .emp .tk { display: block; font-size: 9px; color: #1f2430; background: #ffffffdd; border-radius: 4px; padding: 0 4px; margin-top: 1px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; }
-    .emp .pb { display: none; height: 3px; width: 44px; margin: 2px auto 0; background: #0003; border-radius: 2px; overflow: hidden; }
+    .csv { display: block; overflow: visible; }
+    .csv .lgL, .csv .lgR, .csv .arL, .csv .arR { transform-box: fill-box; transform-origin: 50% 6%; }
+    .emp .tagbox { position: absolute; left: 50%; bottom: 78px; transform: translateX(-50%); text-align: center; white-space: nowrap; pointer-events: none; }
+    .emp .nm { display: inline-block; font-size: 10px; font-weight: 700; color: #fff; background: #1f2430d9; padding: 1px 7px; border-radius: 7px; box-shadow: 0 1px 3px #0003; }
+    .emp .tk { display: block; font-size: 9px; color: #1f2430; background: #ffffffe6; border-radius: 4px; padding: 0 5px; margin-top: 1px; max-width: 124px; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 1px 3px #0002; }
+    .emp .pb { display: none; height: 3px; width: 46px; margin: 2px auto 0; background: #0003; border-radius: 2px; overflow: hidden; }
     .emp .pb div { height: 100%; width: 0; background: var(--work); transition: width .3s; }
     .emp.working .pb { display: block; }
-    .emp .bubble { position: absolute; left: 50%; bottom: 100px; transform: translateX(-50%); background: #fff; color: #1f2430; border: 1px solid #c8d0dc; font-size: 10px; padding: 3px 8px; border-radius: 9px; max-width: 170px; width: max-content; white-space: normal; line-height: 1.25; text-align: center;
+    .emp .bubble { position: absolute; left: 50%; bottom: 112px; transform: translateX(-50%); background: #fff; color: #1f2430; border: 1px solid #c8d0dc; font-size: 10px; padding: 3px 8px; border-radius: 9px; max-width: 170px; width: max-content; white-space: normal; line-height: 1.25; text-align: center;
       opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 1000; box-shadow: 0 2px 6px #0002; }
     .emp.say .bubble { opacity: 1; }
     .emp.working .nm { background: var(--work); } .emp.waiting .nm { background: var(--wait); } .emp.done .nm { background: var(--done); } .emp.error .nm { background: var(--err); }
@@ -143,12 +100,12 @@
     .emp.walking .char { animation: bob2 .38s ease-in-out infinite; }
     .emp.left.walking .char { animation: bob2l .38s ease-in-out infinite; }
     @keyframes bob2 { 50% { transform: translateY(-2px); } } @keyframes bob2l { 0%,100% { transform: scaleX(-1); } 50% { transform: scaleX(-1) translateY(-2px); } }
-    .emp.walking .legL, .emp.walking .armR { animation: swingA .38s ease-in-out infinite; }
-    .emp.walking .legR, .emp.walking .armL { animation: swingB .38s ease-in-out infinite; }
-    @keyframes swingA { 0%,100% { transform: rotate(-26deg); } 50% { transform: rotate(26deg); } }
-    @keyframes swingB { 0%,100% { transform: rotate(26deg); } 50% { transform: rotate(-26deg); } }
-    .emp.typing .armL { animation: typeA .28s ease-in-out infinite; } .emp.typing .armR { animation: typeA .28s .14s ease-in-out infinite; }
-    @keyframes typeA { 50% { transform: rotate(-22deg) translateY(-2px); } }
+    .emp.walking .lgL, .emp.walking .arR, .char.walking .lgL, .char.walking .arR { animation: swingA .4s ease-in-out infinite; }
+    .emp.walking .lgR, .emp.walking .arL, .char.walking .lgR, .char.walking .arL { animation: swingB .4s ease-in-out infinite; }
+    @keyframes swingA { 0%,100% { transform: rotate(-24deg); } 50% { transform: rotate(24deg); } }
+    @keyframes swingB { 0%,100% { transform: rotate(24deg); } 50% { transform: rotate(-24deg); } }
+    .emp.typing .arL { animation: typeA .28s ease-in-out infinite; } .emp.typing .arR { animation: typeA .28s .14s ease-in-out infinite; }
+    @keyframes typeA { 50% { transform: rotate(-14deg); } }
     .emp.boss .nm { background: #7c3aed; }
 
     /* ---- yon panel ---- */
@@ -203,7 +160,7 @@
 
 <script>
 /* ======================= O'LCHAMLAR ======================= */
-const TX = 100, TY = 70, FW = 140;          // minora chap/yuqori, qavat balandligi
+const TX = 100, TY = 190, FW = 140, STAGE_H = 1090;          // minora chap/yuqori, qavat balandligi
 const DOOR_X = TX + 770;                     // lift eshigi
 const $ = id => document.getElementById(id);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -212,14 +169,7 @@ const pick = a => a[Math.floor(Math.random() * a.length)];
 const Y = n => TY + (5 - n) * FW;            // qavat tepasi (n = 1..5)
 const LANE = n => Y(n) + 130;                // yurish chizig'i
 const SEAT = n => Y(n) + 112;                // o'tirish chizig'i
-const DESK_X = [110, 270, 430];
-const THEMES = {
-  research:  { wall: ['#eaf0ff', '#dbe4ff'], carpet: '#b8c7f5', accent: '#4c6ef5' },
-  marketing: { wall: ['#fff0f6', '#ffe0ec'], carpet: '#f7b6cf', accent: '#e64980' },
-  sales:     { wall: ['#fff9db', '#fff0b3'], carpet: '#f5d56b', accent: '#e8890c' },
-  risk:      { wall: ['#e6ebef', '#d3dbe2'], carpet: '#9aa7b3', accent: '#d63031' },
-  control:   { wall: ['#efe9fb', '#ded3f6'], carpet: '#a78bda', accent: '#7048e8' },
-};
+const DESK_X = [60, 210, 420];
 
 const S = { e: {}, emps: [], queue: [], results: [], journal: [], cases: {}, shipped: 0, err: 0, live: false, ai: false, roster: null };
 const KEY = new URLSearchParams(location.search).get('key') || '';
@@ -235,78 +185,249 @@ function log(text, icon = '•') {
 
 /* ======================= SAHNA ======================= */
 function el(html) { const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
+function seeded(a) { return () => { a = (a * 16807) % 2147483647; return (a - 1) / 2147483646; }; }
+const GT = TY + 5 * FW;                       // yer sathi (binoning pasti)
 
+/* ---------- xodim (SVG) ---------- */
+const HAIR = {
+  short:  { back: '', front: 'M11 9 Q11 -1 20 -1 Q29 -1 29 9 Q27 3.5 20 3.5 Q13 3.5 11 9Z' },
+  long:   { back: 'M10 8 Q9 24 12 30 L28 30 Q31 24 30 8 Q30 -2 20 -2 Q10 -2 10 8Z', front: 'M11 9 Q14 2 20 2.5 Q26 2 29 9 Q24 5 20 6 Q15 5 11 9Z' },
+  bun:    { back: '', front: 'M11 9 Q11 -1 20 -1 Q29 -1 29 9 Q27 3.5 20 3.5 Q13 3.5 11 9Z M20 -9 a4.6 4.6 0 1 0 .01 0Z' },
+  spiky:  { back: '', front: 'M10.5 9 L10.8 1 L14 4.5 L16 -3 L19 3 L22.5 -4 L24 3 L27.5 -1 L29 5 L29.5 9 Q27 3.8 20 3.8 Q13 3.8 10.5 9Z' },
+  slick:  { back: '', front: 'M11 9 Q10.5 -1 21 -1 Q30.5 0 29 9 Q27 2.5 19 3 Q14 3.5 11 9Z' },
+  messy:  { back: '', front: 'M10.5 10 Q8.5 2 15 -1 Q19 -3 24 -1 Q31 1 29.5 10 Q28 4.5 25 5.5 Q23 2.5 20 5.5 Q17 2.5 14 5.5 Q12 4.5 10.5 10Z' },
+  bob:    { back: 'M9.5 9 Q9 -2 20 -2 Q31 -2 30.5 9 L30.5 22 Q30 25 27 23 L27 12 L13 12 L13 23 Q10 25 9.5 22Z', front: 'M11 9 Q14 2 20 2.5 Q26 2 29 9 Q24 5.5 20 6 Q15 5.5 11 9Z' },
+  pony:   { back: 'M28 6 Q38 8 35 22 Q31 15 28.5 12Z', front: 'M11 9 Q11 -1 20 -1 Q29 -1 29 9 Q27 3.5 20 3.5 Q13 3.5 11 9Z' },
+  side:   { back: '', front: 'M11 9 Q10 -1 20 -1 Q30 -1 29 9 Q26 2.5 17 4 Q13 5 11 9Z' },
+};
+function svgChar(l, opt = {}) {
+  const h = HAIR[l.style] || HAIR.short, sh = shade(l.shirt, -22), sk2 = shade(l.skin, -18), pn2 = shade(l.pants, 14);
+  const acc = {
+    glasses: '<g fill="#ffffff33" stroke="#1e2430" stroke-width="1.3"><circle cx="16.3" cy="10.8" r="3.3"/><circle cx="23.7" cy="10.8" r="3.3"/><path d="M19.6 10.6h.8" fill="none"/></g>',
+    headphones: '<path d="M10.5 11 Q10 -2.5 20 -2.5 Q30 -2.5 29.5 11" fill="none" stroke="#252b3a" stroke-width="2.6"/><rect x="7.6" y="8" width="4.4" height="8" rx="2" fill="#252b3a"/><rect x="28" y="8" width="4.4" height="8" rx="2" fill="#252b3a"/>',
+    tie: '<path d="M20 20 L22.3 24 L21.3 38 L20 40.5 L18.7 38 L17.7 24Z" fill="#c0392b"/><path d="M17.5 19.5 L20 24 L22.5 19.5Z" fill="#fff" opacity=".9"/>',
+    cap: '<path d="M10.2 7.5 Q10.5 -2.2 20 -2.2 Q29.5 -2.2 29.8 7.5Z" fill="#22283a"/><path d="M26 6.5 L36 8.3 L36 10.5 L26.5 9.6Z" fill="#22283a"/>',
+    scarf: '<path d="M10.5 20.5 Q20 27 29.5 20.5 L29.5 25.5 Q20 32 10.5 25.5Z" fill="#e84393"/><rect x="24" y="25" width="4" height="10" rx="2" fill="#e84393"/>',
+    none: '',
+  }[l.acc] || '';
+  const back = l.style === 'pony' || l.style === 'long' || l.style === 'bob' ? `<path d="${h.back}" fill="${l.hair}"/>` : '';
+  const front = `<path d="${h.front}" fill="${l.hair}"/>`;
+  const capHidesHair = l.acc === 'cap';
+  return `<svg viewBox="0 0 40 72" width="40" height="72" class="csv">
+    ${opt.noShadow ? '' : '<ellipse cx="20" cy="70.5" rx="12" ry="2.6" fill="#0003"/>'}
+    ${back}
+    <g class="lgL"><rect x="12" y="44" width="7.4" height="24" rx="3.2" fill="${l.pants}"/><rect x="10.8" y="64.5" width="10" height="5.5" rx="2.7" fill="#1a1d27"/></g>
+    <g class="lgR"><rect x="20.6" y="44" width="7.4" height="24" rx="3.2" fill="${pn2}"/><rect x="19.4" y="64.5" width="10" height="5.5" rx="2.7" fill="#1a1d27"/></g>
+    <path d="M10 24 Q10 19.5 15.5 18.8 L24.5 18.8 Q30 19.5 30 24 L31 46.5 Q31 49.5 28 49.5 L12 49.5 Q9 49.5 9 46.5Z" fill="${l.shirt}"/>
+    <path d="M10 24 Q10 19.5 15.5 18.8 L24.5 18.8 Q30 19.5 30 24 L30.6 30 Q20 33 9.4 30Z" fill="#fff" opacity=".14"/>
+    <rect x="9" y="45.5" width="22" height="4" rx="1.5" fill="${l.pants}" opacity=".85"/>
+    <rect x="17" y="15" width="6" height="5.5" rx="2" fill="${sk2}"/>
+    <path d="M15.5 18.8 L20 23.5 L24.5 18.8Z" fill="${sh}"/>
+    <g class="arL"><rect x="5.2" y="20.5" width="6.4" height="22" rx="3.2" fill="${sh}"/><circle cx="8.4" cy="43.6" r="3.2" fill="${l.skin}"/></g>
+    <g class="arR"><rect x="28.4" y="20.5" width="6.4" height="22" rx="3.2" fill="${sh}"/><circle cx="31.6" cy="43.6" r="3.2" fill="${l.skin}"/></g>
+    ${l.acc === 'tie' || l.acc === 'scarf' ? acc : ''}
+    <circle cx="11.6" cy="10.6" r="2.1" fill="${sk2}"/><circle cx="28.4" cy="10.6" r="2.1" fill="${sk2}"/>
+    <ellipse cx="20" cy="9.8" rx="8.6" ry="9.7" fill="${l.skin}"/>
+    <ellipse cx="14.6" cy="13.6" rx="2.2" ry="1.4" fill="#ff7a7a" opacity=".22"/><ellipse cx="25.4" cy="13.6" rx="2.2" ry="1.4" fill="#ff7a7a" opacity=".22"/>
+    <ellipse cx="16.4" cy="10.6" rx="1.15" ry="1.6" fill="#1c1f2a"/><ellipse cx="23.6" cy="10.6" rx="1.15" ry="1.6" fill="#1c1f2a"/>
+    <circle cx="16.8" cy="10" r=".42" fill="#fff"/><circle cx="24" cy="10" r=".42" fill="#fff"/>
+    <path d="M14.4 7.6 Q16.4 6.6 18.2 7.6 M21.8 7.6 Q23.6 6.6 25.6 7.6" stroke="${l.hair}" stroke-width="1" fill="none" stroke-linecap="round"/>
+    <path d="M17.8 15 Q20 16.7 22.2 15" stroke="#a5483f" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+    ${capHidesHair ? '' : front}
+    ${l.acc === 'tie' || l.acc === 'scarf' ? '' : acc}
+    ${l.acc === 'cap' ? acc : ''}
+  </svg>`;
+}
+function shade(hex, amt) {
+  const n = parseInt(hex.slice(1), 16), c = v => Math.max(0, Math.min(255, v));
+  return '#' + [(n >> 16) + amt, ((n >> 8) & 255) + amt, (n & 255) + amt].map(v => c(v).toString(16).padStart(2, '0')).join('');
+}
+const miniChar = (l, x, y, s) => `<svg x="${x}" y="${y}" width="${40 * s}" height="${72 * s}" viewBox="0 0 40 72">${svgChar(l, { noShadow: true }).replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '')}</svg>`;
+
+/* ---------- shahar, qobiq, tom, lobbi ---------- */
 function buildCity() {
+  const r = seeded(11), W = 1000, H = STAGE_H, cx = TX + 400;
+  let far = '', mid = '', trees = '';
+  for (let x = -20; x < 1020; x += 30 + r() * 30) { const w = 30 + r() * 38, hh = 560 + r() * 300, bx = x.toFixed(0), by = (GT - hh).toFixed(0), c = r() < .5 ? '#a9cde4' : '#9bc3dd';
+    far += `<rect x="${bx}" y="${by}" width="${w.toFixed(0)}" height="${hh.toFixed(0)}" fill="${c}"/><rect x="${bx}" y="${by}" width="${w.toFixed(0)}" height="${hh.toFixed(0)}" fill="url(#wg)" opacity=".6"/>`; }
+  [[-6, 70, 600], [52, 54, 470], [96, 34, 640]].forEach(([x, w, h]) => mid += `<rect x="${x}" y="${GT - h}" width="${w}" height="${h}" fill="url(#gl)"/><path d="M${x} ${GT - h} l${w} 0 l0 ${h * .4} z" fill="#fff" opacity=".13"/>`);
+  [[912, 74, 640], [962, 56, 520], [885, 30, 700]].forEach(([x, w, h]) => mid += `<rect x="${x}" y="${GT - h}" width="${w}" height="${h}" fill="url(#gl)"/><path d="M${x} ${GT - h} l${w} 0 l0 ${h * .4} z" fill="#fff" opacity=".13"/>`);
+  const tree = (x, y, s) => `<g transform="translate(${x} ${y}) scale(${s})"><rect x="-3" y="-4" width="6" height="26" rx="2" fill="#7b5a3a"/><circle cx="0" cy="-22" r="19" fill="#4da668"/><circle cx="-13" cy="-12" r="14" fill="#5cb877"/><circle cx="13" cy="-13" r="14" fill="#3f9a5c"/><circle cx="2" cy="-30" r="12" fill="#6bc786"/></g>`;
+  [30, 150, 860, 970].forEach((x, i) => trees += tree(x, GT + 138, 1 + (i % 2) * .15));
+  [120, 880].forEach(x => trees += tree(x, GT + 150, .8));
+  // lobbi
+  const lob = `
+    <rect x="${TX}" y="${GT}" width="800" height="120" fill="#dff2fb" opacity=".92"/><rect x="${TX}" y="${GT + 96}" width="800" height="24" fill="#b9c8d6"/>
+    <ellipse cx="${cx - 50}" cy="${GT + 104}" rx="150" ry="14" fill="#2f6f9e" opacity=".45"/>
+    <circle cx="${cx - 50}" cy="${GT + 56}" r="34" fill="url(#holo)"/>
+    <g fill="none" stroke="#bff3ff" stroke-width="1.2" opacity=".9"><ellipse cx="${cx - 50}" cy="${GT + 56}" rx="34" ry="12"/><ellipse cx="${cx - 50}" cy="${GT + 56}" rx="14" ry="34"/><ellipse cx="${cx - 50}" cy="${GT + 56}" rx="26" ry="34"/><path d="M${cx - 84} ${GT + 56}h68"/></g>
+    <ellipse cx="${cx - 50}" cy="${GT + 100}" rx="46" ry="7" fill="#7be0ff" opacity=".6"/>
+    <rect x="${TX + 40}" y="${GT + 62}" width="120" height="34" rx="5" fill="#cfa16e"/><rect x="${TX + 40}" y="${GT + 56}" width="120" height="9" rx="4" fill="#e7c697"/><rect x="${TX + 78}" y="${GT + 40}" width="30" height="18" rx="3" fill="#1b2233"/>
+    ${miniChar({ skin: '#f1c27d', hair: '#3e2723', style: 'bun', shirt: '#2c6e9b', pants: '#2d3436', acc: 'none' }, TX + 124, GT + 24, .9)}
+    <rect x="${TX + 600}" y="${GT + 40}" width="70" height="56" rx="4" fill="#12303f"/><text x="${TX + 635}" y="${GT + 66}" font-size="10" font-weight="700" fill="#7be0ff" text-anchor="middle">SILIKON</text><text x="${TX + 635}" y="${GT + 80}" font-size="10" font-weight="700" fill="#7be0ff" text-anchor="middle">MINORA</text>
+    <rect x="${TX + 690}" y="${GT + 14}" width="82" height="106" fill="#9ed7f2" opacity=".55" stroke="#fff" stroke-width="3"/><path d="M${TX + 731} ${GT + 14}v106" stroke="#fff" stroke-width="3"/>
+    <g fill="#4da668"><circle cx="${TX + 18}" cy="${GT + 84}" r="12"/><circle cx="${TX + 782}" cy="${GT + 84}" r="12"/></g>`;
+  // tom bog'i va gumbaz
+  const top = TY;
+  const roof = `
+    <ellipse cx="${cx}" cy="${top - 6}" rx="420" ry="9" fill="#c5d0dd"/>
+    <rect x="${cx - 280}" y="${top - 26}" width="560" height="14" rx="6" fill="#6fbf73"/>
+    ${[cx - 240, cx - 190, cx + 190, cx + 245].map((x, i) => tree(x, top - 28, .62 + (i % 2) * .1)).join('')}
+    <ellipse cx="${cx}" cy="${top - 24}" rx="92" ry="8" fill="#63d3ee"/><path d="M${cx - 12} ${top - 26} q12 -38 24 0 M${cx - 24} ${top - 26} q24 -26 48 0" fill="none" stroke="#bff3ff" stroke-width="2"/>
+    ${miniChar({ skin: '#e8b48a', hair: '#2b1b12', style: 'long', shirt: '#6c5ce7', pants: '#2d3436', acc: 'none' }, cx - 140, top - 62, .5)}
+    ${miniChar({ skin: '#c68642', hair: '#111', style: 'short', shirt: '#00b894', pants: '#2d3436', acc: 'none' }, cx + 120, top - 62, .5)}
+    <path d="M${cx - 300} ${top - 14} Q${cx - 300} ${top - 176} ${cx} ${top - 176} Q${cx + 300} ${top - 176} ${cx + 300} ${top - 14}Z" fill="url(#dome)" stroke="#ffffffcc" stroke-width="2"/>
+    <g fill="none" stroke="#ffffff" stroke-width="1.4" opacity=".75">${[-2, -1, 0, 1, 2].map(k => `<path d="M${cx + k * 120} ${top - 14} Q${cx + k * 58} ${top - 150} ${cx} ${top - 176}"/>`).join('')}
+    <path d="M${cx - 262} ${top - 70} Q${cx} ${top - 112} ${cx + 262} ${top - 70}"/><path d="M${cx - 214} ${top - 122} Q${cx} ${top - 150} ${cx + 214} ${top - 122}"/></g>
+    <path d="M${cx - 120} ${top - 150} Q${cx - 60} ${top - 176} ${cx} ${top - 170} L${cx - 40} ${top - 100}Z" fill="#fff" opacity=".28"/>`;
+  const svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="position:absolute;left:0;top:0">
+    <defs>
+      <pattern id="wg" width="10" height="14" patternUnits="userSpaceOnUse"><rect x="2" y="3" width="6" height="8" fill="#fff" opacity=".38"/></pattern>
+      <linearGradient id="gl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a9d6f0"/><stop offset="1" stop-color="#4f86b3"/></linearGradient>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7fcbf5"/><stop offset=".6" stop-color="#bfe6f9"/><stop offset="1" stop-color="#e6f5f6"/></linearGradient>
+      <linearGradient id="haze" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6f5f6" stop-opacity="0"/><stop offset="1" stop-color="#e6f5f6" stop-opacity=".85"/></linearGradient>
+      <linearGradient id="dome" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".55"/><stop offset=".5" stop-color="#bfe9ff" stop-opacity=".22"/><stop offset="1" stop-color="#8fd0f0" stop-opacity=".34"/></linearGradient>
+      <radialGradient id="holo" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#e8fbff"/><stop offset=".55" stop-color="#52c9ee"/><stop offset="1" stop-color="#1a6fa3"/></radialGradient>
+    </defs>
+    <rect width="${W}" height="${H}" fill="url(#sky)"/>
+    ${far}<rect x="0" y="${GT - 120}" width="${W}" height="120" fill="url(#haze)"/>
+    ${mid}
+    <rect x="0" y="${GT}" width="${W}" height="${H - GT}" fill="#8e9aa8"/>
+    ${lob}${roof}
+    <rect x="0" y="${GT + 120}" width="${W}" height="34" fill="#d3dae3"/><rect x="0" y="${GT + 120}" width="${W}" height="4" fill="#aab4c0"/>
+    <rect x="0" y="${GT + 154}" width="${W}" height="${H - GT - 154}" fill="#5b6270"/>
+    <path d="M0 ${GT + 184}H${W}" stroke="#f3f3f3" stroke-width="3" stroke-dasharray="30 26" opacity=".75"/>
+    ${trees}
+  </svg>`;
+  stage.appendChild(el(`<div class="citywrap">${svg}</div>`));
   stage.appendChild(el('<div class="sun"></div>'));
-  [[40, 60, 70], [300, 30, 95], [620, 90, 80], [760, 50, 110]].forEach(([l, t, d]) =>
-    stage.appendChild(el(`<div class="cloud" style="left:${l}px;top:${t}px;width:${70 + (l % 40)}px;animation-duration:${d}s;animation-delay:-${l / 8}s"></div>`)));
-  // fon binolari (silikon shahar)
-  [[0, 90, 420], [48, 60, 360], [96, 40, 470], [915, 70, 430], [950, 50, 360], [900, 28, 480]].forEach(([l, w, h]) => {
-    let win = ''; for (let i = 0; i < 26; i++) win += `<i style="left:${6 + (i % 4) * 14}px;top:${10 + Math.floor(i / 4) * 22}px;${Math.random() < .35 ? 'opacity:.2' : ''}"></i>`;
-    stage.appendChild(el(`<div class="bgb" style="left:${l}px;top:${770 - h}px;width:${w}px;height:${h}px">${win}</div>`));
-  });
-  stage.appendChild(el('<div class="ground"></div>')); stage.appendChild(el('<div class="walk"></div>')); stage.appendChild(el('<div class="road-line"></div>'));
-  ['#e74c3c', '#3498db', '#f1c40f', '#2ecc71'].forEach((c, i) => stage.appendChild(el(`<div class="car" style="background:${c};animation-duration:${9 + i * 3}s;animation-delay:-${i * 3}s"></div>`)));
-  [20, 70, 905, 955].forEach(x => stage.appendChild(el(`<div class="tree" style="left:${x}px"></div>`)));
-  stage.appendChild(el('<div id="roof"><b>SILIKON MINORA</b></div>')); stage.appendChild(el('<div id="antenna"></div>'));
+  [[40, 60, 70], [330, 90, 95], [640, 40, 80], [780, 120, 110]].forEach(([l, t, d]) =>
+    stage.appendChild(el(`<div class="cloud" style="left:${l}px;top:${t}px;width:${80 + (l % 50)}px;animation-duration:${d}s;animation-delay:-${l / 7}s"></div>`)));
+  // kapsulali transport va piyodalar
+  const podCol = ['#ffffff', '#e8fff5', '#fff3e0', '#e6f0ff'];
+  podCol.forEach((c, i) => stage.appendChild(el(`<div class="pod ${i % 2 ? 'rev' : ''}" style="top:${GT + 156}px;animation-duration:${14 + i * 4}s;animation-delay:-${i * 5}s">
+    <svg width="96" height="40" viewBox="0 0 96 40"><ellipse cx="48" cy="38" rx="42" ry="2.5" fill="#0003"/><path d="M6 30 Q6 12 30 8 L68 8 Q90 12 90 30Z" fill="${c}" stroke="#aab7c6" stroke-width="1.5"/><path d="M16 28 Q18 15 33 12 L62 12 Q80 15 82 28Z" fill="#8fd3f0" opacity=".85"/><path d="M48 12v16" stroke="#aab7c6"/><circle cx="24" cy="31" r="6" fill="#2b3140"/><circle cx="72" cy="31" r="6" fill="#2b3140"/><rect x="40" y="3" width="16" height="4" rx="2" fill="#37e0ff"/></svg></div>`)));
+  const looks = [
+    { skin: '#e8b48a', hair: '#2b1b12', style: 'long', shirt: '#e17055', pants: '#2d3436', acc: 'none' }, { skin: '#c68642', hair: '#111', style: 'short', shirt: '#0984e3', pants: '#1e272e', acc: 'none' },
+    { skin: '#f1c27d', hair: '#5d4037', style: 'bun', shirt: '#00b894', pants: '#636e72', acc: 'scarf' }, { skin: '#d9a066', hair: '#1b1b1b', style: 'slick', shirt: '#6c5ce7', pants: '#2d3436', acc: 'tie' },
+    { skin: '#e0ac69', hair: '#212121', style: 'messy', shirt: '#fdcb6e', pants: '#2d3436', acc: 'cap' }, { skin: '#f5cba7', hair: '#8e5a3a', style: 'pony', shirt: '#fd79a8', pants: '#34495e', acc: 'none' },
+  ];
+  looks.forEach((l, i) => stage.appendChild(el(`<div class="ped ${i % 2 ? 'rev' : ''}" style="top:${GT + 124}px;animation-duration:${46 + i * 9}s;animation-delay:-${i * 11}s"><div class="char walking">${svgChar(l)}</div></div>`)));
 }
 
-const DECOR = {
-  research: () => `
-    <div class="item" style="left:8px;top:22px;width:46px;height:90px;background:#8a6a4a;border:3px solid #6b4f35;border-radius:3px">
-      ${[0, 1, 2, 3].map(r => `<div style="position:absolute;left:2px;right:2px;top:${6 + r * 21}px;height:14px;background:repeating-linear-gradient(90deg,#e55039 0 5px,#4a69bd 5px 10px,#78e08f 10px 15px,#f6b93b 15px 20px)"></div>`).join('')}</div>
-    <div class="item" style="left:318px;top:16px;width:130px;height:72px;background:#fff;border:4px solid #b8c0cc;border-radius:4px">
-      <svg viewBox="0 0 120 60" width="122" height="64"><polyline points="6,48 28,36 46,42 66,20 86,28 112,8" fill="none" stroke="#4c6ef5" stroke-width="3"/><circle cx="66" cy="20" r="3" fill="#e64980"/><text x="8" y="14" font-size="9" fill="#555">Bozor tahlili</text></svg></div>
-    <div class="item" style="left:468px;top:24px;font-size:26px">🌐</div>`,
-  marketing: () => `
-    <div class="item" style="left:8px;top:20px;font-size:30px">📸</div>
-    <div class="item" style="left:318px;top:16px;width:130px;height:72px;background:#fff;border:4px solid #e6c0d2;border-radius:4px;display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding:4px">
-      ${['#ff6b6b', '#ffd93d', '#6bcB77', '#4d96ff', '#c77dff', '#ff9f43', '#00cec9', '#fd79a8'].map(c => `<div style="background:${c};border-radius:2px"></div>`).join('')}</div>
-    <div class="item" style="left:468px;top:22px;padding:2px 8px;border:2px solid #ff4fa3;color:#ff4fa3;border-radius:6px;font-weight:800;font-size:13px;text-shadow:0 0 8px #ff4fa3">IDEA</div>`,
-  sales: () => `
-    <div class="item" style="left:8px;top:20px;font-size:30px">🎯</div>
-    <div class="item" style="left:318px;top:16px;width:130px;height:72px;background:#1b2030;border:4px solid #424a62;border-radius:4px">
-      ${[44, 30, 52, 20].map((h, i) => `<div style="position:absolute;left:${14 + i * 28}px;bottom:6px;width:16px;height:${h}px;background:${['#22c55e', '#3b82f6', '#f59e0b', '#a855f7'][i]}"></div>`).join('')}
-      <div style="position:absolute;right:6px;top:2px;font-size:14px">🏆</div></div>
-    <div class="item" style="left:468px;top:26px;font-size:24px">🔔</div>`,
-  risk: () => `
-    <div class="item" style="left:8px;top:22px;width:40px;height:90px;background:#3b4350;border:3px solid #232a35;border-radius:3px">
-      ${[0, 1, 2, 3, 4, 5].map(r => `<div style="position:absolute;left:4px;right:4px;top:${5 + r * 14}px;height:9px;background:#232a35"><i style="position:absolute;right:3px;top:3px;width:3px;height:3px;border-radius:50%;background:${r % 2 ? '#22c55e' : '#ef4444'};animation:blink ${1 + r * .3}s infinite"></i></div>`).join('')}</div>
-    <div class="item" style="left:340px;top:14px;font-size:62px;filter:drop-shadow(0 2px 4px #0003)">🛡️</div>
-    <div class="item" style="left:0;right:0;bottom:28px;height:5px;background:repeating-linear-gradient(135deg,#f1c40f 0 10px,#2d3436 10px 20px)"></div>`,
-  control: () => `
-    <div class="item" style="left:430px;top:12px;width:150px;height:76px;background:#12151f;border:4px solid #3b4260;border-radius:4px;overflow:hidden">
-      ${[[6, 40], [24, 26], [40, 48], [60, 20], [78, 36], [96, 30], [114, 44]].map(([l, h]) => `<div style="position:absolute;left:${l}px;bottom:0;width:14px;height:${h}px;background:#3b5bdb"><i style="position:absolute;left:3px;top:4px;width:3px;height:3px;background:#ffe066"></i></div>`).join('')}</div>
-    <div class="item" style="left:8px;top:24px;font-size:28px">🏆</div>
-    <div class="item" style="left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,#c9a227,#fff2a8,#c9a227)"></div>`,
+/* ---------- qobiq: oyna ustunlari, tosh-plita, qanotlar ---------- */
+function buildShell() {
+  const x0 = TX, x1 = TX + 800;
+  let m = '';
+  for (let k = 0; k <= 10; k++) m += `<path d="M${x0 + k * 80} ${TY} V${GT}" stroke="#fff" stroke-opacity=".22" stroke-width="1.6"/>`;
+  let slabs = '';
+  for (let n = 1; n <= 5; n++) {
+    const yb = Y(n) + FW;
+    slabs += `<rect x="${x0 - 20}" y="${yb - 7}" width="840" height="13" rx="6.5" fill="url(#slab)"/><rect x="${x0 - 20}" y="${yb + 5}" width="840" height="3" rx="1.5" fill="#0002"/>
+      <g fill="#4da668"><ellipse cx="${x0 - 8}" cy="${yb - 12}" rx="11" ry="8"/><ellipse cx="${x1 + 8}" cy="${yb - 12}" rx="11" ry="8"/></g><g fill="#6bc786"><ellipse cx="${x0 + 6}" cy="${yb - 14}" rx="8" ry="6"/><ellipse cx="${x1 - 8}" cy="${yb - 14}" rx="8" ry="6"/></g>`;
+  }
+  const fR = `M${x1 + 4} ${GT} C${x1 + 92} ${GT - 180} ${x1 + 92} ${TY + 160} ${x1 + 4} ${TY - 14} L${x1 + 18} ${TY - 8} C${x1 + 118} ${TY + 170} ${x1 + 118} ${GT - 190} ${x1 + 22} ${GT + 4}Z`;
+  const fL = `M${x0 - 4} ${GT} C${x0 - 70} ${GT - 180} ${x0 - 70} ${TY + 160} ${x0 - 4} ${TY - 14} L${x0 - 16} ${TY - 8} C${x0 - 90} ${TY + 170} ${x0 - 90} ${GT - 190} ${x0 - 20} ${GT + 4}Z`;
+  stage.appendChild(el(`<svg class="shell" width="1000" height="${STAGE_H}" viewBox="0 0 1000 ${STAGE_H}" style="position:absolute;left:0;top:0;z-index:3;pointer-events:none">
+    <defs><linearGradient id="slab" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1f5fa"/><stop offset="1" stop-color="#aab6c6"/></linearGradient>
+    <linearGradient id="fin" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e8f7ff" stop-opacity=".5"/><stop offset=".6" stop-color="#8ed0f2" stop-opacity=".28"/><stop offset="1" stop-color="#ffffff" stop-opacity=".5"/></linearGradient></defs>
+    ${m}<path d="${fR}" fill="url(#fin)" stroke="#fff" stroke-width="1.4"/><path d="${fL}" fill="url(#fin)" stroke="#fff" stroke-width="1.4"/>${slabs}
+    <rect x="${x0 - 2}" y="${TY - 2}" width="804" height="${GT - TY + 4}" fill="none" stroke="#e8f0f8" stroke-width="3" rx="2"/>
+  </svg>`));
+  // shisha yaltirashi (eng ustida)
+  stage.appendChild(el(`<div class="glare" style="left:${TX}px;top:${TY - 170}px;width:800px;height:${GT - TY + 170}px"></div>`));
+}
+
+/* ---------- qavat ichi (SVG) ---------- */
+const THEMES = {
+  research:  { wall: ['#eef3ff', '#dce6ff'], carpet: ['#c4d2f7', '#a9bcf0'], accent: '#4c6ef5', tag: '#6f95ff' },
+  marketing: { wall: ['#fff3f8', '#ffe2ee'], carpet: ['#f9c5d9', '#f3a6c3'], accent: '#e64980', tag: '#ff6fae' },
+  sales:     { wall: ['#fffbe6', '#fff1b8'], carpet: ['#f7de82', '#efc752'], accent: '#e8890c', tag: '#ffb43a' },
+  risk:      { wall: ['#e9eef2', '#d5dde5'], carpet: ['#a9b5c1', '#8e9cab'], accent: '#d63031', tag: '#ff5d5d' },
+  control:   { wall: ['#f1ebfc', '#dfd5f7'], carpet: ['#b79ee6', '#9a7fd6'], accent: '#7048e8', tag: '#b18cff' },
 };
-const AMENITY = () => `
-  <div class="item" style="left:548px;top:60px;width:26px;height:52px;background:#2f3646;border-radius:4px;color:#fff;font-size:15px;text-align:center;line-height:26px">☕<i style="position:absolute;left:6px;bottom:6px;width:14px;height:6px;background:#8b5a2b;border-radius:2px"></i></div>
-  <div class="item" style="left:600px;top:56px;width:24px;height:56px;background:#dff3ff;border:2px solid #9ccbe8;border-radius:5px;text-align:center;font-size:14px;line-height:30px">💧</div>
-  <div class="item" style="left:636px;top:74px;font-size:26px">🪴</div>
-  <div class="item" style="left:666px;top:84px;width:62px;height:28px;background:linear-gradient(#7c8da6,#667895);border-radius:10px 10px 4px 4px"></div>
-  <div class="item" style="left:662px;top:70px;width:12px;height:42px;background:#667895;border-radius:6px"></div>`;
+function floorSVG(f) {
+  const t = THEMES[f.id], id = f.id;
+  let win = '', pend = '';
+  [56, 236, 416, 596].forEach(x => {
+    win += `<g><rect x="${x}" y="16" width="150" height="66" rx="3" fill="url(#sk-${id})" stroke="#fff" stroke-width="3.5"/>
+      <path d="M${x + 4} 78 V58 h12 V48 h10 V66 h8 V40 h10 V70 h10 V52 h12 V64 h10 V44 h10 V78Z" fill="#9fc4de" opacity=".75"/>
+      <ellipse cx="${x + 38}" cy="34" rx="18" ry="5" fill="#fff" opacity=".9"/><ellipse cx="${x + 108}" cy="26" rx="14" ry="4" fill="#fff" opacity=".8"/>
+      <path d="M${x + 75} 18 V80" stroke="#fff" stroke-width="2"/><path d="M${x + 10} 80 L${x + 60} 18 L${x + 80} 18 L${x + 30} 80Z" fill="#fff" opacity=".16"/></g>`;
+  });
+  [190, 350, 510].forEach(x => pend += `<path d="M${x} 7 V22" stroke="#555" stroke-width="1"/><path d="M${x - 11} 30 Q${x} 18 ${x + 11} 30Z" fill="${t.accent}" opacity=".9"/><ellipse cx="${x}" cy="33" rx="13" ry="4" fill="#fff6c8" opacity=".6"/>`);
+  let perspective = ''; for (let x = -200; x <= 940; x += 70) perspective += `<path d="M${x * .55 + 165} 112 L${x} 140" stroke="#fff" stroke-opacity=".14" stroke-width="1"/>`;
+  const amen = `
+    <rect x="534" y="78" width="62" height="32" rx="3" fill="#4a5068"/><rect x="530" y="75" width="70" height="6" rx="3" fill="#8b93ab"/>
+    <rect x="542" y="52" width="22" height="25" rx="3" fill="#2b3042"/><rect x="546" y="57" width="14" height="6" rx="1" fill="#7be0ff" opacity=".8"/><circle cx="553" cy="69" r="2.2" fill="#ff5d5d"/><rect x="549" y="73" width="8" height="4" fill="#fff"/>
+    <rect x="574" y="68" width="7" height="8" rx="1.5" fill="#fff"/><rect x="584" y="68" width="7" height="8" rx="1.5" fill="#ffd9a8"/>
+    <rect x="604" y="62" width="22" height="48" rx="4" fill="#eef8ff" stroke="#a8d4ee" stroke-width="2"/><rect x="608" y="48" width="14" height="18" rx="5" fill="#8fd6f5" opacity=".85" stroke="#6bb9de"/><circle cx="615" cy="82" r="3" fill="#3b9ed6"/>
+    <rect x="640" y="94" width="20" height="16" rx="3" fill="#8c6a4a"/><g fill="#4da668"><ellipse cx="650" cy="82" rx="12" ry="14"/><ellipse cx="642" cy="88" rx="8" ry="10"/><ellipse cx="659" cy="88" rx="8" ry="10"/></g>
+    <rect x="668" y="86" width="64" height="24" rx="9" fill="#7384a3"/><rect x="664" y="68" width="14" height="42" rx="7" fill="#65769a"/><rect x="722" y="74" width="12" height="36" rx="6" fill="#65769a"/><rect x="684" y="80" width="20" height="14" rx="5" fill="#9aa9c6"/>`;
+  const DEC = {
+    research: `
+      <rect x="6" y="20" width="48" height="92" rx="3" fill="#8f6e4d" stroke="#6a4f35" stroke-width="3"/>
+      ${[0, 1, 2, 3].map(r => `<rect x="9" y="${40 + r * 22 - 18}" width="42" height="3" fill="#6a4f35"/>${[0, 1, 2, 3, 4, 5, 6].map(b => `<rect x="${11 + b * 5.6}" y="${25 + r * 22 - 4 + (b % 2)}" width="4.6" height="${13 + (b * 3 + r) % 5}" fill="${['#e55039', '#4a69bd', '#78e08f', '#f6b93b', '#a29bfe', '#00cec9', '#fd79a8'][(b + r * 2) % 7]}"/>`).join('')}`).join('')}
+      <rect x="258" y="12" width="92" height="70" rx="4" fill="#fff" stroke="#b9c3d1" stroke-width="4"/>
+      <text x="264" y="26" font-size="8" font-weight="700" fill="#556">BOZOR HAJMI</text>
+      <polyline points="264,70 280,56 296,62 314,40 332,48 345,30" fill="none" stroke="#4c6ef5" stroke-width="2.6" stroke-linejoin="round"/><g fill="#4c6ef5"><circle cx="314" cy="40" r="2.8"/><circle cx="345" cy="30" r="2.8"/></g>
+      <rect x="326" y="56" width="9" height="9" fill="#ffd93d" transform="rotate(-6 330 60)"/><rect x="338" y="62" width="9" height="9" fill="#ff8fab" transform="rotate(5 342 66)"/>
+      <ellipse cx="496" cy="106" rx="20" ry="5" fill="#3b4666"/><rect x="490" y="92" width="12" height="14" fill="#3b4666"/><circle cx="496" cy="64" r="24" fill="#6fe0ff" opacity=".22" stroke="#6fe0ff" stroke-width="1.4"/><ellipse cx="496" cy="64" rx="24" ry="8" fill="none" stroke="#6fe0ff" stroke-width="1"/><ellipse cx="496" cy="64" rx="9" ry="24" fill="none" stroke="#6fe0ff" stroke-width="1"/><path d="M472 64h48" stroke="#6fe0ff"/>`,
+    marketing: `
+      <circle cx="30" cy="40" r="17" fill="none" stroke="#fff" stroke-width="5"/><circle cx="30" cy="40" r="17" fill="none" stroke="#ffd93d" stroke-width="1.5"/><rect x="28" y="57" width="4" height="46" fill="#4a4f63"/><path d="M14 108 L30 98 L46 108Z" fill="#4a4f63"/><rect x="22" y="36" width="16" height="12" rx="2" fill="#2b3042"/><circle cx="30" cy="42" r="3.4" fill="#7be0ff"/>
+      <rect x="258" y="12" width="92" height="70" rx="4" fill="#e9c9a0" stroke="#c9a173" stroke-width="4"/>
+      ${[[264, 18, '#ff6b6b'], [296, 20, '#ffd93d'], [322, 16, '#6bcb77'], [266, 48, '#4d96ff'], [298, 46, '#c77dff'], [324, 44, '#ff9f43']].map(([x, y, c], i) => `<rect x="${x}" y="${y}" width="24" height="24" fill="#fff" transform="rotate(${(i % 3 - 1) * 4} ${x + 12} ${y + 12})"/><rect x="${x + 2}" y="${y + 2}" width="20" height="14" fill="${c}" transform="rotate(${(i % 3 - 1) * 4} ${x + 12} ${y + 12})"/>`).join('')}
+      <rect x="466" y="22" width="68" height="30" rx="8" fill="none" stroke="#ff4fa3" stroke-width="1.8" filter="url(#glw-${id})"/><text x="500" y="44" font-size="19" font-weight="800" fill="#ff4fa3" text-anchor="middle" filter="url(#glw-${id})">IDEA</text>
+      <ellipse cx="488" cy="106" rx="20" ry="8" fill="#ff8fab"/><ellipse cx="514" cy="104" rx="16" ry="7" fill="#74b9ff"/>`,
+    sales: `
+      <circle cx="30" cy="44" r="22" fill="#fff" stroke="#c0392b" stroke-width="3"/><circle cx="30" cy="44" r="15" fill="#c0392b"/><circle cx="30" cy="44" r="9" fill="#fff"/><circle cx="30" cy="44" r="4" fill="#c0392b"/><path d="M30 44 L52 22" stroke="#444" stroke-width="2"/>
+      <rect x="258" y="12" width="92" height="70" rx="4" fill="#151a28" stroke="#444c66" stroke-width="4"/>
+      <text x="264" y="26" font-size="8" font-weight="700" fill="#7be0ff">SOTUV · HAFTA</text>
+      ${[[34, '#22c55e'], [24, '#3b82f6'], [44, '#f59e0b'], [18, '#a855f7'], [30, '#14b8a6']].map(([hh, c], i) => `<rect x="${266 + i * 16}" y="${76 - hh}" width="11" height="${hh}" fill="${c}"/>`).join('')}
+      <path d="M266 56 L284 48 L302 52 L320 36 L338 40 L346 30" fill="none" stroke="#fff" stroke-width="1.4" opacity=".8"/>
+      <rect x="468" y="44" width="46" height="68" rx="3" fill="#a98a5a" stroke="#7d6340" stroke-width="2"/><rect x="472" y="48" width="38" height="60" fill="#d8ecf7" opacity=".7"/>
+      <text x="491" y="72" font-size="18" text-anchor="middle">🏆</text><text x="481" y="96" font-size="10" text-anchor="middle">🥇</text><text x="501" y="96" font-size="10" text-anchor="middle">🥈</text>`,
+    risk: `
+      <rect x="6" y="20" width="44" height="92" rx="3" fill="#3b4350" stroke="#232a35" stroke-width="3"/>
+      ${[0, 1, 2, 3, 4, 5].map(r => `<rect x="10" y="${24 + r * 14.5}" width="36" height="10" rx="1" fill="#232a35"/><circle cx="41" cy="${29 + r * 14.5}" r="2" fill="${r % 2 ? '#22c55e' : '#ef4444'}" class="led" style="animation-delay:${r * .3}s"/><rect x="13" y="${27 + r * 14.5}" width="14" height="3" fill="#6b7686"/>`).join('')}
+      <path d="M304 14 L346 25 L346 56 Q346 80 304 94 Q262 80 262 56 L262 25Z" fill="#6fe0ff" opacity=".2" stroke="#6fe0ff" stroke-width="2.4"/><path d="M304 26 L334 34 L334 56 Q334 73 304 84 Q274 73 274 56 L274 34Z" fill="none" stroke="#6fe0ff" stroke-width="1.2"/><path d="M290 54 l10 10 l19 -21" fill="none" stroke="#6fe0ff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="466" y="20" width="60" height="36" rx="3" fill="#161b26" stroke="#454f66" stroke-width="3"/><rect x="472" y="28" width="20" height="20" fill="#ff5d5d" opacity=".85"/><rect x="496" y="28" width="24" height="8" fill="#22c55e" opacity=".85"/><rect x="496" y="40" width="24" height="8" fill="#f59e0b" opacity=".85"/>
+      <circle cx="370" cy="14" r="5" fill="#ff4d4d" class="led"/><path d="M0 108 H740" stroke="#f1c40f" stroke-width="5" stroke-dasharray="14 14" opacity=".85"/>`,
+    control: `
+      <text x="22" y="52" font-size="26" text-anchor="middle">🏆</text><rect x="6" y="62" width="34" height="48" rx="3" fill="#8f7a52"/><rect x="10" y="68" width="26" height="40" fill="#e9dcc0"/><text x="23" y="92" font-size="14" text-anchor="middle">🏅</text>
+      <rect x="400" y="12" width="136" height="76" rx="4" fill="#0f1420" stroke="#3b4260" stroke-width="4"/>
+      ${[[408, 40], [424, 26], [440, 52], [458, 20], [474, 36], [490, 30], [506, 46]].map(([x, hh], i) => `<rect x="${x}" y="${82 - hh}" width="13" height="${hh}" fill="${i % 2 ? '#3b5bdb' : '#4c6ef5'}"/><rect x="${x + 3}" y="${82 - hh + 4}" width="3" height="3" fill="#ffe066"/><rect x="${x + 8}" y="${82 - hh + 10}" width="3" height="3" fill="#ffe066"/>`).join('')}
+      <ellipse cx="568" cy="52" rx="20" ry="8" fill="#cfc2ee" opacity=".7"/><path d="M0 4 H740" stroke="#d6b64a" stroke-width="4"/>`,
+  };
+  return `<svg width="740" height="140" viewBox="0 0 740 140" style="position:absolute;left:0;top:0">
+    <defs>
+      <linearGradient id="wl-${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${t.wall[0]}"/><stop offset="1" stop-color="${t.wall[1]}"/></linearGradient>
+      <linearGradient id="fl-${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${t.carpet[0]}"/><stop offset="1" stop-color="${t.carpet[1]}"/></linearGradient>
+      <linearGradient id="sk-${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ccff6"/><stop offset="1" stop-color="#e7f6fd"/></linearGradient>
+      <filter id="glw-${id}"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <rect width="740" height="112" fill="url(#wl-${id})"/>
+    <rect y="112" width="740" height="28" fill="url(#fl-${id})"/>${perspective}
+    <rect width="740" height="8" fill="#ffffff" opacity=".7"/>${[100, 300, 500, 690].map(x => `<rect x="${x - 34}" y="6" width="68" height="4" rx="2" fill="#fff8d6"/><ellipse cx="${x}" cy="16" rx="42" ry="9" fill="#fff4b8" opacity=".35"/>`).join('')}
+    ${win}${pend}
+    <rect y="104" width="740" height="8" fill="${t.accent}" opacity=".22"/>
+    <ellipse cx="170" cy="124" rx="120" ry="9" fill="${t.accent}" opacity=".13"/><ellipse cx="430" cy="124" rx="130" ry="9" fill="${t.accent}" opacity=".13"/>
+    ${DEC[id]}${amen}
+  </svg>`;
+}
 
 function buildTower() {
   S.roster.floors.forEach(f => {
     const t = THEMES[f.id], top = Y(f.n);
-    stage.appendChild(el(`<div class="floor" id="floor-${f.id}" style="left:${TX}px;top:${top}px;border-bottom-color:${t.accent}">
-      <div class="wall" style="background:linear-gradient(${t.wall[0]},${t.wall[1]})"></div>
-      ${[70, 240, 410, 580].map(x => `<div class="win" style="left:${x}px"></div>`).join('')}
-      ${[100, 300, 500].map(x => `<div class="light" style="left:${x}px"></div>`).join('')}
-      <div class="carpet" style="background:repeating-linear-gradient(90deg,${t.carpet} 0 40px,${t.carpet}cc 40px 80px)"></div>
-      ${DECOR[f.id]()}${AMENITY()}</div>`));
-    stage.appendChild(el(`<div class="floorsign" style="top:${top + 40}px;background:${t.accent}"><span>${f.emoji}</span>${f.n} · ${f.name.toUpperCase()}</div>`));
+    stage.appendChild(el(`<div class="floor" id="floor-${f.id}" style="left:${TX}px;top:${top}px">${floorSVG(f)}</div>`));
+    stage.appendChild(el(`<div class="tag" style="left:4px;top:${top + 46}px;--tg:${t.tag}"><b>${String(f.n).padStart(2, '0')}</b>${f.name.toUpperCase()}</div>`));
   });
+  stage.appendChild(el(`<div class="tag" style="left:4px;top:${GT + 38}px;--tg:#37e0ff"><b>00</b>LOBBI</div>`));
+  stage.appendChild(el(`<div class="tag" style="left:716px;top:${TY - 150}px;--tg:#6bdc8a"><b>↑</b>TOM BOG'I</div>`));
   stage.appendChild(el('<div id="shaft"></div>'));
   S.roster.floors.forEach(f => stage.appendChild(el(`<div class="sdoor" style="left:${TX + 740 + 7}px;top:${Y(f.n) + 16}px;z-index:1"></div>`)));
   stage.appendChild(el('<div id="cabin"></div>'));
-}
-
-function charHTML(l) {
-  return `<div class="char hs-${l.style} acc-${l.acc}" style="--skin:${l.skin};--hair:${l.hair};--shirt:${l.shirt};--pants:${l.pants}">
-    <i class="armL"></i><i class="legL"></i><i class="torso"></i><i class="legR"></i><i class="armR"></i>
-    <i class="head"><b class="hair"></b><b class="eyes"></b></i><i class="acc"></i></div>`;
+  buildShell();
 }
 
 function makeEmp(def, desk, extra = {}) {
@@ -314,12 +435,21 @@ function makeEmp(def, desk, extra = {}) {
   const hx = TX + desk + 22;                                  // stol yonida o'tirish
   const e = Object.assign({ def, id: def.id, f, home: { f, x: hx, y: SEAT(f) }, x: hx, y: SEAT(f), sitting: true,
     state: 'idle', mode: 'idle', task: null, progress: 0, pending: 0, q: Promise.resolve(), talkN: 0, sub: false, item: null, tok: 0 }, extra);
+  stage.appendChild(el(`<div class="chair" style="left:${hx - 20}px;top:${SEAT(f) - 62}px;z-index:${SEAT(f) - 1}"><svg width="40" height="64" viewBox="0 0 40 64"><rect x="6" y="0" width="28" height="36" rx="11" fill="#3a4360"/><rect x="9" y="4" width="22" height="26" rx="8" fill="#4a5578" opacity=".8"/><rect x="3" y="34" width="34" height="9" rx="4.5" fill="#2c3450"/><rect x="18" y="43" width="4" height="13" fill="#9aa5b8"/><path d="M6 59 H34" stroke="#6f7a8f" stroke-width="3.5" stroke-linecap="round"/><circle cx="8" cy="61" r="2.6" fill="#222"/><circle cx="32" cy="61" r="2.6" fill="#222"/></svg></div>`));
   e.el = el(`<div class="emp" style="left:${e.x}px;top:${e.y}px;z-index:${SEAT(f)}">
     <div class="tagbox"><span class="nm">${esc(def.name)}</span><span class="tk">${esc(def.title)}</span><div class="pb"><div></div></div></div>
-    <div class="bubble"></div>${charHTML(def.look)}</div>`);
+    <div class="bubble"></div><div class="char">${svgChar(def.look)}</div></div>`);
   stage.appendChild(e.el);
-  e.desk = el(`<div class="desk${extra.boss ? ' boss' : ''}" style="left:${TX + desk - 52 + (extra.boss ? -18 : 0)}px;top:${SEAT(f) - 40}px;z-index:${SEAT(f) + 1}">
-    <div class="top"></div><div class="mon"><i></i><i></i><i></i></div>${extra.boss ? '<div class="mon m2"><i></i></div><div class="mon m3"><i></i></div>' : '<div class="cup"></div>'}</div>`);
+  const wide = extra.boss ? 148 : 108;
+  e.desk = el(`<div class="desk${extra.boss ? ' boss' : ''}" style="left:${TX + desk - 52 + (extra.boss ? -20 : 0)}px;top:${SEAT(f) - 62}px;z-index:${SEAT(f) + 1}">
+    <svg width="${wide}" height="62" viewBox="0 0 ${wide} 62">
+      ${(extra.boss ? [8, 52, 96] : [8]).map(x => `<g><rect x="${x}" y="2" width="${extra.boss ? 38 : 46}" height="${extra.boss ? 26 : 30}" rx="3" fill="#1b2233" stroke="#3a4560" stroke-width="2"/><rect x="${x + 3}" y="5" width="${extra.boss ? 32 : 40}" height="${extra.boss ? 19 : 22}" fill="#0e1422"/>
+        <g class="scr"><rect class="ln" x="${x + 6}" y="9" width="${extra.boss ? 20 : 26}" height="2.4" rx="1" fill="#38bdf8"/><rect class="ln" x="${x + 6}" y="14" width="${extra.boss ? 14 : 18}" height="2.4" rx="1" fill="#a78bfa"/><rect class="ln" x="${x + 6}" y="19" width="${extra.boss ? 24 : 30}" height="2.4" rx="1" fill="#34d399"/></g>
+        <path d="M${x + (extra.boss ? 15 : 19)} 30 h8 l2 5 h-12z" fill="#3a4560"/></g>`).join('')}
+      <rect x="2" y="34" width="${wide - 4}" height="7" rx="3" fill="#e2c49d"/><rect x="${wide - 22}" y="25" width="9" height="10" rx="2" fill="#fff"/><path d="M${wide - 13} 28 q4 1 0 5" fill="none" stroke="#fff" stroke-width="1.6"/>
+      <rect x="6" y="41" width="${wide - 12}" height="21" rx="2" fill="#c49a6c"/><rect x="${wide - 36}" y="45" width="26" height="6" rx="1" fill="#b3885a"/><rect x="${wide - 36}" y="54" width="26" height="6" rx="1" fill="#b3885a"/><rect x="12" y="45" width="3" height="15" fill="#b3885a"/>
+      <rect x="16" y="33" width="26" height="3.5" rx="1.5" fill="#c9d1de"/>
+    </svg></div>`);
   stage.appendChild(e.desk);
   return e;
 }
@@ -388,7 +518,7 @@ async function goSeat(e) {
   await go(e, e.home.x, SEAT(e.home.f), SEAT(e.home.f)); e.sitting = true; e.el.classList.remove('left');
   if (e.state === 'working') e.el.classList.add('typing');
 }
-const spotX = (n, name) => TX + ({ coffee: 560, cooler: 612, board: n === 5 ? 490 : 350, sofa: 690, window: 200 }[name]);
+const spotX = (n, name) => TX + ({ coffee: 560, cooler: 612, board: n === 5 ? 480 : 304, sofa: 690, window: 180 }[name]);
 async function goNear(e, other) {
   const side = e.home.x <= other.home.x ? -46 : 46;
   await goTo(e, other.home.f, other.home.x + side);
@@ -600,7 +730,7 @@ function setupTaskbar() {
 setInterval(() => { if ($('auto').checked && S.queue.length) choose(S.queue[0].id, true); }, 1500);
 
 /* ======================= ISHGA TUSHIRISH ======================= */
-function fit() { const w = $('wrap').clientWidth, k = Math.min(1, w / 1000); stage.style.transform = `scale(${k})`; $('wrap').style.height = 860 * k + 'px'; }
+function fit() { const w = $('wrap').clientWidth, k = Math.min(1, w / 1000); stage.style.transform = `scale(${k})`; $('wrap').style.height = STAGE_H * k + 'px'; }
 addEventListener('resize', fit); fit();
 
 (async function init() {
