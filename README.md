@@ -32,3 +32,10 @@ node agents/install-hook.js coder   # bir marta: hook ni ~/.claude/settings.json
 Endi Claude Code ishlaganda "Dasturchi" stolida vazifa va progress ko'rinadi, tugagach "Tayyor".
 Boshqa stol uchun: `node agents/install-hook.js research`. O'chirish: `node agents/install-hook.js --remove`.
 Server boshqa joyda bo'lsa `OFFICE_URL` / `OFFICE_TOKEN` env larini qo'ying (Railway shart emas).
+
+## Railway (ixtiyoriy, masofadan ko'rish uchun)
+1. railway.com → **New Project → Deploy from GitHub repo** → `muminovgit/frontend` (branch `claude/vibrant-gates-2d29le`).
+2. **Variables**: `OFFICE_TOKEN` = uzun maxfiy kalit. **Settings → Networking → Generate Domain**.
+3. Ofis: `https://xxx.up.railway.app/?key=KALIT`
+4. Hook ni shu serverga ulash:
+   `OFFICE_URL=https://xxx.up.railway.app OFFICE_TOKEN=KALIT node agents/install-hook.js coder`

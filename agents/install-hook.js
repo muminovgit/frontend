@@ -15,7 +15,8 @@ for (const ev of events) cfg.hooks[ev] = (cfg.hooks[ev] || []).filter(g => !JSON
 
 if (process.argv[2] !== '--remove') {
   const agent = process.argv[2] || 'coder';
-  const cmd = `OFFICE_AGENT=${agent} node "${hook}" # ${MARK}`;
+  const env = ['OFFICE_URL', 'OFFICE_TOKEN'].filter(k => process.env[k]).map(k => `${k}='${process.env[k]}'`).join(' ');
+  const cmd = `${env} OFFICE_AGENT=${agent} node "${hook}" # ${MARK}`.trim();
   for (const ev of events) cfg.hooks[ev].push({ hooks: [{ type: 'command', command: cmd }] });
 }
 for (const ev of events) if (!cfg.hooks[ev].length) delete cfg.hooks[ev];
