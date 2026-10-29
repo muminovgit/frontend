@@ -70,7 +70,7 @@ async function run({ agent, task, emit, waitDecision }) {
       emit({ type: 'needApproval', agent, task: task.slice(0, 60), itemId, resultId: res.id });
       const decision = await waitDecision(itemId, 60 * 60000);
       if (decision === 'approved' || decision === 'expired') {
-        res.status = decision === 'approved' ? 'approved' : 'expired'; emit(meta(res)); emit({ type: 'done', agent }); return;
+        res.status = decision === 'approved' ? 'approved' : 'expired'; emit(meta(res)); return; // stol holatini 'decide' hodisasi o'zi yangilaydi
       }
       if (rev === MAX_REVISIONS) break;
       res.status = 'working'; emit(meta(res));
