@@ -4,6 +4,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const ai = require('./ai-agents');
 
 const PORT = process.env.PORT || 3000;
 const TOKEN = process.env.OFFICE_TOKEN || ''; // ixtiyoriy: agentlar uchun maxfiy kalit
@@ -26,6 +27,8 @@ function remember(e) {
   else if (['done', 'error', 'idle'].includes(e.type)) delete last[e.agent];
   if (e.type === 'needApproval') pending[e.itemId] = e;
 }
+
+const emit = e => { if (e.agent) lastReal[e.agent] = Date.now(); remember(e); broadcast(e); };
 
 function body(req) {
   return new Promise((ok, fail) => {
@@ -50,18 +53,33 @@ http.createServer(async (req, res) => {
       res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
       return res.end(fs.readFileSync(path.join(__dirname, 'index.html')));
     }
-    if (url.pathname === '/ping') return json(res, 200, { office: true, locked: !!TOKEN });
+    if (url.pathname === '/ping') return json(res, 200, { office: true, locked: !!TOKEN, ai: ai.enabled, model: ai.enabled ? ai.MODEL : null });
 
     if (url.pathname === '/events') {
       if (!authed(req, url)) return json(res, 401, { error: 'token' });
       res.writeHead(200, { 'content-type': 'text/event-stream', 'cache-control': 'no-cache', connection: 'keep-alive' });
       // Joriy holatni qayta yuboramiz
       Object.values(last).forEach(l => { res.write(`data: ${JSON.stringify(l.start)}\n\n`); if (l.progress) res.write(`data: ${JSON.stringify(l.progress)}\n\n`); });
+      ai.list().forEach(r => res.write(`data: ${JSON.stringify(r)}\n\n`));
       Object.values(pending).forEach(p => res.write(`data: ${JSON.stringify(p)}\n\n`));
       clients.add(res);
       const ka = setInterval(() => res.write(': ka\n\n'), 25000);
       req.on('close', () => { clients.delete(res); clearInterval(ka); });
       return;
+    }
+
+    // Haqiqiy AI agentga vazifa berish (brauzerdan)
+    if (req.method === 'POST' && url.pathname === '/task') {
+      if (!authed(req, url)) return json(res, 401, { error: 'token' });
+      const { agent, task } = await body(req);
+      const r = ai.start({ agent, task, emit, waitDecision });
+      return json(res, r.code, r);
+    }
+    const rm = url.pathname.match(/^\/result\/([\w-]+)$/);
+    if (req.method === 'GET' && rm) {
+      if (!authed(req, url)) return json(res, 401, { error: 'token' });
+      const text = ai.getText(rm[1]);
+      return text === undefined ? json(res, 404, { error: 'topilmadi' }) : json(res, 200, { text });
     }
 
     // Agent hodisa yuboradi. needApproval bo'lsa javobda itemId qaytadi.
@@ -100,6 +118,15 @@ http.createServer(async (req, res) => {
 
 // ---- Ichki demo agentlar (DEMO=0 bilan o'chiriladi) ----
 // Hamma stol ishlab tursin; haqiqiy agent ulansa, shu stol uchun demo to'xtaydi.
+// Kutilgan qarorni kutadi: 'approved' | 'rejected' | 'expired'
+async function waitDecision(itemId, ms) {
+  const until = Date.now() + ms;
+  while (!decisions[itemId] && pending[itemId] && Date.now() < until) await new Promise(r => setTimeout(r, 500));
+  if (decisions[itemId]) return decisions[itemId];
+  if (pending[itemId]) { delete pending[itemId]; broadcast({ type: 'decide', itemId, ok: true }); }
+  return 'expired';
+}
+
 const DEMO = [
   ['research', ['Bozor tahlili', 'Raqobatchilar', 'Trend qidiruv']],
   ['writer',   ['Blog post', 'Email kampaniya', 'Reels ssenariy']],
@@ -109,7 +136,6 @@ const DEMO = [
 ];
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const real = a => Date.now() - (lastReal[a] || 0) < 120000;
-const emit = e => { remember(e); broadcast(e); };
 
 async function demoAgent(agent, tasks) {
   await sleep(Math.random() * 5000);
@@ -133,4 +159,5 @@ async function demoAgent(agent, tasks) {
     await sleep(3000 + Math.random() * 5000);
   }
 }
-if (process.env.DEMO !== '0') DEMO.forEach(([a, t]) => demoAgent(a, t));
+// Haqiqiy AI yoqilgan bo'lsa demo o'chadi (DEMO=1 bilan majburan yoqish mumkin)
+if (process.env.DEMO === '1' || (process.env.DEMO !== '0' && !ai.enabled)) DEMO.forEach(([a, t]) => demoAgent(a, t));

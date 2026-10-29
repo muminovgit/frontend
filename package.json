@@ -1,2 +1,1 @@
-{ "name": "agent-office", "version": "1.0.0", "private": true,
-  "scripts": { "start": "node server.js", "demo": "node agents/demo.js" } }
+{"name":"agent-office","version":"1.0.0","private":true,"scripts":{"start":"node server.js","demo":"node agents/demo.js"},"dependencies":{"@anthropic-ai/sdk":"^1.3.0"}}

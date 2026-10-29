@@ -43,3 +43,18 @@ Server boshqa joyda bo'lsa `OFFICE_URL` / `OFFICE_TOKEN` env larini qo'ying (Rai
 ## Ichki demo agentlar
 Server ishga tushganda 5 ta agent o'zi ishlab turadi (ofis doim tirik). Haqiqiy hodisa (hook, curl, n8n) kelgan stol
 2 daqiqa demo'dan chiqadi. O'chirish: `DEMO=0 node server.js` (Railway Variables ga `DEMO=0`).
+
+## Haqiqiy AI agentlar (Claude API)
+Agentlar Claude API orqali haqiqiy ish qiladi: siz vazifa berasiz, agent natijani tayyorlaydi, siz ko'rib ✓/✕ bosasiz
+(✕ bo'lsa agent 2 martagacha qayta urinadi). Agentlar faqat **matn tayyorlaydi** — email yubormaydi, kod deploy qilmaydi.
+Tadqiqotchi va Sotuv veb-qidiruvdan foydalanadi.
+
+Railway → Variables:
+| O'zgaruvchi | Ma'nosi |
+|---|---|
+| `ANTHROPIC_API_KEY` | **Majburiy.** console.anthropic.com dan oling |
+| `AGENT_MODEL` | Ixtiyoriy. Default `claude-opus-5-5`; arzonroq: `claude-sonnet-5-5`, eng arzon: `claude-haiku-5-5` |
+| `MAX_TASKS_PER_DAY` | Ixtiyoriy. Kunlik vazifa limiti (default 40) — xarajatni nazorat qilish uchun |
+
+Kalit qo'yilgach demo agentlar o'chadi va ofisda vazifa kiritish paneli chiqadi. Natijalar serverda xotirada
+turadi (oxirgi 30 ta), server qayta ishga tushsa o'chadi. Veb-qidiruv ishlamasa, Console → Settings da yoqilganini tekshiring.

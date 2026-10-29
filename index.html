@@ -31,6 +31,19 @@
     button.ok { background: var(--done); color: #fff; border-color: var(--done); }
     button.no { background: var(--err); color: #fff; border-color: var(--err); }
 
+    #taskbar { display: none; gap: 8px; padding: 0 16px 12px; flex-wrap: wrap; }
+    #taskbar.on { display: flex; }
+    #taskbar select, #taskbar input { font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; background: var(--card); color: var(--ink); }
+    #taskbar input { flex: 1; min-width: 220px; }
+    #taskbar button { background: var(--work); color: #fff; border-color: var(--work); }
+    #modal { position: fixed; inset: 0; background: #0008; display: none; place-items: center; z-index: 50; padding: 16px; }
+    #modal.on { display: grid; }
+    #modal .box { background: var(--card); border-radius: 14px; max-width: 760px; width: 100%; max-height: 85vh; display: flex; flex-direction: column; }
+    #modal header { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+    #modal pre { margin: 0; padding: 16px; overflow: auto; white-space: pre-wrap; word-break: break-word; font: .85rem/1.5 system-ui, sans-serif; }
+    .res { padding: 6px 0; border-top: 1px solid var(--line); font-size: .78rem; display: flex; gap: 6px; align-items: center; }
+    .res span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .res small { color: var(--muted); }
     main { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 12px; padding: 0 16px 16px; }
     @media (max-width: 960px) { main { grid-template-columns: 1fr; } }
     #wrap { background: var(--floor); border: 1px solid var(--line); border-radius: 14px;
@@ -112,6 +125,13 @@
     </div>
   </header>
 
+  <div id="taskbar">
+    <select id="tAgent"></select>
+    <input id="tText" maxlength="4000" placeholder="Agentga vazifa yozing… (masalan: Toshkentdagi kofe-shop bozorini tahlil qil)">
+    <button id="tGo">▶ Vazifa ber</button>
+  </div>
+  <div id="modal"><div class="box"><header><b id="mTitle"></b> <button id="mClose" style="float:right">Yopish</button></header><pre id="mText"></pre></div></div>
+
   <main>
     <div id="wrap"><div id="stage">
       <div id="belt"></div>
@@ -121,7 +141,7 @@
       <div id="human"><div class="top"><div class="m"></div><div class="m"></div><div class="m"></div></div>
         <div style="font-size:.75rem;font-weight:600;margin-top:6px">Siz (Boss)</div></div>
     </div></div>
-    <aside><h3>Jonli log</h3><ul id="log"></ul></aside>
+    <aside><h3 id="resH" style="display:none">Natijalar</h3><div id="results"></div><h3>Jonli log</h3><ul id="log"></ul></aside>
   </main>
 
 <script>
@@ -137,7 +157,7 @@ const QUEUE_POS = { x: 480, y: 335 };
 
 /* ---- Holat ---- */
 const stage = document.getElementById('stage');
-const S = { shipped: 0, err: 0, queue: [], paused: false, a: {} };
+const S = { results: [], shipped: 0, err: 0, queue: [], paused: false, a: {} };
 const $ = id => document.getElementById(id);
 const rnd = (a, b) => a + Math.random() * (b - a);
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
@@ -186,7 +206,7 @@ const API = {
   needApproval(id, task, e) {
     const st = S.a[id]; if (!st) return;
     if (task && e) st.task = task;
-    const item = { id: (e && e.itemId) || Date.now() + Math.random(), agent: id, task: st.task || 'vazifa' };
+    const item = { id: (e && e.itemId) || Date.now() + Math.random(), agent: id, task: st.task || 'vazifa', resultId: e && e.resultId };
     S.queue.push(item); st.pending = item;
     setState(st, 'walking'); const slot = S.queue.length - 1;
     place(st, { x: QUEUE_POS.x - 90 + (slot % 5) * 45, y: QUEUE_POS.y + Math.floor(slot / 5) * 40 });
@@ -201,6 +221,13 @@ const API = {
     if (ok) { S.shipped++; setState(st, 'done', 'Tayyor ✔'); say(st, 'Rahmat!'); log(`«${item.task}» tasdiqlandi`, '✅'); setTimeout(() => API.idle(st.def.id), 2500); }
     else { setProgress(st, 0.4); setState(st, 'working', item.task + ' (qayta)'); say(st, 'Qayta qilaman'); log(`«${item.task}» rad etildi`, '↩️'); st.redo = true; }
   },
+  log(id, msg)       { const st = S.a[id]; if (st) log(`${st.def.name}: ${msg}`, '🧮'); },
+  result(id, task, e) {
+    const i = S.results.findIndex(r => r.id === e.resultId);
+    const r = { id: e.resultId, agent: e.agent, task: e.task, status: e.status };
+    if (i < 0) S.results.unshift(r); else S.results[i] = r;
+    renderResults();
+  },
   error(id, msg)     { const st = S.a[id]; if (!st) return; S.err++; setState(st, 'error', msg || 'Xato'); say(st, 'Xato!'); log(`${st.def.name}: ${msg || 'xato'}`, '⚠️'); setTimeout(() => API.idle(id), 3000); },
   done(id)           { const st = S.a[id]; if (!st) return; S.shipped++; setState(st, 'done', 'Tayyor ✔'); log(`${st.def.name}: «${st.task}» tayyor`, '✅'); setTimeout(() => API.idle(id), 2000); },
   idle(id)           { const st = S.a[id]; if (!st) return; st.task = null; setProgress(st, 0); setState(st, 'idle', 'kutmoqda'); },
@@ -210,6 +237,39 @@ const API = {
   },
 };
 window.AgentOffice = API;
+
+/* ---- Natijalar va vazifa berish (haqiqiy AI rejimi) ---- */
+const STATUS = { working: '⏳ ishlayapti', review: '👁 tasdiq kutadi', approved: '✅ tasdiqlandi', rejected: '↩️ rad etildi', expired: '⌛ muddati o\'tdi', error: '⚠️ xato' };
+function renderResults() {
+  $('resH').style.display = S.results.length ? '' : 'none';
+  const box = $('results'); box.innerHTML = '';
+  S.results.forEach(r => {
+    const row = document.createElement('div'); row.className = 'res';
+    const a = S.a[r.agent];
+    row.innerHTML = `<span>${a ? a.def.emoji : ''} ${esc(r.task)}<br><small>${STATUS[r.status] || r.status}</small></span>`;
+    row.appendChild(Object.assign(document.createElement('button'), { textContent: 'Ko\'rish', onclick: () => openResult(r.id, r.task) }));
+    box.appendChild(row);
+  });
+}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+async function openResult(id, title) {
+  $('mTitle').textContent = title; $('mText').textContent = 'Yuklanmoqda…'; $('modal').classList.add('on');
+  try { const r = await fetch('/result/' + id + '?key=' + encodeURIComponent(KEY)); $('mText').textContent = (await r.json()).text || '(bo\'sh)'; }
+  catch { $('mText').textContent = 'Yuklab bo\'lmadi'; }
+}
+$('mClose').onclick = () => $('modal').classList.remove('on');
+$('modal').onclick = e => { if (e.target === $('modal')) $('modal').classList.remove('on'); };
+function setupTaskbar() {
+  $('tAgent').innerHTML = AGENTS.map(a => `<option value="${a.id}">${a.emoji} ${a.name}</option>`).join('');
+  $('taskbar').classList.add('on');
+  const go = async () => {
+    const task = $('tText').value.trim(); if (!task) return;
+    const r = await fetch('/task?key=' + encodeURIComponent(KEY), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ agent: $('tAgent').value, task }) });
+    const j = await r.json();
+    if (j.ok) $('tText').value = ''; else log(j.error || 'Xato', '⚠️');
+  };
+  $('tGo').onclick = go; $('tText').onkeydown = e => { if (e.key === 'Enter') go(); };
+}
 
 /* ---- Render ---- */
 /* Jonli rejimda qaror serverga yuboriladi, server hammaga (va kutayotgan agentga) tarqatadi */
@@ -228,6 +288,7 @@ function render() {
   S.queue.forEach(it => {
     const row = document.createElement('div'); row.className = 'qi';
     row.innerHTML = `<span>${S.a[it.agent].def.emoji} ${it.task}</span>`;
+    if (it.resultId) row.insertBefore(Object.assign(document.createElement('button'), { textContent: '👁', title: 'Natijani ko\'rish', onclick: () => openResult(it.resultId, it.task) }), row.firstChild.nextSibling);
     const ok = Object.assign(document.createElement('button'), { textContent: '✓', className: 'ok', onclick: () => choose(it.id, true) });
     const no = Object.assign(document.createElement('button'), { textContent: '✕', className: 'no', onclick: () => choose(it.id, false) });
     row.append(ok, no); q.appendChild(row);
@@ -262,7 +323,7 @@ const qs = new URLSearchParams(location.search);
 /* Server.js bilan ochilganda (http://localhost:3000) avtomatik jonli rejim */
 fetch('/ping').then(r => r.ok && r.json()).then(j => {
   if (!j || !j.office) return;
-  S.live = true; S.paused = true; $('pause').style.display = 'none';
+  S.live = true; S.paused = true; if (j.ai) { setupTaskbar(); log('Haqiqiy AI rejimi: ' + j.model, '🧠'); } $('pause').style.display = 'none';
   const es = new EventSource('/events?key=' + encodeURIComponent(KEY)); es.onmessage = m => API.event(JSON.parse(m.data));
   es.onopen = () => log('Serverga ulandi', '🔌');
 }).catch(() => {});
