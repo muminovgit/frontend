@@ -1,8 +1,0 @@
-{
-  "env": { "OFFICE_URL": "https://SIZNING-LOYIHA.up.railway.app", "OFFICE_TOKEN": "maxfiy-kalit", "OFFICE_AGENT": "coder" },
-  "hooks": {
-    "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "node ~/agent-office/agents/hook.js" }] }],
-    "PostToolUse":      [{ "hooks": [{ "type": "command", "command": "node ~/agent-office/agents/hook.js" }] }],
-    "Stop":             [{ "hooks": [{ "type": "command", "command": "node ~/agent-office/agents/hook.js" }] }]
-  }
-}
