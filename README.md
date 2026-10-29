@@ -88,3 +88,10 @@ Bitta xodimga alohida vazifa ham berish mumkin; xodimlar `ask_teammate` orqali b
 Loyiha = 5 birlik (`MAX_TASKS_PER_DAY`, default 40), bitta bosqichda hamkasb so'rovlari `MAX_TALK_CALLS` (default 6).
 Claude Code hook'i endi `dilnoza` stolida ko'rinadi (`node agents/install-hook.js <xodim-id>` bilan o'zgartiring).
 Eslatma: ofis serverdan `roster.json` ni oladi, shuning uchun `index.html` ni faqat fayl sifatida ochib bo'lmaydi — `node server.js` kerak.
+
+## Ko'rinish: xodim-shakllar, ranglar, PDF
+- Xodimlar odam emas, Claude belgisiga o'xshash jonli shakllar: Aziza — Claude uchquni, Bobur — yulduz, Dilnoza — olti burchak, Jasur — gavhar, Malika — gul,
+  Sardor — suhbat pufagi, Rustam — uchburchak, Nigora — bulut, Otabek — kub, Kamola — qalqon, Timur — kapsula, Madina — toj kiygan blob. Shakl va rang `roster.json` dagi `look` da.
+- Tepadagi **Rang** menyusi: *Iliq* (standart), *Shisha*, *Kechki shahar* (yulduzlar, oy, yonib turgan oynalar). Tanlov brauzerda eslab qolinadi.
+- Natija oynasi (👁 / "Ko'rish") uzun matnni formatlab (sarlavha, jadval, ro'yxat, kod) ko'rsatadi va aylanadi. Tugmalar: **📄 PDF** (chop etish oynasida
+  "PDF sifatida saqlash" ni tanlang), **⬇ .md**, **📋 Nusxa**. Loyiha jarayonida pipeline panelidagi **📄 Loyiha PDF** barcha bosqichlar, muloqot va yakuniy qarorni bitta PDF qiladi.
