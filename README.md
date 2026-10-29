@@ -24,15 +24,15 @@ CLI: `node agents/office.js start coder "Bug fix"`.
 
 Agent id lari: `research, writer, sales, coder, support` (`index.html` dagi `AGENTS` massivida o'zgartiring).
 
-## Claude Code bilan
-`.claude/settings.json` ga hook qo'shsangiz, Claude Code sessiyasi "coder" stolida ko'rinadi:
-```json
-{ "hooks": {
-  "UserPromptSubmit": [{ "hooks": [{ "type": "command", "command": "node agents/office.js start coder \"Claude Code ishlayapti\"" }] }],
-  "Stop": [{ "hooks": [{ "type": "command", "command": "node agents/office.js done coder" }] }]
-} }
-```
+## Railway ga qo'yish
+1. railway.com → **New Project → Deploy from GitHub repo** → `muminovgit/frontend` (branch: `claude/vibrant-gates-2d29le`, yoki avval `main` ga merge qiling).
+2. **Variables** ga `OFFICE_TOKEN` = o'zingiz o'ylab topgan uzun maxfiy kalit qo'shing.
+3. **Settings → Networking → Generate Domain** — `https://xxx.up.railway.app` olasiz. (`railway.json` tayyor, PORT ni Railway o'zi beradi.)
+4. Ofisni oching: `https://xxx.up.railway.app/?key=MAXFIY_KALIT`
 
-## Internetga chiqarish
-`OFFICE_TOKEN=maxfiy node server.js` — agentlar `Authorization: Bearer maxfiy` yuborishi kerak
-(`office.js` `OFFICE_TOKEN` va `OFFICE_URL` env larini o'qiydi). Serverni VPS/Render/Railway ga qo'ying.
+## Claude Code ni ulash
+1. `agents/hook.js` ni kompyuteringizga oling (masalan `~/agent-office/agents/hook.js`).
+2. `claude-hooks.example.json` ni `~/.claude/settings.json` ga qo'shing (URL va kalitni o'zgartiring).
+3. Endi Claude Code ishlaganda "Dasturchi" stolida vazifa va progress ko'rinadi, tugagach "Tayyor".
+   Bir nechta sessiya/stol uchun `OFFICE_AGENT` ni o'zgartiring (`research`, `writer`, ...).
+

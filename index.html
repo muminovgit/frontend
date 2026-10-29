@@ -213,9 +213,10 @@ window.AgentOffice = API;
 
 /* ---- Render ---- */
 /* Jonli rejimda qaror serverga yuboriladi, server hammaga (va kutayotgan agentga) tarqatadi */
+const KEY = new URLSearchParams(location.search).get('key') || '';
 function choose(id, ok) {
   if (!S.live) return API.decide(id, ok);
-  fetch('/decision', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ itemId: id, ok }) });
+  fetch('/decision?key=' + encodeURIComponent(KEY), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ itemId: id, ok }) });
 }
 function render() {
   $('sShipped').textContent = S.shipped;
@@ -262,7 +263,7 @@ const qs = new URLSearchParams(location.search);
 fetch('/ping').then(r => r.ok && r.json()).then(j => {
   if (!j || !j.office) return;
   S.live = true; S.paused = true; $('pause').style.display = 'none';
-  const es = new EventSource('/events'); es.onmessage = m => API.event(JSON.parse(m.data));
+  const es = new EventSource('/events?key=' + encodeURIComponent(KEY)); es.onmessage = m => API.event(JSON.parse(m.data));
   es.onopen = () => log('Serverga ulandi', '🔌');
 }).catch(() => {});
 if (qs.get('ws')) { S.paused = true; const ws = new WebSocket(qs.get('ws')); ws.onmessage = m => API.event(JSON.parse(m.data)); }
