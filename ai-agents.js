@@ -20,7 +20,7 @@ const shortTitle = t => { const l = String(t).replace(/\s+/g, ' ').trim(); retur
 
 const EMP = Object.fromEntries(roster.employees.map(e => [e.id, e]));
 const FLOORS = Object.fromEntries(roster.floors.map(f => [f.id, f]));
-const PIPELINE = ['research', 'marketing', 'sales', 'risk'];
+const PIPELINE = ['research', 'marketing', 'content', 'sales', 'risk'];
 
 // ---- Skill kutubxonasi: skills/*.md (title, desc + ish usuli). Xodimga roster.json dagi `skills` orqali beriladi ----
 const skills = {};
@@ -48,11 +48,13 @@ const HANDOFF = 'Javobingiz HANDOFF shaklida bo\'lsin: Loyiha ID, Bosqich, Ishla
 const STAGES = {
   research: 'BOSQICH: TADQIQOT (1-qavat). Brief\'ni tekshiring: kuzatuvlar, bozor/mijoz/raqobat faktlari (veb-qidiruv bilan, manba + sana), qarama-qarshi dalillar, muqobil tushuntirishlar, noma\'lumlar. ' +
     'Hamkasblaringiz Bobur (skaner) va Dilnoza (ma\'lumot) — kerak bo\'lsa so\'rang. ' + HANDOFF,
+  content: 'BOSQICH: KONTENT STUDIYA (3-qavat). Marketing rejasiga tayanib ishlab chiqariladigan kontent paketini tayyorlang: kontent briefi, 2–3 tayyor matn/ssenariy namunasi, vizual brif, kadrlar ro\'yxati (video bo\'lsa), kanal bo\'yicha qayta ishlatish rejasi va tahririy tekshiruv ro\'yxati. ' +
+    'Tadqiqot va marketingda yo\'q faktni qo\'shmang; rasm/musiqa/shrift huquqlari va isbot talab qiladigan da\'volarni belgilang. Hamkasblaringiz Laylo (ssenariy), Anvar (video), Shahlo (vizual), Doniyor (SEO va taqsimot) — kerak bo\'lsa so\'rang. ' + HANDOFF,
   marketing: 'BOSQICH: MARKETING (2-qavat). Tadqiqot hisobotiga tayanib: pozitsiyalash, maqsadli auditoriya, asosiy xabar, kanallar va kontent rejasi (2–3 namunaviy matn). Tadqiqotda yo\'q faktni qo\'shmang; da\'volar isbotga tayansin. ' + HANDOFF,
-  sales: 'BOSQICH: SOTUV (3-qavat). Hisobot va marketing rejasiga tayanib: ideal mijoz profili, outreach ketma-ketligi (qoralama xabarlar), kutilgan e\'tirozlar va javoblar, narx/taklif tuzilmasi (raqamlar illustrativ), keyingi qadamlar. ' + HANDOFF,
-  risk: 'BOSQICH: RISK VA SIFAT (4-qavat). Oldingi uch bosqichni tekshiring: isbotlanmagan da\'volar, qarama-qarshiliklar, huquqiy/reklama/shaxsiy ma\'lumot xatarlari, byudjet va operatsion xatarlar, eng yomon holat. ' +
+  sales: 'BOSQICH: SOTUV (4-qavat). Hisobot va marketing rejasiga tayanib: ideal mijoz profili, outreach ketma-ketligi (qoralama xabarlar), kutilgan e\'tirozlar va javoblar, narx/taklif tuzilmasi (raqamlar illustrativ), keyingi qadamlar. ' + HANDOFF,
+  risk: 'BOSQICH: RISK VA SIFAT (5-qavat). Oldingi bosqichlarni (tadqiqot, marketing, kontent, sotuv) tekshiring: isbotlanmagan da\'volar, qarama-qarshiliklar, huquqiy/reklama/shaxsiy ma\'lumot xatarlari, byudjet va operatsion xatarlar, eng yomon holat. ' +
     'Universal "xavfsiz" chegaralarni o\'ylab topmang — chegaralar yo\'q bo\'lsa Boss\'dan so\'rang va WAIT qaytaring. ' + HANDOFF,
-  control: 'BOSQICH: NAZORAT (5-qavat, penthouse). Barcha handoff\'larni va asl brief\'ni o\'qing. Aynan bitta qaror tanlang: GO (keyingi bosqich/pilotga tayyor), WAIT (kirish, tekshiruv yoki limit yetishmaydi), REJECT (jiddiy nuqson yoki qarama-qarshilik). ' +
+  control: 'BOSQICH: NAZORAT (6-qavat, penthouse). Barcha handoff\'larni va asl brief\'ni o\'qing. Aynan bitta qaror tanlang: GO (keyingi bosqich/pilotga tayyor), WAIT (kirish, tekshiruv yoki limit yetishmaydi), REJECT (jiddiy nuqson yoki qarama-qarshilik). ' +
     'Hech bir qaror tashqi amalni avtorizatsiya qilmaydi. Bajarilmagan/yetishmayotgan tekshiruvni "o\'tgan" deb hisoblamang. Ko\'pchilik ovozi isbot emas. ' +
     'Yozing: eng kuchli e\'tiroz; qayta ko\'rib chiqish shartlari. Oxirida AYNAN shu uch qator: `SABAB: <bir jumla>`, `KEYINGI: <bir jumla>`, `QAROR: GO|WAIT|REJECT`.',
 };

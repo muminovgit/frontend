@@ -110,3 +110,17 @@ Har bir xodim o'z skill'lari (ish usullari) va asboblari bilan ishlaydi. Xodimni
 - **Asboblar** (`roster.json` → `tools`): `web_search` (veb-qidiruv), `web_fetch` (aniq sahifani o'qish), `code_exec` (hisob-kitobni kod bilan bajarish; Dilnoza va Otabek).
   Asbob ishlamasa (masalan Console'da yoqilmagan), xodim asbobsiz davom etadi va logga yozadi.
 - Tokenlar: skill'lar prompt'ni uzaytiradi (har xodimga taxminan 400–700 token). Arzonlashtirish uchun kamroq skill biriktiring yoki `AGENT_MODEL` ni o'zgartiring.
+
+## Kontent studiya (3-qavat)
+Marketing va Sotuv orasida yangi qavat: kontentni **ishlab chiqaradigan** 5 kishilik jamoa.
+| Xodim | Shakl | Vazifa | Skill'lar |
+|---|---|---|---|
+| Zafar | sakkizburchak | Kontent boshlig'i (bosqich rahbari) | Kontent briefi, Tahririy tekshiruv, Qayta ishlatish, Brend ovozi |
+| Laylo | yurak | Ssenarist va kopirayter | Hikoya va ssenariy, Hook yozish, Matn formulalari |
+| Anvar | tomchi | Video muharrir | Kadrlar ro'yxati, Hook yozish, Ijtimoiy tarmoq formatlari |
+| Shahlo | romb | Dizayner | Vizual brif, Muqova dizayni, Brend ovozi |
+| Doniyor | shar | Kontent strategi (SEO va taqsimot) | SEO kontent, Qayta ishlatish, Kontent kalendari |
+
+Loyiha jarayoni endi: Tadqiqot → Marketing → **Kontent studiya** → Sotuv → Risk → Nazorat. Kontent bosqichi marketing rejasidan tayyor kontent paketini (brif, matn/ssenariy
+namunalari, vizual brif, kadrlar ro'yxati, qayta ishlatish rejasi, tahririy ro'yxat) chiqaradi; huquqlar (rasm/musiqa/shrift) va isbot talab qiladigan da'volar Risk qavatiga belgilab beriladi.
+Qavatlar soni `roster.json` dan hisoblanadi: yangi qavat qo'shish uchun `floors` ga yozing (`n` — pastdan raqam, `narrow: true` — ixcham stollar, 5 tagacha xodim) va xodimlarni `deskX` bilan joylang.

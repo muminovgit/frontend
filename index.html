@@ -180,13 +180,14 @@
 
 <script>
 /* ======================= O'LCHAMLAR ======================= */
-const TX = 100, TY = 190, FW = 140, STAGE_H = 1090;          // minora chap/yuqori, qavat balandligi
+const TX = 100, TY = 190, FW = 140;
+let NF = 5, STAGE_H = 1090, GT = 0;            // qavatlar soni, sahna balandligi, yer sathi (roster'dan hisoblanadi)          // minora chap/yuqori, qavat balandligi
 const DOOR_X = TX + 770;                     // lift eshigi
 const $ = id => document.getElementById(id);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const rnd = (a, b) => a + Math.random() * (b - a);
 const pick = a => a[Math.floor(Math.random() * a.length)];
-const Y = n => TY + (5 - n) * FW;            // qavat tepasi (n = 1..5)
+const Y = n => TY + (NF - n) * FW;           // qavat tepasi (n = 1..NF)
 const LANE = n => Y(n) + 130;                // yurish chizig'i
 const SEAT = n => Y(n) + 112;                // o'tirish chizig'i
 const DESK_X = [60, 210, 420];
@@ -195,15 +196,15 @@ const PALS = {
   claude: { night: false, page: '#f0ebe1', sky: ['#d6e4ea', '#efe4d2', '#f4ead9'], far: ['#d3c7b8', '#c4b8a8'], farWin: '#fff3d6', farOp: .5, mid: ['#bcae9d', '#8f8070'], haze: '#f4ead9',
     ground: '#8d867b', walk: '#d9d1c2', walkEdge: '#b8ae9c', road: '#55514b', lobby: '#f1e9da', lobbyFloor: '#cdbfa6', slab: ['#f6f0e4', '#b9ad97'], winPane: ['#a9cfe0', '#f2e8d5'], winFar: '#b3c3cb', glow: .35, sun: '#ffe7ae',
     themes: { research: mk('#f6f0e4', '#ece2d0', '#cdb18a', '#b99a6f', '#3f8f8b', '#5fc9c2'), marketing: mk('#f8eee6', '#f0dccd', '#d3ab8c', '#bf9070', '#d9775a', '#ff9a7a'),
-      sales: mk('#f8f1de', '#efe2bd', '#d3b784', '#bd9a62', '#d1963a', '#ffc058'), risk: mk('#efe9e4', '#e0d6cd', '#b5a79a', '#9d8e81', '#b5483f', '#ff7a6e'), control: mk('#efe9f2', '#e0d5e8', '#b7a3c9', '#9f89b6', '#6a62b8', '#a79cff') } },
+      sales: mk('#f8f1de', '#efe2bd', '#d3b784', '#bd9a62', '#d1963a', '#ffc058'), risk: mk('#efe9e4', '#e0d6cd', '#b5a79a', '#9d8e81', '#b5483f', '#ff7a6e'), control: mk('#efe9f2', '#e0d5e8', '#b7a3c9', '#9f89b6', '#6a62b8', '#a79cff'), content: mk('#eef2f4', '#dde6ec', '#bccbd6', '#a2b6c5', '#3f87c9', '#6fb4f5') } },
   glass: { night: false, page: '#e9eef4', sky: ['#a9d3ee', '#d3e9f4', '#eaf4f6'], far: ['#a7c3d6', '#93b3c9'], farWin: '#ffffff', farOp: .4, mid: ['#8fb2cb', '#5c86a6'], haze: '#e8f3f6',
     ground: '#8b97a4', walk: '#d2d9e1', walkEdge: '#aab4c0', road: '#565d6a', lobby: '#e3eff6', lobbyFloor: '#b6c4d0', slab: ['#f2f6fb', '#a9b6c6'], winPane: ['#8ccaf0', '#e6f4fb'], winFar: '#9bbdd4', glow: .3, sun: '#fff0b8',
     themes: { research: mk('#eef3f8', '#dfe8f0', '#b9c9d8', '#9fb3c6', '#3b7fb0', '#6cc0f5'), marketing: mk('#f4eef3', '#e8dde6', '#c9b3c6', '#b098ad', '#b0558f', '#e88bc4'),
-      sales: mk('#eef3ee', '#dfe9df', '#b3c8b6', '#98b09c', '#3f9a6b', '#6fdca0'), risk: mk('#eceef1', '#dde1e6', '#a9b2bd', '#8f9aa7', '#c0504d', '#ff8a85'), control: mk('#edeaf4', '#dfdaee', '#aaa3c9', '#9088b6', '#5a55b8', '#a9a4ff') } },
+      sales: mk('#eef3ee', '#dfe9df', '#b3c8b6', '#98b09c', '#3f9a6b', '#6fdca0'), risk: mk('#eceef1', '#dde1e6', '#a9b2bd', '#8f9aa7', '#c0504d', '#ff8a85'), control: mk('#edeaf4', '#dfdaee', '#aaa3c9', '#9088b6', '#5a55b8', '#a9a4ff'), content: mk('#eef0f8', '#dfe4f3', '#b3bde0', '#9aa7d3', '#4a6fc9', '#8fb0ff') } },
   night: { night: true, page: '#12162b', sky: ['#0b1028', '#1a2350', '#2c3566'], far: ['#252e58', '#1c2448'], farWin: '#ffd479', farOp: .7, mid: ['#1b2348', '#10162f'], haze: '#2c3566',
     ground: '#2a2f45', walk: '#3a4058', walkEdge: '#2a2f44', road: '#1a1e30', lobby: '#2c3552', lobbyFloor: '#1f2740', slab: ['#55608a', '#2a3150'], winPane: ['#18235a', '#34448a'], winFar: '#0f1738', glow: .8, sun: '#f4f0d0',
     themes: { research: mk('#2e3554', '#242a47', '#3a4064', '#2f3555', '#4fd1c5', '#4fd1c5'), marketing: mk('#38304e', '#2c2540', '#473a63', '#392f52', '#ff8fb1', '#ff8fb1'),
-      sales: mk('#383550', '#2c2a42', '#4a4562', '#3b3752', '#ffc15a', '#ffc15a'), risk: mk('#2c3148', '#222639', '#3c4260', '#30354f', '#ff6b6b', '#ff6b6b'), control: mk('#322d55', '#27224a', '#453b7a', '#372f66', '#a78bfa', '#a78bfa') } },
+      sales: mk('#383550', '#2c2a42', '#4a4562', '#3b3752', '#ffc15a', '#ffc15a'), risk: mk('#2c3148', '#222639', '#3c4260', '#30354f', '#ff6b6b', '#ff6b6b'), control: mk('#322d55', '#27224a', '#453b7a', '#372f66', '#a78bfa', '#a78bfa'), content: mk('#2a3550', '#212b44', '#34405f', '#2a3550', '#6fb4f5', '#6fb4f5') } },
 };
 let PAL_KEY = 'claude'; try { PAL_KEY = localStorage.getItem('pal') || 'claude'; } catch {}
 const PAL = PALS[PAL_KEY] || PALS.claude; document.documentElement.dataset.pal = PALS[PAL_KEY] ? PAL_KEY : 'claude';
@@ -223,7 +224,6 @@ function log(text, icon = '•') {
 /* ======================= SAHNA ======================= */
 function el(html) { const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
 function seeded(a) { return () => { a = (a * 16807) % 2147483647; return (a - 1) / 2147483646; }; }
-const GT = TY + 5 * FW;                       // yer sathi (binoning pasti)
 
 /* ---------- xodim: Claude uslubidagi jonli shakllar (SVG) ---------- */
 let CID = 0;
@@ -241,6 +241,11 @@ const SH = {   // fy = ko'z chizig'i, ty = tepa, by = pastki chekka
   cube:     { fy: 31, ty: 17, by: 50, d: () => '<rect x="5" y="17" width="30" height="33" rx="8"/>' },
   shield:   { fy: 31, ty: 15, by: 53, d: () => '<path d="M20 15 L34 20 L34 36 Q34 47 20 53 Q6 47 6 36 L6 20Z" stroke-width="3" stroke-linejoin="round"/>' },
   pill:     { fy: 29, ty: 14, by: 54, d: () => '<rect x="9" y="14" width="22" height="40" rx="11"/>' },
+  octagon:  { fy: 33, ty: 17, by: 50, d: () => `<path d="${reg(20, 34, 16.5, 8, -67.5)}" stroke-width="4" stroke-linejoin="round"/>` },
+  heart:    { fy: 32, ty: 17, by: 51, d: () => '<path d="M20 52 C5 40 3 24 12 19 C16 17 20 19 20 23 C20 19 24 17 28 19 C37 24 35 40 20 52Z" stroke-width="3" stroke-linejoin="round"/>' },
+  drop:     { fy: 38, ty: 14, by: 54, d: () => '<path d="M20 14 C28 25 35 33 35 42 C35 50 28 54 20 54 C12 54 5 50 5 42 C5 33 12 25 20 14Z" stroke-width="2" stroke-linejoin="round"/>' },
+  diamond:  { fy: 34, ty: 15, by: 52, d: () => `<path d="${reg(20, 34, 17.5, 4, -90)}" stroke-width="4" stroke-linejoin="round"/>` },
+  ball:     { fy: 34, ty: 16, by: 52, d: () => '<circle cx="20" cy="34" r="17"/>', extra: '<path d="M6 30 Q20 38 34 30" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="1.2"/>' },
   blob:     { fy: 33, ty: 14, by: 52, d: () => '<path d="M8 36 Q4 20 18 16 Q34 12 35 30 Q38 48 22 52 Q8 54 8 36Z" stroke-width="3" stroke-linejoin="round"/>' },
 };
 function shade(hex, amt) {
@@ -358,7 +363,7 @@ function buildShell() {
   let m = '';
   for (let k = 0; k <= 10; k++) m += `<path d="M${x0 + k * 80} ${TY} V${GT}" stroke="#fff" stroke-opacity=".22" stroke-width="1.6"/>`;
   let slabs = '';
-  for (let n = 1; n <= 5; n++) {
+  for (let n = 1; n <= NF; n++) {
     const yb = Y(n) + FW;
     slabs += `<rect x="${x0 - 20}" y="${yb - 7}" width="840" height="13" rx="6.5" fill="url(#slab)"/><rect x="${x0 - 20}" y="${yb + 5}" width="840" height="3" rx="1.5" fill="#0002"/>
       <g fill="#4da668"><ellipse cx="${x0 - 8}" cy="${yb - 12}" rx="11" ry="8"/><ellipse cx="${x1 + 8}" cy="${yb - 12}" rx="11" ry="8"/></g><g fill="#6bc786"><ellipse cx="${x0 + 6}" cy="${yb - 14}" rx="8" ry="6"/><ellipse cx="${x1 - 8}" cy="${yb - 14}" rx="8" ry="6"/></g>`;
@@ -424,7 +429,12 @@ function floorSVG(f) {
       <path d="M304 14 L346 25 L346 56 Q346 80 304 94 Q262 80 262 56 L262 25Z" fill="#6fe0ff" opacity=".2" stroke="#6fe0ff" stroke-width="2.4"/><path d="M304 26 L334 34 L334 56 Q334 73 304 84 Q274 73 274 56 L274 34Z" fill="none" stroke="#6fe0ff" stroke-width="1.2"/><path d="M290 54 l10 10 l19 -21" fill="none" stroke="#6fe0ff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
       <rect x="466" y="20" width="60" height="36" rx="3" fill="#161b26" stroke="#454f66" stroke-width="3"/><rect x="472" y="28" width="20" height="20" fill="#ff5d5d" opacity=".85"/><rect x="496" y="28" width="24" height="8" fill="#22c55e" opacity=".85"/><rect x="496" y="40" width="24" height="8" fill="#f59e0b" opacity=".85"/>
       <circle cx="370" cy="14" r="5" fill="#ff4d4d" class="led"/><path d="M0 108 H740" stroke="#f1c40f" stroke-width="5" stroke-dasharray="14 14" opacity=".85"/>`,
-    control: `
+    content: `
+      <circle cx="26" cy="40" r="17" fill="none" stroke="#fff" stroke-width="5"/><circle cx="26" cy="40" r="17" fill="none" stroke="#ffd93d" stroke-width="1.5"/><rect x="24" y="57" width="4" height="46" fill="#4a4f63"/><path d="M10 108 L26 98 L42 108Z" fill="#4a4f63"/>
+      <g>${[0, 1, 2, 3, 4, 5].map(i => `<rect x="${112 + i * 46}" y="${12 + (i % 2) * 3}" width="38" height="26" fill="#fff" transform="rotate(${(i % 3 - 1) * 3} ${131 + i * 46} 25)"/><rect x="${115 + i * 46}" y="${15 + (i % 2) * 3}" width="32" height="16" fill="${['#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff', '#c77dff', '#ff9f43'][i]}" transform="rotate(${(i % 3 - 1) * 3} ${131 + i * 46} 25)"/>`).join('')}<path d="M104 8 H392" stroke="#b9a38a" stroke-width="2"/></g>
+      <rect x="470" y="14" width="76" height="28" rx="8" fill="none" stroke="${t.accent}" stroke-width="1.8" filter="url(#glw-${id})"/><text x="508" y="34" font-size="15" font-weight="800" fill="${t.accent}" text-anchor="middle" filter="url(#glw-${id})">CONTENT</text>
+      <rect x="560" y="14" width="40" height="26" rx="3" fill="#161b26" stroke="#454f66" stroke-width="3"/><circle cx="580" cy="27" r="7" fill="#ff5d5d"/><path d="M577 23 l9 4 l-9 4z" fill="#fff"/>`,
+  control: `
       <text x="22" y="52" font-size="26" text-anchor="middle">🏆</text><rect x="6" y="62" width="34" height="48" rx="3" fill="#8f7a52"/><rect x="10" y="68" width="26" height="40" fill="#e9dcc0"/><text x="23" y="92" font-size="14" text-anchor="middle">🏅</text>
       <rect x="400" y="12" width="136" height="76" rx="4" fill="#0f1420" stroke="#3b4260" stroke-width="4"/>
       ${[[408, 40], [424, 26], [440, 52], [458, 20], [474, 36], [490, 30], [506, 46]].map(([x, hh], i) => `<rect x="${x}" y="${82 - hh}" width="13" height="${hh}" fill="${i % 2 ? '#3b5bdb' : '#4c6ef5'}"/><rect x="${x + 3}" y="${82 - hh + 4}" width="3" height="3" fill="#ffe066"/><rect x="${x + 8}" y="${82 - hh + 10}" width="3" height="3" fill="#ffe066"/>`).join('')}
@@ -455,15 +465,15 @@ function buildTower() {
   });
   stage.appendChild(el(`<div class="tag" style="left:4px;top:${GT + 38}px;--tg:#37e0ff"><b>00</b>LOBBI</div>`));
   stage.appendChild(el(`<div class="tag" style="left:716px;top:${TY - 150}px;--tg:#6bdc8a"><b>↑</b>TOM BOG'I</div>`));
-  stage.appendChild(el('<div id="shaft"></div>'));
+  stage.appendChild(el(`<div id="shaft" style="height:${NF * FW}px"></div>`));
   S.roster.floors.forEach(f => stage.appendChild(el(`<div class="sdoor" style="left:${TX + 740 + 7}px;top:${Y(f.n) + 16}px;z-index:1"></div>`)));
   stage.appendChild(el('<div id="cabin"></div>'));
   buildShell();
 }
 
 function makeEmp(def, desk, extra = {}) {
-  const f = S.roster.floors.find(x => x.id === def.floor).n;
-  const hx = TX + desk + 22;                                  // stol yonida o'tirish
+  const fl = S.roster.floors.find(x => x.id === def.floor), f = fl.n, narrow = !!fl.narrow;
+  const hx = TX + desk + (narrow ? 18 : 22);                                  // stol yonida o'tirish
   const e = Object.assign({ def, id: def.id, f, home: { f, x: hx, y: SEAT(f) }, x: hx, y: SEAT(f), sitting: true,
     state: 'idle', mode: 'idle', task: null, progress: 0, pending: 0, q: Promise.resolve(), talkN: 0, sub: false, item: null, tok: 0 }, extra);
   stage.appendChild(el(`<div class="chair" style="left:${hx - 20}px;top:${SEAT(f) - 62}px;z-index:${SEAT(f) - 1}"><svg width="40" height="64" viewBox="0 0 40 64"><rect x="6" y="0" width="28" height="36" rx="11" fill="#3a4360"/><rect x="9" y="4" width="22" height="26" rx="8" fill="#4a5578" opacity=".8"/><rect x="3" y="34" width="34" height="9" rx="4.5" fill="#2c3450"/><rect x="18" y="43" width="4" height="13" fill="#9aa5b8"/><path d="M6 59 H34" stroke="#6f7a8f" stroke-width="3.5" stroke-linecap="round"/><circle cx="8" cy="61" r="2.6" fill="#222"/><circle cx="32" cy="61" r="2.6" fill="#222"/></svg></div>`));
@@ -472,12 +482,12 @@ function makeEmp(def, desk, extra = {}) {
     <div class="bubble"></div><div class="char">${svgChar(def.look)}</div></div>`);
   stage.appendChild(e.el);
   if (!extra.boss) { const ch = e.el.querySelector('.char'); ch.title = `${def.name}: ${(def.skills || []).length} skill — bosib ko'ring`; ch.addEventListener('click', () => openProfile(def.id)); }
-  const wide = extra.boss ? 148 : 108;
-  e.desk = el(`<div class="desk${extra.boss ? ' boss' : ''}" style="left:${TX + desk - 52 + (extra.boss ? -20 : 0)}px;top:${SEAT(f) - 62}px;z-index:${SEAT(f) + 1}">
+  const wide = extra.boss ? 148 : narrow ? 92 : 108, mw = extra.boss ? 38 : narrow ? 40 : 46;
+  e.desk = el(`<div class="desk${extra.boss ? ' boss' : ''}" style="left:${TX + desk - (extra.boss ? 72 : narrow ? 46 : 52)}px;top:${SEAT(f) - 62}px;z-index:${SEAT(f) + 1}">
     <svg width="${wide}" height="62" viewBox="0 0 ${wide} 62">
-      ${(extra.boss ? [8, 52, 96] : [8]).map(x => `<g><rect x="${x}" y="2" width="${extra.boss ? 38 : 46}" height="${extra.boss ? 26 : 30}" rx="3" fill="#1b2233" stroke="#3a4560" stroke-width="2"/><rect x="${x + 3}" y="5" width="${extra.boss ? 32 : 40}" height="${extra.boss ? 19 : 22}" fill="#0e1422"/>
+      ${(extra.boss ? [8, 52, 96] : [8]).map(x => `<g><rect x="${x}" y="2" width="${mw}" height="${extra.boss ? 26 : 30}" rx="3" fill="#1b2233" stroke="#3a4560" stroke-width="2"/><rect x="${x + 3}" y="5" width="${mw - 6}" height="${extra.boss ? 19 : 22}" fill="#0e1422"/>
         <g class="scr"><rect class="ln" x="${x + 6}" y="9" width="${extra.boss ? 20 : 26}" height="2.4" rx="1" fill="#38bdf8"/><rect class="ln" x="${x + 6}" y="14" width="${extra.boss ? 14 : 18}" height="2.4" rx="1" fill="#a78bfa"/><rect class="ln" x="${x + 6}" y="19" width="${extra.boss ? 24 : 30}" height="2.4" rx="1" fill="#34d399"/></g>
-        <path d="M${x + (extra.boss ? 15 : 19)} 30 h8 l2 5 h-12z" fill="#3a4560"/></g>`).join('')}
+        <path d="M${x + mw / 2 - 4} 30 h8 l2 5 h-12z" fill="#3a4560"/></g>`).join('')}
       <rect x="2" y="34" width="${wide - 4}" height="7" rx="3" fill="#e2c49d"/><rect x="${wide - 22}" y="25" width="9" height="10" rx="2" fill="#fff"/><path d="M${wide - 13} 28 q4 1 0 5" fill="none" stroke="#fff" stroke-width="1.6"/>
       <rect x="6" y="41" width="${wide - 12}" height="21" rx="2" fill="#c49a6c"/><rect x="${wide - 36}" y="45" width="26" height="6" rx="1" fill="#b3885a"/><rect x="${wide - 36}" y="54" width="26" height="6" rx="1" fill="#b3885a"/><rect x="12" y="45" width="3" height="15" fill="#b3885a"/>
       <rect x="16" y="33" width="26" height="3.5" rx="1.5" fill="#c9d1de"/>
@@ -550,7 +560,7 @@ async function goSeat(e) {
   await go(e, e.home.x, SEAT(e.home.f), SEAT(e.home.f)); e.sitting = true; e.el.classList.remove('left');
   if (e.state === 'working') e.el.classList.add('typing');
 }
-const spotX = (n, name) => TX + ({ coffee: 560, cooler: 612, board: n === 5 ? 480 : 304, sofa: 690, window: 180 }[name]);
+const spotX = (n, name) => TX + ({ coffee: 560, cooler: 612, board: n === NF ? 480 : 304, sofa: 690, window: 180 }[name]);
 async function goNear(e, other) {
   const side = e.home.x <= other.home.x ? -46 : 46;
   await goTo(e, other.home.f, other.home.x + side);
@@ -599,7 +609,7 @@ function startLife(e) {
 const QX = k => TX + 385 + k * 30;
 function releaseSub(e) { e.sub = false; e.mode = 'idle'; setProgress(e, 0); setState(e, 'idle', ''); }
 function requeue() {
-  S.queue.forEach((q, k) => { const e = S.e[q.agent]; if (e && e.state === 'waiting') enqueue(e, () => goTo(e, 5, QX(k))); });
+  S.queue.forEach((q, k) => { const e = S.e[q.agent]; if (e && e.state === 'waiting') enqueue(e, () => goTo(e, NF, QX(k))); });
 }
 const API = {
   start(id, task) {
@@ -617,7 +627,7 @@ const API = {
     S.queue.push(item); e.item = item; e.mode = 'busy';
     setState(e, 'walking');
     const slot = S.queue.length - 1;
-    enqueue(e, async () => { await goTo(e, 5, QX(slot)); if (e.item === item) { setState(e, 'waiting'); say(e, '🙋 Tasdiq kerak!', 4500); } });
+    enqueue(e, async () => { await goTo(e, NF, QX(slot)); if (e.item === item) { setState(e, 'waiting'); say(e, '🙋 Tasdiq kerak!', 4500); } });
     log(`${e.def.name}: «${item.task}» tasdiq kutmoqda`, '🙋');
   },
   decide(itemId, ok) {
@@ -896,8 +906,9 @@ addEventListener('resize', fit); fit();
   try { S.skills = await (await fetch('/skills.json')).json(); } catch { S.skills = {}; }
   try { S.roster = await (await fetch('/roster.json')).json(); }
   catch { stage.innerHTML = '<div style="padding:40px;font-size:18px">Serverni ishga tushiring: <code>node server.js</code>, so\'ng <code>http://localhost:3000</code> ni oching.</div>'; return; }
+  NF = Math.max(...S.roster.floors.map(f => f.n)); GT = TY + NF * FW; STAGE_H = GT + 210; stage.style.height = STAGE_H + 'px'; fit();
   buildCity(); buildTower();
-  S.roster.employees.forEach(d => { const e = makeEmp(d, DESK_X[d.slot] ?? 110); S.e[d.id] = e; S.emps.push(e); });
+  S.roster.employees.forEach(d => { const e = makeEmp(d, d.deskX ?? DESK_X[d.slot] ?? 110); S.e[d.id] = e; S.emps.push(e); });
   // Boss (siz) — penthouse
   const boss = makeEmp({ id: 'boss', name: 'Siz (Boss)', floor: 'control', title: 'Boss', look: { shape: 'spark', color: '#c9653f', acc: 'crown' }, traits: { speed: 1, coffee: 0, chat: 0, wander: 0 }, lines: [] }, 300, { boss: true });
   boss.el.classList.add('boss'); S.e.boss = boss; S.emps.push(boss);
