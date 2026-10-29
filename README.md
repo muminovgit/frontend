@@ -53,7 +53,7 @@ Railway → Variables:
 | O'zgaruvchi | Ma'nosi |
 |---|---|
 | `ANTHROPIC_API_KEY` | **Majburiy.** console.anthropic.com dan oling |
-| `AGENT_MODEL` | Ixtiyoriy. Default `claude-opus-5-5`; arzonroq: `claude-sonnet-5-5`, eng arzon: `claude-haiku-5-5` |
+| `AGENT_MODEL` | Ixtiyoriy. Default `claude-sonnet-5-5`; kuchliroq (qimmatroq): `claude-opus-5-5`; eng arzon: `claude-haiku-5-5` |
 | `MAX_TASKS_PER_DAY` | Ixtiyoriy. Kunlik vazifa limiti (default 40) — xarajatni nazorat qilish uchun |
 
 Kalit qo'yilgach demo agentlar o'chadi va ofisda vazifa kiritish paneli chiqadi. Natijalar serverda xotirada

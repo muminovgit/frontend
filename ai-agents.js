@@ -6,7 +6,7 @@ const Anthropic = require('@anthropic-ai/sdk');
 
 const enabled = !!(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
 const client = enabled ? new Anthropic() : null;
-const MODEL = process.env.AGENT_MODEL || 'claude-opus-5-5';       // arzonroq: claude-sonnet-5-5 yoki claude-haiku-5-5
+const MODEL = process.env.AGENT_MODEL || 'claude-sonnet-5-5';     // kuchliroq: claude-opus-5-5; arzonroq: claude-haiku-5-5
 const MAX_PER_DAY = Number(process.env.MAX_TASKS_PER_DAY || 40);  // xarajatni cheklash
 const MAX_DEPTH = Number(process.env.MAX_TALK_DEPTH || 2);        // hamkasbning hamkasbiga so'rovi zanjiri
 const MAX_CALLS = Number(process.env.MAX_TALK_CALLS || 8);        // bitta vazifa uchun jami hamkasb so'rovlari
