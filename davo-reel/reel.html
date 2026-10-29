@@ -22,6 +22,7 @@ svg{overflow:visible}
 // ===================================================================== Davo Delivery — 15s showreel
 // Every style is computed from t inside seek(t). Constants and DOM are declared before the first seek.
 const W=1080,H=1920,DUR=23.55;
+const PH_SC=1.15,PH_W=Math.round(590*PH_SC);   // phone screen = real 590px-wide screenshots at 1.15x
 const INK='#121212',TEAL='#09bbd4',BG='#f4f4f4',WHITE='#ffffff',Y='#ffce68',PK='#fb4669',V='#5e3a9a',G='#01bdac',MAG='#e8308a';
 const T={ // scene starts
   s1:0, s2:1.85, s3:4.8, s4:6.65, s5:8.95, s6:13.55, s7:16.25, s8:18.8};   // paced to the voiceover
@@ -99,7 +100,7 @@ function build(){
   headline('h5',['Dori vaqtini','eslatamiz.'],112,[WHITE,Y],360);
   E.notif=div('card','',undefined,25);S(E.notif,{width:920,height:190,borderRadius:'44px'});
   E.notif.innerHTML=`<svg class="a" style="left:34px;top:43px" width="104" height="104" viewBox="-50 -50 100 100"><rect x="-50" y="-50" width="100" height="100" rx="24" fill="#fff" stroke="#eee" stroke-width="2"/><g transform="scale(.8)">${logoSVG().replace(/class="p" data-i="(\d)"/g,(m,i)=>`transform="translate(${PETAL[i][0]} ${PETAL[i][1]})"`)}</g></svg>
-    <div class="a" style="left:166px;top:36px;font-size:26px;font-weight:600;color:#8a8a8a">Davo Delivery · hozir</div><div class="a" style="left:166px;top:72px;font-size:40px;font-weight:800">Dori ichish vaqti</div><div class="a" style="left:166px;top:124px;font-size:30px;font-weight:500;color:#555">Paratsetamol · 1 tabletka</div>`;
+    <div class="a" style="left:166px;top:36px;font-size:26px;font-weight:600;color:#8a8a8a">Davo Delivery · hozir</div><div class="a" style="left:166px;top:72px;font-size:40px;font-weight:800">Dori ichish vaqti</div><div class="a" style="left:166px;top:124px;font-size:30px;font-weight:500;color:#555">Askorbin kislotasi · 1 tabletka</div>`;
   E.slots=['Ertalab','Tushlik','Kechqurun'].map((s,i)=>{const d=div('','',undefined,20);d.innerHTML=`<div class="a box" style="left:0;top:0;width:280px;height:280px;border-radius:44px;background:rgba(255,255,255,.14);border:4px solid rgba(255,255,255,.35)"></div><div class="a" style="left:0;top:300px;width:280px;text-align:center;font-size:34px;font-weight:700;color:#fff">${s}</div><div class="a" style="left:0;top:346px;width:280px;text-align:center;font-size:30px;font-weight:600;color:rgba(255,255,255,.6)">${['08:00','14:00','20:00'][i]}</div>`;return d});
   E.caps=[0,1,2].map(i=>{const c=svg(`<g><rect x="-70" y="-32" width="140" height="64" rx="32" fill="#fff"/><path d="M0 -32 H38 a32 32 0 0 1 0 64 H0z" fill="${[TEAL,MAG,Y][i]}"/><rect x="-52" y="-22" width="44" height="10" rx="5" fill="#fff" opacity=".0"/></g>`,undefined,22);return c});
   E.checks=[0,1,2].map(i=>{const c=svg(`<g><circle r="40" fill="${G}"/><path d="M-17 1 L-5 13 L18 -12" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></g>`,undefined,24);return c});
@@ -108,6 +109,22 @@ function build(){
   E.serv=[['nurse','Hamshira chaqirish'],['ambulance','Tez yordam chaqirish'],['vitamins','Vitaminlar va badlar'],['baby','Chaqaloqlar uchun'],['cosmetics',"Go'zallik va kosmetika"]].map(([im,l])=>{const b=div('','',undefined,20);
     b.innerHTML=`<div class="a" style="left:-150px;top:-150px;width:300px;height:300px;border-radius:150px;background:#fff;box-shadow:0 30px 60px rgba(0,0,0,.08)"></div><img class="a" src="assets/img/${im}.png" style="left:-120px;top:-120px;width:240px;height:240px">`;
     const lab=div('mask','',undefined,30);const li=div('h',l,lab);S(li,{fontSize:'64px',color:INK,left:0,top:0});return {b,lab,li,w:tw(l,64)}});
+  // real app: phone + stitched home page; overlays live in page coordinates so they scroll with it
+  E.phone=div('','',undefined,18);S(E.phone,{width:PH_W+36,height:1700,borderRadius:'92px',background:'#0d0d0f',boxShadow:'0 50px 120px rgba(0,0,0,.28)'});
+  E.screen=div('','',E.phone);S(E.screen,{left:18,top:18,width:PH_W,height:1664,borderRadius:'76px',overflow:'hidden',background:'#fff'});
+  E.page=div('','',E.screen);S(E.page,{width:590,height:1860,transformOrigin:'0 0'});
+  img('assets/img/app-page.png',E.page);
+  E.addr=div('',"Amir Temur ko\u2018chasi, 108A",E.page);S(E.addr,{left:0,top:142,width:590,textAlign:'center',fontSize:'22px',fontWeight:500,color:'#555'});
+  E.sf=div('','',E.page);S(E.sf,{left:26,top:190,width:538,height:85,borderRadius:'24px',background:'rgb(218,246,254)'});
+  E.sf.innerHTML=`<svg class="a" style="left:26px;top:24px" width="36" height="36" viewBox="0 0 36 36"><circle cx="15" cy="15" r="11" fill="none" stroke="#333" stroke-width="3.5"/><path d="M23 23 L32 32" stroke="#333" stroke-width="3.5" stroke-linecap="round"/></svg><div class="a" id="sq" style="left:78px;top:21px;font-size:30px;font-weight:500;white-space:pre;color:${INK}"></div><div class="a" id="sc" style="top:22px;width:3px;height:40px;background:${TEAL}"></div>`;
+  E.hl=div('','',E.page);S(E.hl,{borderRadius:'34px',border:`5px solid ${TEAL}`});
+  E.plus=div('','',E.page);S(E.plus,{width:66,height:66,borderRadius:'33px',border:`5px solid ${TEAL}`});
+  E.cnt=div('','',E.page);S(E.cnt,{left:326,top:955,width:150,height:56,background:'#f5f5f5'});E.cntT=div('h','0/2',E.cnt);S(E.cntT,{left:4,top:2,fontSize:'44px',fontWeight:800,letterSpacing:'-0.02em',color:INK});
+  E.bars=[0,1].map(i=>{const b=div('','',E.page);S(b,{left:330+i*110,top:1014,height:12,borderRadius:'6px',background:TEAL});return b});
+  E.chk=svg(`<g><circle r="22" fill="${G}"/><path d="M-9 1 L-3 7 L10 -7" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></g>`,E.page);E.chk.parentNode.style.zIndex=5;
+  E.ring=div('','',E.page);S(E.ring,{border:`5px solid ${TEAL}`,borderRadius:'30px'});
+  E.status=div('','',E.screen);E.status.innerHTML=`<div class="a" style="left:66px;top:30px;font-size:34px;font-weight:600">9:41</div><svg class="a" style="left:${PH_W-170}px;top:36px" width="120" height="26" viewBox="0 0 120 26"><g fill="${INK}"><rect x="0" y="16" width="6" height="10" rx="2"/><rect x="10" y="11" width="6" height="15" rx="2"/><rect x="20" y="6" width="6" height="20" rx="2"/><rect x="30" y="1" width="6" height="25" rx="2"/><rect x="74" y="3" width="40" height="21" rx="6" fill="none" stroke="${INK}" stroke-width="2.4"/><rect x="78" y="7" width="32" height="13" rx="3"/></g></svg>`;
+  E.soon=div('pill',"Ba\u2018zi xizmatlar \u2014 tez orada",undefined,30);S(E.soon,{height:64,padding:'0 30px',background:'#fde7f1',color:'#d6246e',fontSize:'30px'});
   // S7 four steps
   headline('h7',["To'rt qadam",'va dori uyingizda.'],92,[WHITE,INK],230);
   E.st=['Qidiring',"Ro'yxat tuzing",'Dorixonani tanlang','Qabul qiling'].map((s,i)=>{const r=div('','',undefined,20);
@@ -118,6 +135,9 @@ function build(){
   E.stores=['App Store','Google Play'].map(s=>{const p=div('pill',s,undefined,32);S(p,{height:96,width:330,background:INK,color:'#fff',fontSize:'38px'});return p});
 }
 
+function posePhone(top,scroll,extra=''){show(E.phone,1);S(E.phone,{left:(W-PH_W-36)/2,top,transform:extra});S(E.page,{transform:`scale(${PH_SC}) translateY(${-scroll}px)`});
+  S(E.status,{width:PH_W,height:96,background:`rgba(255,255,255,${clamp(scroll/80)})`,zIndex:3})}   // status bar turns solid once content scrolls under it
+function pageToFrame(px,py,top,scroll){return [(W-PH_W-36)/2+18+px*PH_SC, top+18+(py-scroll)*PH_SC]}
 // ---------------------------------------------------------------- seek(t)
 let WORDW=0,TAGW=0,QW=[];
 function seek(t){
@@ -131,16 +151,20 @@ function seek(t){
     const push=ease.expoIn(P(t,1.22,.6));const u=lerp(5.2,5.2*42,push);
     poseLogo(L1,540,960,u,pk,ck);
   }
-  // ================= S2  search (1.85 – 3.75)
+  // ================= S2  real app: search (1.85 – 4.8)
   if(t>=T.s2&&t<T.s3+.05){
-    setHeadline('h2',t,T.s2+.08,3.45);
-    const bi=spring(t-(T.s2+.15),2.4,.55);show(E.bar,1);S(E.bar,{left:90,top:700,width:900,height:132,borderRadius:'66px',transform:`translateY(${(1-bi)*240}px) scale(${lerp(.8,1,bi)})`,border:`4px solid ${TEAL}`});
-    const q='Paratsetamol',n=Math.round(clamp((t-(T.s2+.35))/.5)*q.length);$('q').textContent=q.slice(0,n);
-    const cx=122+tw(q.slice(0,n),54,600,'Inter',0)+4;S($('caret'),{left:cx,opacity:(Math.floor(t*3)%2&&n>=q.length)?0:1});
-    E.cards.forEach((c,i)=>{const k=spring(t-(T.s2+1.0+i*.12),2.2,.5);show(c,k>0);S(c,{left:90+i*470,top:930,width:430,height:430,transform:`translateY(${(1-k)*380}px) rotate(${(1-k)*(i?8:-8)}deg)`})});
-    const tg=spring(t-(T.s2+1.3),3,.45);show(E.tag,tg>0);S(E.tag,{left:96,top:1400,transform:`scale(${tg})`,transformOrigin:'0 50%'});
-    // exit: a teal circle grows from the first card's "+" (the next scene's colour)
-    const wk=ease.expoIn(P(t,T.s3-.32,.36));if(wk>0){const r=wk*2100;show(wipe,1);S(wipe,{left:420-r,top:1298-r,width:2*r,height:2*r,background:TEAL})}
+    setHeadline('h2',t,T.s2+.08,T.s3-.35);
+    const rise=spring(t-(T.s2+.1),1.9,.62),top=lerp(1960,520,rise),scroll=615*ease.expoInOut(P(t,T.s2+1.55,.7));
+    posePhone(top,scroll,`rotate(${(1-rise)*4}deg)`);
+    [...E.page.children].forEach(c=>{if(c.tagName!=='IMG'&&c!==E.addr&&c!==E.sf&&c!==E.hl&&c!==E.plus)c.style.display='none'});show(E.addr,1);
+    const act=ease.expoOut(P(t,T.s2+.45,.25));show(E.sf,1);E.sf.style.boxShadow=`inset 0 0 0 ${act*4}px ${TEAL}`;
+    const q='Avirol',n=Math.round(clamp((t-(T.s2+.6))/.45)*q.length);$('sq').textContent=n?q.slice(0,n):'';
+    $('sq').style.color=n?INK:'#888';if(!n)$('sq').textContent=t<T.s2+.45?'':'';
+    S($('sc'),{left:80+tw(q.slice(0,n),30,500,'Inter',0)+2,opacity:act>0&&(Math.floor(t*3)%2===0||n<q.length)?1:0});
+    // the result card (АВИРОЛ С №12) gets a ring, then its "+" pulses
+    const hk=ease.expoOut(P(t,T.s2+2.05,.35));show(E.hl,hk>0);S(E.hl,{left:26-8*hk,top:1532-8*hk,width:538+16*hk,height:128+16*hk,opacity:hk});
+    const pk=spring(t-(T.s2+2.35),3,.4);show(E.plus,pk>0);S(E.plus,{left:457,top:1587,transform:`scale(${lerp(.6,1.25,pk)})`});
+    const wk=ease.expoIn(P(t,T.s3-.32,.36));if(wk>0){const [px,py]=pageToFrame(490,1620,top,scroll);const r=wk*2300;show(wipe,1);wipe.style.zIndex=30;S(wipe,{left:px-r,top:py-r,width:2*r,height:2*r,background:TEAL})}
   }
   // ================= S3  map, pins, chips (3.7 – 5.55)
   if(t>=T.s3&&t<T.s4+.05){
@@ -175,25 +199,26 @@ function seek(t){
     bg=V;
     const sk=spring(t-(T.s5+.06),2.4,.4),sq=squash(t-(T.s5+.2),.25);show(E.sticker,1);S(E.sticker,{left:80,top:180,transform:`rotate(${lerp(-40,-7,sk)}deg) scale(${lerp(2.2,1,sk)*sq[0]},${lerp(2.2,1,sk)*sq[1]})`});
     setHeadline('h5',t,T.s5+.15,T.s6-.3);
-    const nk=spring(t-(T.s5+.45),2.2,.55),ring=Math.exp(-Math.max(0,t-(T.s5+.7))*6)*Math.sin((t-(T.s5+.7))*40)*(t>T.s5+.7?3:0);
-    show(E.notif,1);S(E.notif,{left:80,top:lerp(-260,640,nk),transform:`rotate(${ring}deg)`});
-    E.slots.forEach((s,i)=>{const k=spring(t-(T.s5+.6+i*.08),2.4,.5);show(s,1);S(s,{left:80+i*320,top:1120,transform:`translateY(${(1-k)*600}px)`})});
-    // capsules drop into the compartments with gravity and settle; a check pops when each lands
-    E.caps.forEach((c,i)=>{const t0=T.s5+1.25+i*.8,k=t-t0;if(k<0)return;show(c.parentNode,1);const fall=.26,g=2*420/(fall*fall);let y,sx=1,sy=1,rot=(1-Math.min(1,k/fall))*180*(i%2?1:-1);
-      if(k<fall){y=1260-420+.5*g*k*k;sy=1+Math.min(.25,g*k/30000);sx=1/Math.sqrt(sy)}else{y=1260;const q=squash(k-fall,.3);sx=q[0];sy=q[1];rot=0}
-      c.querySelector('g').setAttribute('transform',`translate(${220+i*320} ${y}) rotate(${rot-20}) scale(${sx} ${sy})`);
-      const ch=spring(k-fall-.05,3.2,.45);if(ch>0){show(E.checks[i].parentNode,1);E.checks[i].querySelector('g').setAttribute('transform',`translate(${330+i*320} ${1140}) scale(${ch})`)}});
-    const wk=ease.expoIn(P(t,T.s6-.32,.36));if(wk>0){const r=wk*2100;show(wipe,1);S(wipe,{left:970-r,top:1140-r,width:2*r,height:2*r,background:BG})}
+    const rise=spring(t-(T.s5+.25),1.9,.62),top=lerp(1960,760,rise);posePhone(top,615);
+    [...E.page.children].forEach(c=>{if(c.tagName!=='IMG'&&c!==E.addr&&c!==E.cnt&&!E.bars.includes(c)&&c!==E.chk.parentNode)c.style.display='none'});show(E.addr,1);
+    const nk=spring(t-(T.s5+.9),2.2,.55),ring=Math.exp(-Math.max(0,t-(T.s5+1.15))*6)*Math.sin((t-(T.s5+1.15))*40)*(t>T.s5+1.15?3:0);
+    show(E.notif,1);E.notif.style.zIndex=40;S(E.notif,{left:80,top:lerp(-260,640,nk),transform:`rotate(${ring}deg)`});
+    const d1=T.s5+1.9,d2=T.s5+2.9,done=(t>=d2?2:t>=d1?1:0);show(E.cnt,1);E.cntT.textContent=done+'/2';
+    const pop=Math.max(spring(t-d1,3.2,.4)*(t<d2?1:0),spring(t-d2,3.2,.4));E.cntT.style.transform=`scale(${t>=d1?lerp(1.35,1,clamp(pop)):1})`;E.cntT.style.transformOrigin='0 60%';
+    E.bars.forEach((b,i)=>{const k=ease.expoOut(P(t,i?d2:d1,.45));show(b,k>0);S(b,{width:102*k})});
+    const ck=spring(t-(d2+.1),3,.42);show(E.chk.parentNode,ck>0);E.chk.querySelector('g').setAttribute('transform',`translate(530 935) scale(${ck})`);
+    const wk=ease.expoIn(P(t,T.s6-.32,.36));if(wk>0){const [px,py]=pageToFrame(530,935,top,615);const r=wk*2300;show(wipe,1);wipe.style.zIndex=30;S(wipe,{left:px-r,top:py-r,width:2*r,height:2*r,background:BG})}
   }
   // ================= S6  services carousel (9.9 – 11.7)
   if(t>=T.s6&&t<T.s7){
     bg=BG;setHeadline('h6',t,T.s6+.05,T.s7-.3);
-    const steps=[.35,.85,1.35,1.85].map(a=>T.s6+a);let pos=steps.reduce((a,s)=>a+ease.expoInOut(P(t,s,.3)),0);const intro=ease.expoOut(P(t,T.s6,.5));
-    const N=E.serv.length;E.serv.forEach((s,i)=>{let a=((i-pos)/N)*Math.PI*2;const depth=(Math.cos(a)+1)/2;const x=540+Math.sin(a)*400,y=1040+(1-depth)*-120;
-      const sc=lerp(.45,1.35,depth)*intro;show(s.b,1);s.b.style.zIndex=10+Math.round(depth*10);S(s.b,{left:x,top:y,transform:`scale(${sc})`,opacity:1});
-      // label of the front item rises; leaving label drops
-      const front=Math.round(pos)%N===i;const k=1-Math.min(1,Math.abs(pos-Math.round(pos))*2.2);const lk=front?k:0;show(s.lab,lk>.01);
-      S(s.lab,{left:(W-s.w)/2-6,top:1330,width:s.w+20,height:84});S(s.li,{transform:`translateY(${(1-lk)*84}px)`})});
+    const rise=spring(t-(T.s6+.05),1.9,.62),top=lerp(1960,560,rise);posePhone(top,0);
+    [...E.page.children].forEach(c=>{if(c.tagName!=='IMG'&&c!==E.addr&&c!==E.ring)c.style.display='none'});show(E.addr,1);
+    const tiles=[[26,298,259,255],[305,298,258,119],[305,433,258,120],[36,576,114,190],[171,576,114,190],[305,576,114,190],[440,576,114,190]];
+    const per=(T.s7-.45-(T.s6+.45))/tiles.length,f=clamp((t-(T.s6+.45))/per,0,tiles.length-1),i0=Math.floor(f),k=ease.expoInOut(clamp((f-i0)*2.2));
+    const a1=tiles[i0],a2=tiles[Math.min(tiles.length-1,i0+1)],rr=a1.map((v,j)=>lerp(v,a2[j],k)),on=ease.expoOut(P(t,T.s6+.4,.3));
+    show(E.ring,on>0);S(E.ring,{left:rr[0]-8,top:rr[1]-8,width:rr[2]+16,height:rr[3]+16,opacity:on});
+    const sk=spring(t-(T.s6+.6),2.8,.5);show(E.soon,sk>0);S(E.soon,{left:(W-(E.soon.offsetWidth||520))/2,top:470,transform:`scale(${sk})`});
   }
   // ================= S7  four steps (11.7 – 13.15)
   if(t>=T.s7&&t<T.s8+.05){

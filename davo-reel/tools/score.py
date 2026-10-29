@@ -88,9 +88,11 @@ for i, a in enumerate([.18, .3, .42, .54]): pop(a + 0.06, 600 + i * 140, 0.28, p
 thud(0.74, 0.7); pop(0.76, 1300, 0.2); whoosh(1.83, 0.6, 0.3)
 # S2 search
 whoosh(T["s2"] + 0.2, 0.25, 0.1); pop(T["s2"] + 0.2, 700, 0.22)
-for k in range(12): tick(T["s2"] + 0.37 + k * 0.042, 0.07, pan=0.2)
-for i in range(2): thud(T["s2"] + 1.12 + i * 0.12, 0.35)
-pop(T["s2"] + 1.33, 1500, 0.15); whoosh(T["s3"] - 0.02, 0.35, 0.25)
+whoosh(T["s2"] + 0.45, 0.4, 0.14)                     # phone rises
+for k in range(6): tick(T["s2"] + 0.62 + k * 0.075, 0.09, pan=0.2)   # typing "Avirol"
+whoosh(T["s2"] + 2.0, 0.5, 0.1)                        # page scrolls to the list
+pop(T["s2"] + 2.12, 900, 0.18); pop(T["s2"] + 2.4, 1500, 0.2)   # result ring, "+" pulse
+whoosh(T["s3"] - 0.02, 0.35, 0.25)
 # S3 map
 scribble(T["s3"] + 0.05, T["s3"] + 0.5, 0.06, 0.5)
 for i in range(6): pop(T["s3"] + 0.3 + i * 0.07 + 0.18, 500 + i * 60, 0.2, pan=((i % 3) - 1) * 0.4)
@@ -103,12 +105,15 @@ for i, a in enumerate([.2, .55, .9, 1.55]): pop(T["s4"] + a + 0.02, 900 + i * 22
 thud(T["s4"] + 1.5, 0.35)
 # S5 the new pill reminder
 thud(T["s5"] + 0.16, 0.8); pop(T["s5"] + 0.2, 1100, 0.25)
-chime(T["s5"] + 0.62, 0.28)
-whoosh(T["s5"] + 0.75, 0.3, 0.12)
-for i in range(3): plastic(T["s5"] + 1.25 + i * 0.8 + 0.26, 0.35); pop(T["s5"] + 1.25 + i * 0.8 + 0.33, 1400 + i * 200, 0.15)
+whoosh(T["s5"] + 0.55, 0.4, 0.14)                     # phone rises
+chime(T["s5"] + 1.05, 0.28)                            # the reminder notification
+for d in (1.9, 2.9): plastic(T["s5"] + d, 0.3); pop(T["s5"] + d + 0.03, 1300 if d < 2.5 else 1600, 0.18)   # 1/2, 2/2 taken
+pop(T["s5"] + 3.02, 1900, 0.16)
 whoosh(T["s6"] - 0.02, 0.36, 0.25)
 # S6 carousel steps
-for a in [.35, .85, 1.35, 1.85]: whoosh(T["s6"] + a + 0.15, 0.22, 0.12); tick(T["s6"] + a + 0.28, 0.1)
+whoosh(T["s6"] + 0.3, 0.4, 0.14)
+per = (T["s7"] - 0.45 - (T["s6"] + 0.45)) / 7
+for i in range(7): tick(T["s6"] + 0.45 + i * per + 0.12, 0.1, pan=((i % 2) - 0.5) * 0.4)   # the ring steps tile to tile
 # S7 four steps
 for i in range(4): thud(T["s7"] + 0.32 + i * 0.38, 0.45); pop(T["s7"] + 0.33 + i * 0.38, 700 + i * 180, 0.14)
 # S8 outro
