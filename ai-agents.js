@@ -29,17 +29,27 @@ const meta = r => ({ type: 'result', resultId: r.id, agent: r.agent, task: r.tas
 const list = () => [...results.values()].map(meta);
 const getText = id => (results.get(id) || {}).text;
 
-async function generate(agent, messages, onText) {
+async function generate(agent, messages, onText, note, noTools) {
   const def = AGENTS[agent];
-  const tools = def.web ? [{ type: 'web_search_20260209', name: 'web_search', max_uses: 5 }] : undefined;
+  const tools = def.web && !noTools ? [{ type: 'web_search_20260209', name: 'web_search', max_uses: 5 }] : undefined;
   let msgs = messages, text = '', inTok = 0, outTok = 0;
   for (let turn = 0; turn < 6; turn++) {
-    const stream = client.messages.stream({
-      model: MODEL, max_tokens: 16000, thinking: { type: 'adaptive' },
-      system: def.system, tools, messages: msgs,
-    });
-    stream.on('text', onText);
-    const msg = await stream.finalMessage();
+    let msg;
+    try {
+      const stream = client.messages.stream({
+        model: MODEL, max_tokens: 16000, thinking: { type: 'adaptive' },
+        system: def.system, tools, messages: msgs,
+      });
+      stream.on('text', onText);
+      msg = await stream.finalMessage();
+    } catch (err) {
+      // Veb-qidiruv yoqilmagan/ruxsat yo'q bo'lsa, qidiruvsiz qayta urinamiz
+      if (tools && err.status === 400) {
+        note(`Veb-qidiruv ishlamadi (${String(err.message).slice(0, 140)}). Qidiruvsiz davom etaman.`);
+        return generate(agent, messages, onText, note, true);
+      }
+      throw err;
+    }
     inTok += msg.usage.input_tokens; outTok += msg.usage.output_tokens;
     text += msg.content.filter(b => b.type === 'text').map(b => b.text).join('');
     if (msg.stop_reason === 'refusal') throw new Error('Model javob berishdan bosh tortdi');
@@ -61,7 +71,7 @@ async function run({ agent, task, emit, waitDecision }) {
       const out = await generate(agent, messages, t => {
         chars += t.length;
         if (Date.now() - lastEmit > 900) { lastEmit = Date.now(); emit({ type: 'progress', agent, value: Math.min(0.95, 1 - Math.exp(-chars / 2500)) }); }
-      });
+      }, m => emit({ type: 'log', agent, message: m }));
       res.text = out.text; res.status = 'review';
       emit({ type: 'progress', agent, value: 1 });
       emit({ type: 'log', agent, message: `${out.inTok} kirish / ${out.outTok} chiqish token` });
@@ -81,7 +91,10 @@ async function run({ agent, task, emit, waitDecision }) {
     res.status = 'rejected'; emit(meta(res)); emit({ type: 'idle', agent });
   } catch (err) {
     res.status = 'error'; emit(meta(res));
-    emit({ type: 'error', agent, message: String(err.message || err).slice(0, 60) });
+    const full = String(err.message || err);
+    console.error(`[${agent}] xato:`, full);
+    emit({ type: 'log', agent, message: 'XATO: ' + full.slice(0, 300) });
+    emit({ type: 'error', agent, message: full.slice(0, 60) });
   } finally { busy.delete(agent); }
 }
 
