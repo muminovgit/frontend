@@ -78,8 +78,8 @@ http.createServer(async (req, res) => {
     const rm = url.pathname.match(/^\/result\/([\w-]+)$/);
     if (req.method === 'GET' && rm) {
       if (!authed(req, url)) return json(res, 401, { error: 'token' });
-      const text = ai.getText(rm[1]);
-      return text === undefined ? json(res, 404, { error: 'topilmadi' }) : json(res, 200, { text });
+      const r = ai.getResult(rm[1]);
+      return r ? json(res, 200, r) : json(res, 404, { error: 'topilmadi' });
     }
 
     // Agent hodisa yuboradi. needApproval bo'lsa javobda itemId qaytadi.

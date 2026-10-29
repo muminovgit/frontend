@@ -58,3 +58,12 @@ Railway → Variables:
 
 Kalit qo'yilgach demo agentlar o'chadi va ofisda vazifa kiritish paneli chiqadi. Natijalar serverda xotirada
 turadi (oxirgi 30 ta), server qayta ishga tushsa o'chadi. Veb-qidiruv ishlamasa, Console → Settings da yoqilganini tekshiring.
+
+## Agentlar o'zaro muloqoti
+Har bir agent `ask_teammate` vositasi bilan hamkasbidan yordam so'ray oladi (masalan, Menejer Tadqiqotchi va Kontentga
+parallel topshiriq beradi, Sotuv Tadqiqotchidan ma'lumot so'raydi). Hamkasb javob beradi, kerak bo'lsa keyingi savol ham mumkin.
+Ofisda agent hamkasbi stoliga borib gapini aytadi; natijadagi **👁** da to'liq muloqot tarixi ko'rinadi.
+Vazifani odatda **🧭 Menejer**ga bering — u o'zi kerakli hamkasblarni jalb qiladi.
+
+Xarajat nazorati (Railway Variables): `MAX_TALK_CALLS` (bitta vazifada jami hamkasb so'rovlari, default 8),
+`MAX_TALK_DEPTH` (so'rov zanjiri chuqurligi, default 2). Har so'rov alohida API chaqiruvi — muloqot ko'p bo'lsa, xarajat ham ko'p.

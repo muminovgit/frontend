@@ -48,7 +48,7 @@
     @media (max-width: 960px) { main { grid-template-columns: 1fr; } }
     #wrap { background: var(--floor); border: 1px solid var(--line); border-radius: 14px;
       overflow: hidden; position: relative; }
-    #stage { position: relative; width: 960px; height: 600px; transform-origin: 0 0;
+    #stage { position: relative; width: 960px; height: 690px; transform-origin: 0 0;
       background:
         linear-gradient(#0000000a 1px, transparent 1px) 0 0 / 40px 40px,
         linear-gradient(90deg, #0000000a 1px, transparent 1px) 0 0 / 40px 40px, var(--floor); }
@@ -87,14 +87,14 @@
       opacity: 0; transition: opacity .25s; pointer-events: none; }
     .agent.show .bubble { opacity: 1; }
 
-    #human { position: absolute; left: 480px; top: 520px; width: 230px; margin-left: -115px; text-align: center; }
+    #human { position: absolute; left: 480px; top: 600px; width: 230px; margin-left: -115px; text-align: center; }
     #human .top { background: #c8a27a; border: 2px solid #a8814f; border-radius: 8px; height: 50px; position: relative;
       box-shadow: 0 4px 0 #a8814f55; }
     #human .m { position: absolute; top: -26px; width: 60px; height: 38px; background: #111827;
       border: 3px solid #374151; border-radius: 4px; }
     #human .m:nth-child(1) { left: 14px; } #human .m:nth-child(2) { left: 85px; } #human .m:nth-child(3) { left: 156px; }
-    #me { position: absolute; left: 480px; top: 474px; font-size: 34px; margin: -22px 0 0 -17px; z-index: 4; }
-    #queue { position: absolute; left: 480px; top: 362px; max-height: 108px; overflow-y: auto; width: 250px; margin-left: -125px;
+    #me { position: absolute; left: 480px; top: 554px; font-size: 34px; margin: -22px 0 0 -17px; z-index: 4; }
+    #queue { position: absolute; left: 480px; top: 442px; max-height: 108px; overflow-y: auto; width: 250px; margin-left: -125px;
       background: var(--card); border: 2px dashed var(--wait); border-radius: 10px; padding: 6px 8px; font-size: .72rem; }
     #queue h4 { margin: 0 0 4px; font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; color: var(--wait); }
     .qi { display: flex; align-items: center; gap: 6px; padding: 3px 0; border-top: 1px solid var(--line); }
@@ -147,13 +147,14 @@
 <script>
 /* ---- Sozlamalar: agentlarni shu yerda o'zgartiring ---- */
 const AGENTS = [
+  { id: 'manager',  name: 'Menejer',     emoji: '🧭', x: 480, y: 290, tasks: ['Haftalik reja', 'Kampaniya koordinatsiyasi', 'Hisobot yig\'ish'] },
   { id: 'research', name: 'Tadqiqotchi', emoji: '🔎', x: 150, y: 90,  tasks: ['Bozor tahlili', 'Raqobatchilar', 'Trend qidiruv'] },
   { id: 'writer',   name: 'Kontent',     emoji: '✍️', x: 480, y: 90,  tasks: ['Blog post', 'Email kampaniya', 'Reels ssenariy'] },
   { id: 'sales',    name: 'Sotuv',       emoji: '💰', x: 810, y: 90,  tasks: ['Lead topish', 'Taklif yuborish', 'Follow-up'] },
   { id: 'coder',    name: 'Dasturchi',   emoji: '🤖', x: 150, y: 290, tasks: ['Bug fix', 'Yangi funksiya', 'Code review'] },
   { id: 'support',  name: 'Support',     emoji: '🎧', x: 810, y: 290, tasks: ['Ticket javob', 'FAQ yangilash', 'Shikoyat'] },
 ];
-const QUEUE_POS = { x: 480, y: 335 };
+const QUEUE_POS = { x: 480, y: 415 };
 
 /* ---- Holat ---- */
 const stage = document.getElementById('stage');
@@ -180,7 +181,7 @@ AGENTS.forEach(def => {
   const el = document.createElement('div');
   el.className = 'agent'; el.innerHTML = `${def.emoji}<span class="bubble"></span>`;
   stage.appendChild(el);
-  const st = { def, desk, el, state: 'idle', task: null, progress: 0, home: { x: def.x, y: def.y - 48 }, pending: null };
+  const st = { def, desk, el, state: 'idle', task: null, progress: 0, home: { x: def.x, y: def.y - 48 }, pending: null, talkN: 0, sub: false };
   S.a[def.id] = st;
   place(st, st.home);
 });
@@ -201,7 +202,7 @@ function setProgress(st, v) { st.progress = v; st.desk.querySelector('.bar div')
 
 /* ---- Hodisalar API (haqiqiy agentlarni ulash uchun) ---- */
 const API = {
-  start(id, task)    { const st = S.a[id]; if (!st) return; st.task = task; setProgress(st, 0); setState(st, 'working', task); say(st, 'Boshladim'); log(`${st.def.name}: «${task}» boshlandi`, '▶️'); },
+  start(id, task)    { const st = S.a[id]; if (!st) return; st.sub = false; st.task = task; setProgress(st, 0); setState(st, 'working', task); say(st, 'Boshladim'); log(`${st.def.name}: «${task}» boshlandi`, '▶️'); },
   progress(id, v)    { const st = S.a[id]; if (st) setProgress(st, v); },
   needApproval(id, task, e) {
     const st = S.a[id]; if (!st) return;
@@ -228,6 +229,23 @@ const API = {
     if (i < 0) S.results.unshift(r); else S.results[i] = r;
     renderResults();
   },
+  talk(id, msg, e) {
+    const from = S.a[id], to = S.a[e.to]; if (!from || !to) return;
+    const snip = String(e.message || '').replace(/\s+/g, ' ');
+    if (e.kind === 'ask') {
+      from.talkN++;
+      place(from, { x: to.home.x + (from.home.x <= to.home.x ? -48 : 48), y: to.home.y + 24 });
+      say(from, `→ ${to.def.name}: ${snip.slice(0, 34)}…`, 5000);
+      if (to.state === 'idle') { to.sub = true; setProgress(to, 0.5); setState(to, 'working', 'So\'rov: ' + snip.slice(0, 28)); }
+      log(`${from.def.name} → ${to.def.name}: ${snip.slice(0, 140)}`, '💬');
+    } else {
+      say(from, `↩ ${snip.slice(0, 34)}…`, 4000);
+      log(`${from.def.name} → ${to.def.name} (javob): ${snip.slice(0, 140)}`, '↩️');
+      if (from.sub) { from.sub = false; API.idle(from.def.id); }
+      to.talkN = Math.max(0, to.talkN - 1);
+      if (to.talkN === 0 && to.state !== 'walking' && to.state !== 'waiting') place(to, to.home);
+    }
+  },
   error(id, msg)     { const st = S.a[id]; if (!st) return; S.err++; setState(st, 'error', msg || 'Xato'); say(st, 'Xato!'); log(`${st.def.name}: ${msg || 'xato'}`, '⚠️'); setTimeout(() => API.idle(id), 3000); },
   done(id)           { const st = S.a[id]; if (!st) return; S.shipped++; setState(st, 'done', 'Tayyor ✔'); log(`${st.def.name}: «${st.task}» tayyor`, '✅'); setTimeout(() => API.idle(id), 2000); },
   idle(id)           { const st = S.a[id]; if (!st) return; st.task = null; setProgress(st, 0); setState(st, 'idle', 'kutmoqda'); },
@@ -252,9 +270,12 @@ function renderResults() {
   });
 }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const NAME = id => (S.a[id] ? S.a[id].def.name : id);
 async function openResult(id, title) {
   $('mTitle').textContent = title; $('mText').textContent = 'Yuklanmoqda…'; $('modal').classList.add('on');
-  try { const r = await fetch('/result/' + id + '?key=' + encodeURIComponent(KEY)); $('mText').textContent = (await r.json()).text || '(bo\'sh)'; }
+  try { const r = await fetch('/result/' + id + '?key=' + encodeURIComponent(KEY)); const j = await r.json();
+    const talk = (j.talk || []).map(t => `💬 ${NAME(t.from)} → ${NAME(t.to)}: ${t.ask}\n↩️ ${NAME(t.to)}: ${t.reply == null ? '(kutilmoqda…)' : t.reply}`).join('\n\n');
+    $('mText').textContent = (talk ? 'HAMKASBLAR MULOQOTI\n\n' + talk + '\n\n──────── YAKUNIY NATIJA ────────\n\n' : '') + (j.text || '(bo\'sh)'); }
   catch { $('mText').textContent = 'Yuklab bo\'lmadi'; }
 }
 $('mClose').onclick = () => $('modal').classList.remove('on');
@@ -331,7 +352,7 @@ if (qs.get('ws')) { S.paused = true; const ws = new WebSocket(qs.get('ws')); ws.
 if (qs.get('sse')) { S.paused = true; const es = new EventSource(qs.get('sse')); es.onmessage = m => API.event(JSON.parse(m.data)); }
 
 /* ---- Ekranga moslash ---- */
-function fit() { const w = $('wrap').clientWidth, k = Math.min(1, w / 960); stage.style.transform = `scale(${k})`; $('wrap').style.height = 600 * k + 'px'; }
+function fit() { const w = $('wrap').clientWidth, k = Math.min(1, w / 960); stage.style.transform = `scale(${k})`; $('wrap').style.height = 690 * k + 'px'; }
 addEventListener('resize', fit); fit();
 render(); log('Ofis ochildi', '🏢');
 </script>
