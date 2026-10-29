@@ -30,7 +30,9 @@
     #taskbar { display: none; gap: 8px; padding: 0 16px 10px; flex-wrap: wrap; }
     #taskbar.on { display: flex; }
     #taskbar select, #taskbar input { font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; background: var(--card); color: var(--ink); }
-    #taskbar input { flex: 1; min-width: 220px; }
+    #taskbar input, #taskbar textarea { flex: 1; min-width: 220px; }
+    #taskbar textarea { font: inherit; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; background: var(--card); color: var(--ink); resize: vertical; min-height: 38px; max-height: 260px; line-height: 1.4; }
+    #taskbar .cnt { align-self: center; font-size: .72rem; color: var(--muted); min-width: 64px; text-align: right; }
     #taskbar button { background: var(--work); color: #fff; border-color: var(--work); }
 
     #pipe { display: none; align-items: center; gap: 6px; padding: 0 16px 10px; flex-wrap: wrap; font-size: .8rem; }
@@ -155,7 +157,7 @@
 
   <div id="taskbar">
     <select id="tAgent"></select>
-    <input id="tText" maxlength="4000">
+    <textarea id="tText" rows="1" maxlength="30000"></textarea>
     <button id="tGo"></button>
   </div>
   <div id="pipe"></div>
@@ -858,7 +860,11 @@ function setupTaskbar() {
     const j = await r.json();
     if (j.ok) $('tText').value = ''; else log(j.error || 'Xato', '⚠️');
   };
-  $('tGo').onclick = goTask; $('tText').onkeydown = e => { if (e.key === 'Enter') goTask(); };
+  const ta = $('tText'), cnt = Object.assign(document.createElement('span'), { className: 'cnt' }); ta.after(cnt);
+  const grow = () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight + 2, 260) + 'px'; cnt.textContent = ta.value.length > 500 ? ta.value.length + ' belgi' : ''; };
+  ta.addEventListener('input', grow);
+  $('tGo').onclick = async () => { await goTask(); grow(); };
+  ta.onkeydown = async e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); await goTask(); grow(); } };
 }
 
 $('pal').value = PALS[PAL_KEY] ? PAL_KEY : 'claude';

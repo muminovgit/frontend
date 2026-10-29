@@ -15,6 +15,8 @@ const MAX_PER_DAY = Number(process.env.MAX_TASKS_PER_DAY || 40);  // kunlik birl
 const MAX_DEPTH = Number(process.env.MAX_TALK_DEPTH || 2);        // hamkasbning hamkasbiga so'rovi zanjiri
 const MAX_CALLS = Number(process.env.MAX_TALK_CALLS || 6);        // bitta bosqich uchun jami hamkasb so'rovlari
 const MAX_REVISIONS = 2;
+const MAX_TEXT = Number(process.env.MAX_TASK_CHARS || 30000);        // vazifa/brief uzunligi
+const shortTitle = t => { const l = String(t).replace(/\s+/g, ' ').trim(); return l.length > 80 ? l.slice(0, 77) + '…' : l; };
 
 const EMP = Object.fromEntries(roster.employees.map(e => [e.id, e]));
 const FLOORS = Object.fromEntries(roster.floors.map(f => [f.id, f]));
@@ -229,7 +231,7 @@ async function runWork({ agent, stage, title, input, emit, waitDecision, onStatu
 
 // To'liq loyiha: Tadqiqot -> Marketing -> Sotuv -> Risk -> Nazorat
 async function runCase({ id, brief, emit, waitDecision }) {
-  const c = { id, brief, stage: 'research', status: 'running', decision: null, stages: Object.fromEntries([...PIPELINE, 'control'].map(f => [f, 'pending'])) };
+  const c = { id, brief: shortTitle(brief), stage: 'research', status: 'running', decision: null, stages: Object.fromEntries([...PIPELINE, 'control'].map(f => [f, 'pending'])) };
   cases.set(id, c);
   while (cases.size > 10) cases.delete(cases.keys().next().value);
   const push = () => emit(caseMeta(c));
@@ -301,11 +303,11 @@ function start({ agent, task, emit, waitDecision }) {
   if (!EMP[agent]) return { code: 400, error: 'xodim topilmadi' };
   task = String(task || '').trim();
   if (!task) return { code: 400, error: 'vazifa bo\'sh' };
-  if (task.length > 4000) return { code: 400, error: 'vazifa 4000 belgidan oshmasin' };
+  if (task.length > MAX_TEXT) return { code: 400, error: `vazifa ${MAX_TEXT} belgidan oshmasin (hozir ${task.length})` };
   if (busy.has(agent)) return { code: 409, error: `${EMP[agent].name} band, tugashini kuting` };
   if (!budget(1)) return { code: 429, error: `kunlik limit (${MAX_PER_DAY}) tugadi` };
   busy.add(agent);
-  runWork({ agent, stage: null, title: task, input: task, emit, waitDecision }).finally(() => busy.delete(agent));
+  runWork({ agent, stage: null, title: shortTitle(task), input: task, emit, waitDecision }).finally(() => busy.delete(agent));
   return { code: 200, ok: true };
 }
 
@@ -313,7 +315,7 @@ function startCase({ brief, emit, waitDecision }) {
   if (!enabled) return { code: 503, error: 'ANTHROPIC_API_KEY o\'rnatilmagan' };
   brief = String(brief || '').trim();
   if (!brief) return { code: 400, error: 'brief bo\'sh' };
-  if (brief.length > 4000) return { code: 400, error: 'brief 4000 belgidan oshmasin' };
+  if (brief.length > MAX_TEXT) return { code: 400, error: `brief ${MAX_TEXT} belgidan oshmasin (hozir ${brief.length})` };
   if (busy.has('case')) return { code: 409, error: 'boshqa loyiha davom etyapti, tugashini kuting' };
   if (!budget(5)) return { code: 429, error: `kunlik limit (${MAX_PER_DAY}) yetmaydi (loyiha = 5 birlik)` };
   busy.add('case');
