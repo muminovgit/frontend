@@ -22,6 +22,17 @@ skills:
   - sms
   - community-marketing
   - video
+  - sales-enablement
+  - emails
+  - cro
+  - pricing
+  - onboarding
+  - public-relations
+  - co-marketing
+  - events
+  - lead-magnets
+  - competitor-profiling
+  - image
   - brand-motion-reel
 ---
 
