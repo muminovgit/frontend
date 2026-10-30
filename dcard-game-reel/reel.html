@@ -212,8 +212,7 @@ function sPad(t){darkBG('rgba(0,173,255,.32)',1150);
     txt(l,x+150,y+58,70,'Chakra',{al:'left'});txt('+1 HIT',x+716,y+58,36,'Chakra',{al:'right',col:YEL,ls:2});ctx.restore()});
   if(t>=T.combo){const d=t-T.combo,s=1+1.1*Math.exp(-d*15),g=20*Math.exp(-d*7);ctx.save();ctx.translate(540,895);ctx.rotate(-.05);ctx.scale(s,s);
     gtxt('KOMBO ×3',0,0,150,'Anton',YEL,g,{w:400,glow:'rgba(255,233,0,.55)',gb:40});ctx.restore()}
-  pad(t);
-  flash((1-P(t,T.pad,.3))*1)}
+  pad(t)}
 
 // ---------------------------------------------------------------- S3 phone: QR objective + loot
 const PH={x:255,y:390,w:570,h:1000,sc:570/393};
@@ -299,7 +298,7 @@ function sLogo(t){darkBG('rgba(0,173,255,.38)',820);floorGrid(t,.45);
 function draw(t){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,W,H);const[sx,sy]=shake(t);ctx.translate(sx,sy);
   if(t<T.hud)sBoot(t);
   else if(t<T.pad){const z=ease.expoIn(P(t,T.zoom,.35));if(z>0){ctx.save();ctx.translate(540,900);ctx.scale(1+z*7,1+z*7);ctx.translate(-540,-900);sHud(t);ctx.restore()}else sHud(t);flash(P(t,T.zoom+.15,.2))}
-  else if(t<T.padOut+.12){const z=ease.expoOut(P(t,T.pad,.45));const wp=ease.expoIn(P(t,T.padOut,.12));ctx.save();ctx.translate(540-wp*1300,960);ctx.scale(lerp(.55,1,z),lerp(.55,1,z));ctx.translate(-540,-960);sPad(t);ctx.restore()}
+  else if(t<T.padOut+.12){const z=ease.expoOut(P(t,T.pad,.45));const wp=ease.expoIn(P(t,T.padOut,.12));ctx.fillStyle=BG;ctx.fillRect(-60,-60,W+120,H+120);ctx.save();ctx.translate(540-wp*1300,960);ctx.scale(lerp(.55,1,z),lerp(.55,1,z));ctx.translate(-540,-960);sPad(t);ctx.restore();flash((1-P(t,T.pad,.3))*1)}
   else if(t<T.win)sPhone(t);
   else if(t<T.logo)sWin(t);
   else sLogo(t);
