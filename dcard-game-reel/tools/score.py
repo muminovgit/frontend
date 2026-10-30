@@ -160,14 +160,27 @@ whoosh(T["word"] + 0.25, 0.35, 0.15, pan=0.3); blip(T["cta"] + 0.02, 1046, 0.14)
 for i in range(6): blip(T["cta"] + 0.5 + i * 0.06, 2093 + i * 220, 0.03, pan=0.3)
 
 # ---------------------------------------------------------------- master
+# voiceover: uz-UZ Madina, energetic preset (+12%, +18Hz, bright EQ); lines in audio/vo/lines.txt. Music ducks ~8 dB under it.
+def loadw(p):
+    w = wave.open(p); return np.frombuffer(w.readframes(w.getnframes()), "<i2").reshape(-1, 2).astype(np.float64) / 32768
+VO = [(0, 0.15), (1, T["head1"] + 0.1), (2, T["b1"] + 0.02), (3, T["b2"] + 0.02), (4, T["b3"] + 0.02), (5, T["phone"] + 0.25), (6, T["band"] + 0.12), (7, T["tag"] + 0.05)]
+vL = np.zeros(N); vR = np.zeros(N)
+if "--no-vo" not in sys.argv and os.path.exists(os.path.join(ROOT, "audio/vo/v0.wav")):
+    for i, t0 in VO:
+        x = loadw(os.path.join(ROOT, f"audio/vo/v{i}.wav")); x = x / np.abs(x).max() * 0.9
+        a = int(t0 * SR); b = min(N, a + len(x)); vL[a:b] += x[:b - a, 0]; vR[a:b] += x[:b - a, 1]
+env = np.abs(vL) + np.abs(vR); k = int(0.12 * SR); env = np.convolve(env, np.ones(k) / k, "same"); env = np.convolve(env, np.ones(k) / k, "same")
+duck = 1 - 0.62 * np.clip(env / (env.max() * 0.25 + 1e-9), 0, 1)
+m = np.abs(np.stack([L, R], 1)).max(); L = L / m * 0.55 * duck + vL; R = R / m * 0.55 * duck + vR
 mix = np.stack([L, R], 1)
 fo = int(0.6 * SR); mix[-fo:] *= np.linspace(1, 0, fo)[:, None]
-mix = np.tanh(mix / np.abs(mix).max() * 1.3) / np.tanh(1.3) * 0.9
+mix = np.tanh(mix / np.abs(mix).max() * 1.2) / np.tanh(1.2) * 0.9
 os.makedirs(os.path.join(ROOT, "audio"), exist_ok=True)
 pre = os.path.join(ROOT, "audio/premaster.wav"); out = os.path.join(ROOT, "audio/score.wav")
 with wave.open(pre, "wb") as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes((mix * 32767).astype("<i2").tobytes())
-gain = float(sys.argv[1]) if len(sys.argv) > 1 else 0.0
+args = [x for x in sys.argv[1:] if not x.startswith("--")]
+gain = float(args[0]) if args else 0.0
 r = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-i", pre, "-af", "ebur128", "-f", "null", "-"], capture_output=True, text=True).stderr
 I = float([l for l in r.splitlines() if l.strip().startswith("I:")][-1].split()[1])
 af = f"volume={-14.0 - I + gain:.2f}dB,aresample=192000,alimiter=limit=0.6:attack=1:release=60:level=0,aresample=48000"
