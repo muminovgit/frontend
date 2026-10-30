@@ -3,24 +3,189 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Hello</title>
+  <title>Safar — xorijga ketishga tayyorlov</title>
+  <meta name="description" content="Koreys va rus tili, imtihon tayyorgarligi va hujjatlar nazorati bir joyda. O'zbek tilida. Ro'yxatga yoziling.">
   <style>
+    :root {
+      --bg: #f7f8fa;
+      --card: #ffffff;
+      --text: #1a2230;
+      --muted: #5b6678;
+      --accent: #0b6e4f;
+      --accent-text: #ffffff;
+      --border: #e2e6ec;
+      --warn-bg: #fff6e0;
+      --warn-text: #6b4a00;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #12161d;
+        --card: #1a2029;
+        --text: #eef1f5;
+        --muted: #9aa5b6;
+        --accent: #3ec595;
+        --accent-text: #08261c;
+        --border: #2a3340;
+        --warn-bg: #2d2511;
+        --warn-text: #f3d68a;
+      }
+    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #f5f5f5;
-      color: #222;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
     }
-    h1 {
-      font-size: 4rem;
+    .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+    header { padding: 20px 0 0; font-weight: 700; font-size: 1.25rem; }
+    .hero { padding: 40px 0 24px; }
+    h1 { font-size: clamp(1.9rem, 6vw, 2.8rem); line-height: 1.15; margin: 0 0 14px; }
+    .lead { font-size: 1.1rem; color: var(--muted); margin: 0 0 24px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
     }
+    h2 { font-size: 1.3rem; margin: 36px 0 14px; }
+    ul.features { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+    ul.features li { padding-left: 28px; position: relative; }
+    ul.features li::before { content: "✓"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+    form { display: grid; gap: 12px; }
+    label { font-weight: 600; font-size: .95rem; }
+    input, select {
+      width: 100%;
+      padding: 12px;
+      font: inherit;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    button {
+      padding: 14px;
+      font: inherit;
+      font-weight: 700;
+      color: var(--accent-text);
+      background: var(--accent);
+      border: 0;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .6; cursor: default; }
+    #status { min-height: 1.4em; font-size: .95rem; }
+    .notice {
+      background: var(--warn-bg);
+      color: var(--warn-text);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: .95rem;
+    }
+    footer { padding: 32px 0 48px; color: var(--muted); font-size: .85rem; }
   </style>
 </head>
 <body>
-  <h1>Hello</h1>
+  <div class="wrap">
+    <header>Safar</header>
+
+    <section class="hero">
+      <h1>Xorijga ketishdan oldin, tayyor bo'ling</h1>
+      <p class="lead">Koreys va rus tili, imtihon tayyorgarligi va hujjatlar nazorati bir joyda. O'zbek tilida, telefoningizda. Ro'yxatga yoziling, ishga tushganda birinchilardan xabar oling.</p>
+
+      <div class="card">
+        <form id="waitlist" novalidate>
+          <div>
+            <label for="name">Ismingiz</label>
+            <input id="name" name="name" type="text" autocomplete="given-name" required>
+          </div>
+          <div>
+            <label for="contact">Telegram (@username) yoki telefon</label>
+            <input id="contact" name="contact" type="text" autocomplete="tel" required>
+          </div>
+          <div>
+            <label for="country">Qayerga bormoqchisiz?</label>
+            <select id="country" name="country" required>
+              <option value="">Tanlang</option>
+              <option>Janubiy Koreya</option>
+              <option>Rossiya</option>
+              <option>Turkiya</option>
+              <option>Yevropa</option>
+              <option>Boshqa</option>
+              <option>Hozircha bilmayman</option>
+            </select>
+          </div>
+          <button id="submit" type="submit">Ro'yxatga yozilish</button>
+          <div id="status" role="status" aria-live="polite"></div>
+        </form>
+      </div>
+    </section>
+
+    <section>
+      <h2>Nimalar bo'ladi</h2>
+      <ul class="features card">
+        <li><strong>AI-ustoz o'zbek tilida.</strong> Koreys tili (EPS-TOPIK) va rus tili imtihoniga bosqichma-bosqich tayyorlov.</li>
+        <li><strong>Shaxsiy reja.</strong> Imtihon sanangizga qarab kunlik vazifalar va zaif joylar bo'yicha qaytarish.</li>
+        <li><strong>Hujjatlar nazorat ro'yxati.</strong> Qaysi hujjat, qayerdan, qachon kerakligi aniq ko'rsatiladi.</li>
+        <li><strong>Firibgarlikdan ehtiyot.</strong> Takliflarni tekshirish bo'yicha yo'riqnoma va rasmiy manbalarga havolalar.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>Muhim</h2>
+      <div class="notice">
+        Safar rasmiy agentlik emas. Biz ish va'da qilmaymiz va ish topib berish uchun pul so'ramaymiz.
+        Chet elda ishlash takliflarini faqat litsenziyalangan agentliklar orqali va rasmiy platformada tekshiring.
+      </div>
+    </section>
+
+    <footer>
+      <p>Bu loyiha tayyorlanmoqda. Ma'lumotlaringiz faqat sizga xabar berish uchun ishlatiladi va uchinchi shaxslarga berilmaydi.</p>
+    </footer>
+  </div>
+
+  <script>
+    // Ro'yxat ma'lumotlari yuboriladigan manzil (masalan Formspree, Google Apps Script yoki o'z backendingiz).
+    // Bo'sh qoldirilsa, forma demo rejimida ishlaydi va hech narsani saqlamaydi.
+    var WAITLIST_ENDPOINT = "";
+
+    var form = document.getElementById("waitlist");
+    var statusEl = document.getElementById("status");
+    var submitBtn = document.getElementById("submit");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var data = {
+        name: form.name.value.trim(),
+        contact: form.contact.value.trim(),
+        country: form.country.value
+      };
+      if (!data.name || !data.contact || !data.country) {
+        statusEl.textContent = "Iltimos, barcha maydonlarni to'ldiring.";
+        return;
+      }
+      if (!WAITLIST_ENDPOINT) {
+        statusEl.textContent = "Demo rejim: ro'yxat hali ulanmagan, ma'lumot saqlanmadi.";
+        return;
+      }
+      submitBtn.disabled = true;
+      statusEl.textContent = "Yuborilmoqda...";
+      fetch(WAITLIST_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
+        body: JSON.stringify(data)
+      }).then(function (res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        form.reset();
+        statusEl.textContent = "Rahmat! Ishga tushganda sizga xabar beramiz.";
+      }).catch(function () {
+        statusEl.textContent = "Xatolik yuz berdi. Keyinroq qayta urinib ko'ring.";
+      }).then(function () {
+        submitBtn.disabled = false;
+      });
+    });
+  </script>
 </body>
 </html>
