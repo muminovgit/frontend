@@ -145,6 +145,8 @@
     #mText .talkh { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 0 0 .4em; }
     #mText .talk { background: var(--page); border-left: 3px solid var(--brand); padding: 6px 10px; margin: .4em 0; font-size: .82rem; border-radius: 0 6px 6px 0; }
     body.noscroll { overflow: hidden; }
+    #toast { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); max-width: min(720px, 92vw); background: var(--err); color: #fff; padding: 10px 16px; border-radius: 10px; font-size: .88rem; line-height: 1.4; z-index: 6000; box-shadow: 0 8px 24px #0005; display: none; cursor: pointer; }
+    #toast.on { display: block; }
     #pipe .pdfb { margin-left: auto; font-size: .75rem; padding: 3px 10px; }
   </style>
 </head>
@@ -157,7 +159,7 @@
       <div class="stat"><b id="sQueue">0</b><span>Tasdiq kutmoqda</span></div>
       <div class="stat"><b id="sErr">0</b><span>Xato</span></div>
     </div>
-    <div class="controls"><label>Rang <select id="pal"><option value="claude">Iliq</option><option value="glass">Shisha</option><option value="night">Kechki shahar</option></select></label><label><input type="checkbox" id="auto"> Avto-tasdiq</label></div>
+    <div class="controls"><label>Rang <select id="pal"><option value="claude">Iliq</option><option value="glass">Shisha</option><option value="night">Kechki shahar</option></select></label><button id="diag" style="display:none" title="Claude, kalit, balans va vositalarni tekshiradi">🩺 Tekshiruv</button><label><input type="checkbox" id="auto"> Avto-tasdiq</label></div>
   </header>
 
   <div id="taskbar">
@@ -165,6 +167,7 @@
     <textarea id="tText" rows="1" maxlength="30000"></textarea>
     <button id="tGo"></button>
   </div>
+  <div id="toast"></div>
   <div id="pipe"></div>
   <div id="modal"><div class="box"><div class="mh"><b id="mTitle"></b><button id="mPdf" title="Chop etish oynasida «PDF sifatida saqlash» ni tanlang">📄 PDF</button><button id="mMd">⬇ .md</button><button id="mCopy">📋 Nusxa</button><button id="mClose">Yopish</button></div><div id="mText"></div></div></div>
 
@@ -215,7 +218,10 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 const NAME = id => (S.e[id] ? S.e[id].def.name : id);
 const stage = $('stage');
 
+let _tt;
+function toast(text) { const t = $('toast'); t.textContent = text; t.classList.add('on'); clearTimeout(_tt); _tt = setTimeout(() => t.classList.remove('on'), 12000); t.onclick = () => t.classList.remove('on'); }
 function log(text, icon = '•') {
+  if (icon === '⚠️') toast(text);
   const li = document.createElement('li'), t = new Date().toLocaleTimeString('uz', { hour12: false });
   li.innerHTML = `<time>${t}</time><span>${icon} ${esc(text)}</span>`;
   $('log').prepend(li); while ($('log').children.length > 250) $('log').lastChild.remove();
@@ -896,6 +902,16 @@ function setupTaskbar() {
 
 $('pal').value = PALS[PAL_KEY] ? PAL_KEY : 'claude';
 $('pal').onchange = e => { try { localStorage.setItem('pal', e.target.value); } catch {} location.reload(); };
+$('diag').onclick = async () => {
+  $('mTitle').textContent = 'Tekshiruv'; document.querySelector('#modal .box').classList.add('isprof'); CUR = null;
+  $('mText').innerHTML = '<p>Claude bilan bog\'lanib tekshirilmoqda… (20–60 soniya)</p>'; setModal(true);
+  try {
+    const j = await (await fetch('/diag?key=' + encodeURIComponent(KEY))).json();
+    if (j.error) throw new Error(j.error);
+    $('mText').innerHTML = '<p>Har qator — haqiqiy Claude\'ga yuborilgan kichik so\'rov. Qizil qator — shu narsa ishlamayapti; xato matnini menga yuboring.</p>' +
+      j.results.map(r => `<div class="talk" style="border-left-color:${r.ok ? 'var(--done)' : 'var(--err)'}"><b>${r.ok ? '✅' : '❌'} ${esc(r.name)}</b>${r.ms ? ' · ' + r.ms + ' ms' : ''}${r.note ? ' · ' + esc(r.note) : ''}${r.error ? '<br>' + esc(r.error) : ''}</div>`).join('');
+  } catch (e) { $('mText').innerHTML = '<p>Tekshiruvni bajarib bo\'lmadi: ' + esc(e.message) + '</p>'; }
+};
 setInterval(() => { if ($('auto').checked && S.queue.length) choose(S.queue[0].id, true); }, 1500);
 
 /* ======================= ISHGA TUSHIRISH ======================= */
@@ -918,7 +934,7 @@ addEventListener('resize', fit); fit();
   try {
     const j = await (await fetch('/ping')).json();
     if (j && j.office) {
-      S.live = true; if (j.ai) { S.ai = true; setupTaskbar(); log('Haqiqiy AI rejimi: ' + j.model, '🧠'); }
+      S.live = true; if (j.ai) { S.ai = true; $('diag').style.display = ''; setupTaskbar(); log('Haqiqiy AI rejimi: ' + j.model, '🧠'); }
       const es = new EventSource('/events?key=' + encodeURIComponent(KEY)); es.onmessage = m => API.event(JSON.parse(m.data));
       es.onopen = () => log('Serverga ulandi', '🔌');
     }

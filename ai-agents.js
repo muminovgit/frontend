@@ -350,4 +350,25 @@ function startCase({ brief, emit, waitDecision }) {
   return { code: 200, ok: true, caseId: id };
 }
 
-module.exports = { enabled, MODEL, start, startCase, list, getResult, skills };
+// ---- Tekshiruv: haqiqiy Claude'ga kichik so'rovlar yuborib, nima ishlamayotganini ko'rsatadi ----
+async function diagnose() {
+  if (!enabled) return [{ name: 'ANTHROPIC_API_KEY', ok: false, error: 'o\'rnatilmagan' }];
+  const tests = [
+    ['Claude javob beradi (kalit va balans)', {}],
+    ['Fikrlash + hamkasb so\'rash vositasi', { thinking: { type: 'adaptive' }, tools: [askTool('aziza')] }],
+    ['Veb-qidiruv', { tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 1 }] }],
+    ['Sahifani o\'qish', { tools: [{ type: 'web_fetch_20260209', name: 'web_fetch', max_uses: 1 }] }],
+    ['Kod bilan hisoblash', { tools: [{ type: 'code_execution_20260521', name: 'code_execution' }] }],
+  ];
+  const out = [];
+  for (const [name, extra] of tests) {
+    const t0 = Date.now();
+    try {
+      const st = client.messages.stream({ model: MODEL, max_tokens: 64, messages: [{ role: 'user', content: 'Faqat "OK" deb javob bering. Hech qanday vosita ishlatmang.' }], ...extra });
+      const m = await st.finalMessage();
+      out.push({ name, ok: true, ms: Date.now() - t0, note: m.stop_reason });
+    } catch (e) { out.push({ name, ok: false, ms: Date.now() - t0, error: `${e.status || ''} ${String(e.message || e).slice(0, 300)}`.trim() }); }
+  }
+  return out.concat([{ name: 'Model', ok: true, note: MODEL }]);
+}
+module.exports = { enabled, MODEL, start, startCase, list, getResult, skills, diagnose };
