@@ -27,7 +27,7 @@ SELECT = ("company_officer_1 as owner_operator,legal_name as company,phone,"
           "business_org_desc as org_type")
 
 
-def build_where(since: str) -> str:
+def build_where(since: str, llc_only: bool = False, require_mc: bool = False) -> str:
     where = [
         "status_code='A'",
         "power_units='1'",
@@ -40,14 +40,18 @@ def build_where(since: str) -> str:
         "phy_country='US'",
         f"add_date>='{since}'",
     ]
+    if llc_only:
+        where.append("(upper(legal_name) like '%LLC%' OR upper(legal_name) like '%L.L.C%')")
+    if require_mc:
+        where.append("docket1prefix='MC'")
     where += [f"upper(legal_name) not like '%{w}%'" for w in EXCLUDE_WORDS]
     return " AND ".join(where)
 
 
-def fetch(since: str, limit: int) -> list[dict]:
+def fetch(since: str, limit: int, llc_only: bool = False, require_mc: bool = False) -> list[dict]:
     params = urllib.parse.urlencode({
         "$select": SELECT,
-        "$where": build_where(since),
+        "$where": build_where(since, llc_only, require_mc),
         "$order": "add_date DESC",
         "$limit": str(limit),
     })
@@ -60,12 +64,14 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--days", type=int, default=1, help="how many days back (default 1)")
     ap.add_argument("--limit", type=int, default=5000)
+    ap.add_argument("--llc-only", action="store_true", help="only companies with LLC in the name")
+    ap.add_argument("--require-mc", action="store_true", help="only carriers holding their own MC authority")
     ap.add_argument("--out", default=None, help="output CSV (default data/leads_<date>.csv)")
     args = ap.parse_args()
 
     today = datetime.date.today()
     since = (today - datetime.timedelta(days=args.days)).strftime("%Y%m%d")
-    rows = fetch(since, args.limit)
+    rows = fetch(since, args.limit, args.llc_only, args.require_mc)
 
     seen, out = set(), []
     for r in rows:
