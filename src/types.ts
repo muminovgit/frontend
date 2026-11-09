@@ -14,7 +14,14 @@ export interface Memory {
   text: string;
   hasMedia: boolean;
   locked: boolean; // 18 yoshgacha qulflangan
+  albumId?: string; // bo'lsa, asosiy lentada ko'rinmaydi
   createdAt: string;
+}
+
+export interface Album {
+  id: string;
+  childId: string;
+  name: string;
 }
 
 export interface Measurement {
@@ -56,4 +63,5 @@ export interface AppState {
   milestones: Milestone[];
   members: Member[];
   orders: Order[];
+  albums: Album[];
 }
