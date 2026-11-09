@@ -252,6 +252,7 @@ const SH = {   // fy = ko'z chizig'i, ty = tepa, by = pastki chekka
   drop:     { fy: 38, ty: 14, by: 54, d: () => '<path d="M20 14 C28 25 35 33 35 42 C35 50 28 54 20 54 C12 54 5 50 5 42 C5 33 12 25 20 14Z" stroke-width="2" stroke-linejoin="round"/>' },
   diamond:  { fy: 34, ty: 15, by: 52, d: () => `<path d="${reg(20, 34, 17.5, 4, -90)}" stroke-width="4" stroke-linejoin="round"/>` },
   ball:     { fy: 34, ty: 16, by: 52, d: () => '<circle cx="20" cy="34" r="17"/>', extra: '<path d="M6 30 Q20 38 34 30" fill="none" stroke="#fff" stroke-opacity=".25" stroke-width="1.2"/>' },
+  arch:     { fy: 31, ty: 14, by: 52, d: () => '<path d="M7 52 V28 Q7 14 20 14 Q33 14 33 28 V52Z" stroke-width="3" stroke-linejoin="round"/>' },
   blob:     { fy: 33, ty: 14, by: 52, d: () => '<path d="M8 36 Q4 20 18 16 Q34 12 35 30 Q38 48 22 52 Q8 54 8 36Z" stroke-width="3" stroke-linejoin="round"/>' },
 };
 function shade(hex, amt) {
@@ -259,7 +260,7 @@ function shade(hex, amt) {
   return '#' + [(n >> 16) + amt, ((n >> 8) & 255) + amt, (n & 255) + amt].map(v => c(v).toString(16).padStart(2, '0')).join('');
 }
 function svgChar(l, opt = {}) {
-  const s = SH[l.shape] || SH.blob, c = l.color, dk = shade(c, -42), id = 'cp' + (CID++), ey = s.fy, ty = s.ty, by = s.by;
+  const s = SH[l.shape] || SH.blob, c = l.color, lum = (() => { const n = parseInt(c.slice(1), 16); return ((n >> 16) * .3 + ((n >> 8) & 255) * .59 + (n & 255) * .11); })(), dk = lum < 70 ? shade(c, 30) : shade(c, -42), grumpy = l.mood === 'grumpy', id = 'cp' + (CID++), ey = s.fy, ty = s.ty, by = s.by;
   const bw = Math.min(ey + 12, by - 5), sy = ey + 9;
   const acc = {
     glasses: `<g fill="#ffffff22" stroke="#1e2430" stroke-width="1.3"><circle cx="15.2" cy="${ey}" r="4.7"/><circle cx="24.8" cy="${ey}" r="4.7"/><path d="M19.9 ${ey}h.2"/></g>`,
@@ -286,7 +287,10 @@ function svgChar(l, opt = {}) {
     <ellipse cx="15.2" cy="${ey}" rx="3.2" ry="3.8" fill="#fff"/><ellipse cx="24.8" cy="${ey}" rx="3.2" ry="3.8" fill="#fff"/>
     <circle cx="15.8" cy="${ey + .5}" r="1.9" fill="#1c1f2a"/><circle cx="25.4" cy="${ey + .5}" r="1.9" fill="#1c1f2a"/>
     <circle cx="16.5" cy="${ey - .5}" r=".75" fill="#fff"/><circle cx="26.1" cy="${ey - .5}" r=".75" fill="#fff"/>
-    <path d="M17.2 ${ey + 7} Q20 ${ey + 9.6} 22.8 ${ey + 7}" stroke="#1c1f2a" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+    ${grumpy ? `<path d="M17 ${ey + 9.4} Q20 ${ey + 6.4} 23 ${ey + 9.4}" stroke="${lum < 70 ? '#e8e8f0' : '#1c1f2a'}" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+      <path d="M11.6 ${ey - 5.6} L18.6 ${ey - 2.6} M28.4 ${ey - 5.6} L21.4 ${ey - 2.6}" stroke="${lum < 70 ? '#e8e8f0' : '#1c1f2a'}" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M11.8 ${ey - 3} H18.6 M21.4 ${ey - 3} H28.2" stroke="${c}" stroke-width="2.4"/>`
+      : `<path d="M17.2 ${ey + 7} Q20 ${ey + 9.6} 22.8 ${ey + 7}" stroke="#1c1f2a" stroke-width="1.3" fill="none" stroke-linecap="round"/>`}
     ${acc}
   </svg>`;
 }
@@ -423,12 +427,12 @@ function floorSVG(f) {
       <ellipse cx="488" cy="106" rx="20" ry="8" fill="#ff8fab"/><ellipse cx="514" cy="104" rx="16" ry="7" fill="#74b9ff"/>`,
     sales: `
       <circle cx="30" cy="44" r="22" fill="#fff" stroke="#c0392b" stroke-width="3"/><circle cx="30" cy="44" r="15" fill="#c0392b"/><circle cx="30" cy="44" r="9" fill="#fff"/><circle cx="30" cy="44" r="4" fill="#c0392b"/><path d="M30 44 L52 22" stroke="#444" stroke-width="2"/>
-      <rect x="258" y="12" width="92" height="70" rx="4" fill="#151a28" stroke="#444c66" stroke-width="4"/>
+      <g transform="translate(136 0)"><rect x="258" y="12" width="92" height="70" rx="4" fill="#151a28" stroke="#444c66" stroke-width="4"/>
       <text x="264" y="26" font-size="8" font-weight="700" fill="#7be0ff">SOTUV · HAFTA</text>
       ${[[34, '#22c55e'], [24, '#3b82f6'], [44, '#f59e0b'], [18, '#a855f7'], [30, '#14b8a6']].map(([hh, c], i) => `<rect x="${266 + i * 16}" y="${76 - hh}" width="11" height="${hh}" fill="${c}"/>`).join('')}
-      <path d="M266 56 L284 48 L302 52 L320 36 L338 40 L346 30" fill="none" stroke="#fff" stroke-width="1.4" opacity=".8"/>
-      <rect x="468" y="44" width="46" height="68" rx="3" fill="#a98a5a" stroke="#7d6340" stroke-width="2"/><rect x="472" y="48" width="38" height="60" fill="#d8ecf7" opacity=".7"/>
-      <text x="491" y="72" font-size="18" text-anchor="middle">🏆</text><text x="481" y="96" font-size="10" text-anchor="middle">🥇</text><text x="501" y="96" font-size="10" text-anchor="middle">🥈</text>`,
+      <path d="M266 56 L284 48 L302 52 L320 36 L338 40 L346 30" fill="none" stroke="#fff" stroke-width="1.4" opacity=".8"/></g>
+      <g transform="translate(20 0)"><rect x="468" y="44" width="46" height="68" rx="3" fill="#a98a5a" stroke="#7d6340" stroke-width="2"/><rect x="472" y="48" width="38" height="60" fill="#d8ecf7" opacity=".7"/>
+      <text x="491" y="72" font-size="18" text-anchor="middle">🏆</text><text x="481" y="96" font-size="10" text-anchor="middle">🥇</text><text x="501" y="96" font-size="10" text-anchor="middle">🥈</text></g>`,
     risk: `
       <rect x="6" y="20" width="44" height="92" rx="3" fill="#3b4350" stroke="#232a35" stroke-width="3"/>
       ${[0, 1, 2, 3, 4, 5].map(r => `<rect x="10" y="${24 + r * 14.5}" width="36" height="10" rx="1" fill="#232a35"/><circle cx="41" cy="${29 + r * 14.5}" r="2" fill="${r % 2 ? '#22c55e' : '#ef4444'}" class="led" style="animation-delay:${r * .3}s"/><rect x="13" y="${27 + r * 14.5}" width="14" height="3" fill="#6b7686"/>`).join('')}

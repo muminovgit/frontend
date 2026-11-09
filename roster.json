@@ -27,7 +27,8 @@
       "n": 4,
       "name": "Sotuv",
       "emoji": "💼",
-      "lead": "rustam"
+      "lead": "aydost",
+      "narrow": true
     },
     {
       "id": "risk",
@@ -490,11 +491,52 @@
       ]
     },
     {
+      "id": "aydost",
+      "name": "Aydost",
+      "floor": "sales",
+      "deskX": 50,
+      "title": "Sotuv boshlig'i",
+      "look": {
+        "shape": "arch",
+        "color": "#1B1D24",
+        "acc": "brows",
+        "mood": "grumpy"
+      },
+      "traits": {
+        "speed": 1.15,
+        "coffee": 0.9,
+        "chat": 0.15,
+        "wander": 0.35
+      },
+      "lines": [
+        "Natija qani?",
+        "Bahona eshitmayman.",
+        "Raqam ko'rsating.",
+        "Yana kechikdingizmi?",
+        "Qora kofe. Shakarsiz."
+      ],
+      "persona": "Qora kiyimli, achchiqchil sotuv boshlig'i: gapi qisqa va keskin, bahonani yoqtirmaydi, sust natijaga sabri yo'q, kinoyani yaxshi ko'radi. Lekin adolatli: raqam va dalilga qaraydi, mijozni aldash yoki isbotsiz va'da berishni hech qachon qabul qilmaydi. Keskin, ammo professional: tanqid qilsa ham yechim taklif qiladi.",
+      "demo": [
+        "Haftalik sotuv hisoboti",
+        "Pipeline tozalash",
+        "Yo'qotilgan bitimlar tahlili"
+      ],
+      "skills": [
+        "pipeline-forecast",
+        "pricing-packaging",
+        "negotiation",
+        "objection-handling"
+      ],
+      "tools": [
+        "web_search",
+        "web_fetch"
+      ]
+    },
+    {
       "id": "rustam",
       "name": "Rustam",
       "floor": "sales",
-      "slot": 0,
-      "title": "Sotuv boshlig'i",
+      "title": "Katta sotuv menejeri",
       "look": {
         "shape": "triangle",
         "color": "#2F9E6B",
@@ -527,13 +569,13 @@
       "tools": [
         "web_search",
         "web_fetch"
-      ]
+      ],
+      "deskX": 150
     },
     {
       "id": "nigora",
       "name": "Nigora",
       "floor": "sales",
-      "slot": 1,
       "title": "Outreach (SDR)",
       "look": {
         "shape": "cloud",
@@ -566,13 +608,13 @@
       "tools": [
         "web_search",
         "web_fetch"
-      ]
+      ],
+      "deskX": 250
     },
     {
       "id": "otabek",
       "name": "Otabek",
       "floor": "sales",
-      "slot": 2,
       "title": "Muzokarachi",
       "look": {
         "shape": "cube",
@@ -605,7 +647,8 @@
       ],
       "tools": [
         "code_exec"
-      ]
+      ],
+      "deskX": 350
     },
     {
       "id": "kamola",

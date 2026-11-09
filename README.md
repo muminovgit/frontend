@@ -76,7 +76,7 @@ kofe-mashinaga, suv avtomatiga, doskaga boradi, bir-biri bilan suhbatlashadi, qa
 |---|---|
 | 5 · Nazorat (Penthouse) | Madina (direktor) + siz (Boss) |
 | 4 · Risk va Sifat | Kamola (risk), Timur (qoidalar/huquq) |
-| 3 · Sotuv | Rustam (boshliq), Nigora (outreach), Otabek (muzokarachi) |
+| 4 · Sotuv | **Aydost (boshliq)**, Rustam (katta menejer), Nigora (outreach), Otabek (muzokarachi) |
 | 2 · Marketing | Jasur (direktor), Malika (kontent), Sardor (SMM) |
 | 1 · Tadqiqot | Aziza (bosh tadqiqotchi), Bobur (skaner), Dilnoza (ma'lumotlar) |
 
@@ -140,3 +140,8 @@ Bu skill'lar katta (10–40 KB), shuning uchun prompt'ga to'liq kiritilmaydi: fa
 Faqat o'ziga biriktirilgan skill'larni ocha oladi. Skill matni "ish usuli" sifatida beriladi; dalil va sifat qoidalari har doim ustun. Profil oynasida (xodimni bossangiz) "GitHub kutubxonasi" bo'limi va manba havolalari ko'rinadi.
 Yangi skill qo'shish: manba reponi klon qiling, `skills/<nom>/SKILL.md` (va `references/*.md`) ni `skills-vendor/<nom>/` ga nusxalang, litsenziyasini tekshiring, `ATTRIBUTION.md` ga yozing va `roster.json` da xodimga `vendorSkills: ["nom"]` qo'shing.
 Import qilishdan oldin matnni tekshiring: u system prompt'ga o'tadi (yashirin ko'rsatmalar bo'lishi mumkin). Bu importda yashirin ko'rsatma topilmadi.
+
+## Aydost: sotuv boshlig'i
+Qora kiyimli, achchiqchil (qoshlari chimirilgan, kayfiyati "kinoyali") sotuv boshlig'i. Gapi qisqa va keskin, bahonani yoqtirmaydi, qora kofeni yaxshi ko'radi, lekin adolatli:
+faqat raqam va dalilga qaraydi, isbotsiz va'daga yo'l qo'ymaydi. Loyiha jarayonida **Sotuv bosqichi endi Aydost** rahbarligida bajariladi (Rustam katta menejer bo'lib qoldi).
+Skill'lari: sotuv hunisi, narx va paketlar, muzokara, e'tirozlar bilan ishlash. Asboblari: veb-qidiruv, sahifani o'qish.
