@@ -145,3 +145,7 @@ Import qilishdan oldin matnni tekshiring: u system prompt'ga o'tadi (yashirin ko
 Qora kiyimli, achchiqchil (qoshlari chimirilgan, kayfiyati "kinoyali") sotuv boshlig'i. Gapi qisqa va keskin, bahonani yoqtirmaydi, qora kofeni yaxshi ko'radi, lekin adolatli:
 faqat raqam va dalilga qaraydi, isbotsiz va'daga yo'l qo'ymaydi. Loyiha jarayonida **Sotuv bosqichi endi Aydost** rahbarligida bajariladi (Rustam katta menejer bo'lib qoldi).
 Skill'lari: sotuv hunisi, narx va paketlar, muzokara, e'tirozlar bilan ishlash. Asboblari: veb-qidiruv, sahifani o'qish.
+
+## Toshkent kechasi (standart ko'rinish)
+Bino kechki Toshkent osmono'par uslubiga o'tkazildi: qora osmon, oy va yulduzlar, panjarali oynali zinapoyali toj (yonib turgan oynalar), binoning chetlari va qavatlar chegarasida ko'k neon chiziqlar,
+o'ng tomonda bayroq ranglaridagi (ko'k, oq, yashil, qizil chiziqlar, yarim oy va yulduzlar) LED ekran. Xodimlar ichkarida ishlaydi. Tepadagi **Rang** menyusidan avvalgi sxemalarga (Iliq, Shisha, Kechki shahar) qaytish mumkin.
