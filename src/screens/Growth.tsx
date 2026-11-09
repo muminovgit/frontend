@@ -21,7 +21,7 @@ export function Growth() {
 
   const marks: HeightMark[] = withHeight.slice(-3).map((m, i, arr) => ({
     cm: m.heightCm!,
-    label: `${m.heightCm} sm · ${formatDate(m.date)}`,
+    label: `${m.heightCm} sm`,
     current: i === arr.length - 1,
   }));
 

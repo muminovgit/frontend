@@ -13,6 +13,19 @@ const PX_PER_CM = (BOTTOM - TOP) / (MAX - MIN);
 
 const yFor = (cm: number) => BOTTOM - (cm - MIN) * PX_PER_CM;
 
+/** Yozuvlar bir-biriga tegmasligi uchun ularni kamida 14px oraliqda joylaydi. */
+function labelPositions(marks: HeightMark[]) {
+  const sorted = marks
+    .map((mark) => ({ mark, y: yFor(mark.cm) }))
+    .sort((a, b) => a.y - b.y);
+  let prev = -Infinity;
+  return sorted.map((item) => {
+    const labelY = Math.max(item.y - 6, prev + 14);
+    prev = labelY;
+    return { ...item, labelY };
+  });
+}
+
 export interface HeightMark {
   cm: number;
   label: string;
@@ -45,18 +58,15 @@ export function HeightRuler({ heightCm, marks = [] }: { heightCm: number; marks?
       <line x1={40} y1={BOTTOM} x2={290} y2={BOTTOM} stroke="var(--border)" strokeWidth={1.5} />
       {ticks}
 
-      {marks.map((m) => {
-        const y = yFor(m.cm);
-        return (
-          <g key={`${m.cm}-${m.label}`}>
-            <line x1={52} y1={y} x2={270} y2={y} stroke={m.current ? 'var(--accent)' : 'var(--border)'} strokeWidth={m.current ? 1.5 : 1} strokeDasharray="4 4" />
-            <circle cx={46} cy={y} r={m.current ? 4.5 : 3.5} fill={m.current ? 'var(--accent)' : 'var(--muted)'} />
-            <text x={296} y={y - 6} fontSize={m.current ? 12 : 10} fontWeight={m.current ? 800 : 700} textAnchor="end" fill={m.current ? 'var(--brand)' : 'var(--muted)'}>
-              {m.label}
-            </text>
-          </g>
-        );
-      })}
+      {labelPositions(marks).map(({ mark: m, y, labelY }) => (
+        <g key={`${m.cm}-${m.label}`}>
+          <line x1={52} y1={y} x2={270} y2={y} stroke={m.current ? 'var(--accent)' : 'var(--border)'} strokeWidth={m.current ? 1.5 : 1} strokeDasharray="4 4" />
+          <circle cx={46} cy={y} r={m.current ? 4.5 : 3.5} fill={m.current ? 'var(--accent)' : 'var(--muted)'} />
+          <text x={296} y={labelY} fontSize={m.current ? 12 : 10} fontWeight={m.current ? 800 : 700} textAnchor="end" fill={m.current ? 'var(--brand)' : 'var(--muted)'}>
+            {m.label}
+          </text>
+        </g>
+      ))}
 
       <g transform={`translate(70 ${BOTTOM}) scale(${scale.toFixed(4)}) translate(0 -200)`} aria-hidden="true">
         <path d="M30 104 Q12 120 18 152" fill="none" stroke="#C98A3D" strokeWidth={4} strokeLinecap="round" />
