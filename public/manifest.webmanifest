@@ -1,0 +1,10 @@
+{
+  "name": "Xotira-hayot",
+  "short_name": "Xotira",
+  "description": "Bolaning xotiralari, o'sishi va oilasi bir joyda",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F6FBFD",
+  "theme_color": "#7A5CC7",
+  "lang": "uz"
+}
