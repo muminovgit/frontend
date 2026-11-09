@@ -10,17 +10,32 @@ const KIND_LABEL: Record<Memory['kind'], string> = {
   note: 'Matn',
 };
 
+type Entry =
+  | { type: 'memory'; key: string; date: string; createdAt: string; memory: Memory }
+  | { type: 'milestone'; key: string; date: string; createdAt: string; title: string };
+
 export function Timeline() {
   const { state, update } = useStore();
   const child = state.child!;
 
-  const memories = [...state.memories].sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : b.createdAt.localeCompare(a.createdAt)));
+  const milestones = state.milestones.filter((m) => m.childId === child.id);
 
-  const grouped = new Map<string, Memory[]>();
-  for (const m of memories) {
-    const list = grouped.get(m.date) ?? [];
-    list.push(m);
-    grouped.set(m.date, list);
+  // Xotiralar va milestone'lar bitta xronologik lentada
+  const entries: Entry[] = [
+    ...state.memories.map<Entry>((m) => ({ type: 'memory', key: `m-${m.id}`, date: m.date, createdAt: m.createdAt, memory: m })),
+    ...milestones.map<Entry>((m) => ({ type: 'milestone', key: `s-${m.id}`, date: m.date, createdAt: '', title: m.title })),
+  ].sort((a, b) => {
+    if (a.date !== b.date) return a.date < b.date ? 1 : -1;
+    // Bir kunda: milestone avval, keyin xotiralar (yangisi yuqorida)
+    if (a.type !== b.type) return a.type === 'milestone' ? -1 : 1;
+    return b.createdAt.localeCompare(a.createdAt);
+  });
+
+  const grouped = new Map<string, Entry[]>();
+  for (const e of entries) {
+    const list = grouped.get(e.date) ?? [];
+    list.push(e);
+    grouped.set(e.date, list);
   }
 
   const remove = (id: string) => {
@@ -41,7 +56,7 @@ export function Timeline() {
         <button className="btn small-btn" style={{ marginTop: 12 }} onClick={() => { window.location.hash = '#/child3d'; }}>3D bola va ovozlar ›</button>
       </div>
 
-      {memories.length === 0 && (
+      {entries.length === 0 && (
         <div className="card empty">
           <h3>Birinchi xotirani qo'shing</h3>
           <p className="muted small" style={{ marginTop: 6 }}>Foto, video, ovoz yoki qisqa matn. Pastdagi "+" tugmasini bosing.</p>
@@ -51,33 +66,55 @@ export function Timeline() {
       {[...grouped.entries()].map(([date, list]) => (
         <section key={date} className="stack" style={{ gap: 12 }}>
           <div className="day">{formatDay(date)}</div>
-          {list.map((m) => {
-            const locked = isLockedNow(child, m.locked);
-            return (
-              <article key={m.id} className="card stack" style={{ gap: 12 }}>
-                {locked ? (
-                  <div className="lock">
-                    <span className="pill accent">18 yoshda ochiladi</span>
-                    <p style={{ marginTop: 10, fontWeight: 700 }}>Bu xotira {formatDate(unlockDate(child))} kuni ochiladi.</p>
-                  </div>
-                ) : (
-                  <>
-                    <MemoryMedia memory={m} />
-                    {m.text && <p>{m.text}</p>}
-                  </>
-                )}
-                <div className="row wrap between">
-                  <div className="row wrap">
-                    <span className="pill">{KIND_LABEL[m.kind]}</span>
-                    {m.locked && <span className="pill lav">Qulflangan</span>}
-                  </div>
-                  <button className="btn ghost small-btn" onClick={() => remove(m.id)} aria-label="Xotirani o'chirish">O'chirish</button>
-                </div>
-              </article>
-            );
-          })}
+          {list.map((e) => (e.type === 'milestone' ? <MilestoneCard key={e.key} title={e.title} /> : <MemoryCard key={e.key} memory={e.memory} child={child} onRemove={remove} />))}
         </section>
       ))}
     </div>
+  );
+}
+
+function MilestoneCard({ title }: { title: string }) {
+  return (
+    <article className="card row between">
+      <div>
+        <span className="pill sage">Milestone</span>
+        <h3 style={{ marginTop: 8 }}>{title}</h3>
+      </div>
+      <span aria-hidden="true" style={{ fontSize: 26 }}>★</span>
+    </article>
+  );
+}
+
+function MemoryCard({
+  memory,
+  child,
+  onRemove,
+}: {
+  memory: Memory;
+  child: { id: string; name: string; birthDate: string };
+  onRemove: (id: string) => void;
+}) {
+  const locked = isLockedNow(child, memory.locked);
+  return (
+    <article className="card stack" style={{ gap: 12 }}>
+      {locked ? (
+        <div className="lock">
+          <span className="pill accent">18 yoshda ochiladi</span>
+          <p style={{ marginTop: 10, fontWeight: 700 }}>Bu xotira {formatDate(unlockDate(child))} kuni ochiladi.</p>
+        </div>
+      ) : (
+        <>
+          <MemoryMedia memory={memory} />
+          {memory.text && <p>{memory.text}</p>}
+        </>
+      )}
+      <div className="row wrap between">
+        <div className="row wrap">
+          <span className="pill">{KIND_LABEL[memory.kind]}</span>
+          {memory.locked && <span className="pill lav">Qulflangan</span>}
+        </div>
+        <button className="link-btn" onClick={() => onRemove(memory.id)} aria-label="Xotirani o'chirish">O'chirish</button>
+      </div>
+    </article>
   );
 }

@@ -266,3 +266,15 @@ textarea.input { resize: vertical; min-height: 84px; }
 .hl { color: var(--accent); }
 
 .empty { text-align: center; padding: 28px 12px; }
+
+.link-btn {
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-weight: 800;
+  font-size: 13px;
+  padding: 6px 4px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.link-btn:hover { color: var(--accent); }
