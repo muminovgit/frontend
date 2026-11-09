@@ -38,6 +38,7 @@ export function Timeline() {
             <p className="muted">{ageText(child.birthDate)} · {state.memories.length} ta xotira</p>
           </div>
         </div>
+        <button className="btn small-btn" style={{ marginTop: 12 }} onClick={() => { window.location.hash = '#/child3d'; }}>3D bola va ovozlar ›</button>
       </div>
 
       {memories.length === 0 && (
