@@ -124,3 +124,19 @@ Marketing va Sotuv orasida yangi qavat: kontentni **ishlab chiqaradigan** 5 kish
 Loyiha jarayoni endi: Tadqiqot → Marketing → **Kontent studiya** → Sotuv → Risk → Nazorat. Kontent bosqichi marketing rejasidan tayyor kontent paketini (brif, matn/ssenariy
 namunalari, vizual brif, kadrlar ro'yxati, qayta ishlatish rejasi, tahririy ro'yxat) chiqaradi; huquqlar (rasm/musiqa/shrift) va isbot talab qiladigan da'volar Risk qavatiga belgilab beriladi.
 Qavatlar soni `roster.json` dan hisoblanadi: yangi qavat qo'shish uchun `floors` ga yozing (`n` — pastdan raqam, `narrow: true` — ixcham stollar, 5 tagacha xodim) va xodimlarni `deskX` bilan joylang.
+
+## GitHub'dan skill import (Kontent studiya)
+Kontent jamoasi GitHub'dagi ochiq kutubxonadan skill oldi: [coreyhaines31/marketingskills](https://github.com/coreyhaines31/marketingskills) (MIT litsenziya, matnlar o'zgartirilmagan: `skills-vendor/`, manba va commit — `skills-vendor/ATTRIBUTION.md`).
+
+| Xodim | GitHub skill'lari |
+|---|---|
+| Zafar | content-strategy, copy-editing, product-marketing |
+| Laylo | copywriting, social, emails |
+| Anvar | video, social |
+| Shahlo | image, ad-creative |
+| Doniyor | seo-audit, ai-seo, content-strategy, lead-magnets |
+
+Bu skill'lar katta (10–40 KB), shuning uchun prompt'ga to'liq kiritilmaydi: faqat nomi va tavsifi turadi, xodim kerak bo'lganda **`use_skill`** vositasi bilan to'liq matnni (va `references/` fayllarini) o'zi ochadi.
+Faqat o'ziga biriktirilgan skill'larni ocha oladi. Skill matni "ish usuli" sifatida beriladi; dalil va sifat qoidalari har doim ustun. Profil oynasida (xodimni bossangiz) "GitHub kutubxonasi" bo'limi va manba havolalari ko'rinadi.
+Yangi skill qo'shish: manba reponi klon qiling, `skills/<nom>/SKILL.md` (va `references/*.md`) ni `skills-vendor/<nom>/` ga nusxalang, litsenziyasini tekshiring, `ATTRIBUTION.md` ga yozing va `roster.json` da xodimga `vendorSkills: ["nom"]` qo'shing.
+Import qilishdan oldin matnni tekshiring: u system prompt'ga o'tadi (yashirin ko'rsatmalar bo'lishi mumkin). Bu importda yashirin ko'rsatma topilmadi.

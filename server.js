@@ -74,6 +74,7 @@ http.createServer(async (req, res) => {
       if (!authed(req, url)) return json(res, 401, { error: 'token' });
       return json(res, 200, { results: await ai.diagnose() });
     }
+    if (req.method === 'GET' && url.pathname === '/vendor-skills.json') return json(res, 200, Object.fromEntries(Object.entries(ai.vendor).map(([k, v]) => [k, { title: v.title, desc: v.desc, source: v.source, license: v.license, refs: v.refs }])));
     if (req.method === 'GET' && url.pathname === '/skills.json') return json(res, 200, Object.fromEntries(Object.entries(ai.skills).map(([k, v]) => [k, { title: v.title, desc: v.desc, body: v.body }])));
 
     // To'liq loyiha: Tadqiqot -> Marketing -> Sotuv -> Risk -> Nazorat

@@ -315,6 +315,11 @@
       "tools": [
         "web_search",
         "web_fetch"
+      ],
+      "vendorSkills": [
+        "content-strategy",
+        "copy-editing",
+        "product-marketing"
       ]
     },
     {
@@ -352,7 +357,12 @@
         "copy-frameworks",
         "brand-voice"
       ],
-      "tools": []
+      "tools": [],
+      "vendorSkills": [
+        "copywriting",
+        "social",
+        "emails"
+      ]
     },
     {
       "id": "anvar",
@@ -388,7 +398,11 @@
         "hook-writing",
         "social-formats"
       ],
-      "tools": []
+      "tools": [],
+      "vendorSkills": [
+        "video",
+        "social"
+      ]
     },
     {
       "id": "shahlo",
@@ -424,7 +438,11 @@
         "thumbnail-design",
         "brand-voice"
       ],
-      "tools": []
+      "tools": [],
+      "vendorSkills": [
+        "image",
+        "ad-creative"
+      ]
     },
     {
       "id": "doniyor",
@@ -463,6 +481,12 @@
       "tools": [
         "web_search",
         "web_fetch"
+      ],
+      "vendorSkills": [
+        "seo-audit",
+        "ai-seo",
+        "content-strategy",
+        "lead-magnets"
       ]
     },
     {

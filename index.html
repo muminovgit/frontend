@@ -212,7 +212,7 @@ const PALS = {
 let PAL_KEY = 'claude'; try { PAL_KEY = localStorage.getItem('pal') || 'claude'; } catch {}
 const PAL = PALS[PAL_KEY] || PALS.claude; document.documentElement.dataset.pal = PALS[PAL_KEY] ? PAL_KEY : 'claude';
 
-const S = { skills: {}, e: {}, emps: [], queue: [], results: [], journal: [], cases: {}, shipped: 0, err: 0, live: false, ai: false, roster: null };
+const S = { skills: {}, vendor: {}, e: {}, emps: [], queue: [], results: [], journal: [], cases: {}, shipped: 0, err: 0, live: false, ai: false, roster: null };
 const KEY = new URLSearchParams(location.search).get('key') || '';
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const NAME = id => (S.e[id] ? S.e[id].def.name : id);
@@ -780,7 +780,8 @@ function openProfile(id) {
   const sk = (d.skills || []).map(k => S.skills[k]).filter(Boolean), fl = S.roster.floors.find(f => f.id === d.floor);
   $('mTitle').textContent = `${d.name} — ${d.title}`;
   $('mText').innerHTML = `<div class="prof"><div class="pc">${svgChar(d.look, { noShadow: true })}</div><div><div class="talkh">${fl.emoji} ${fl.n}-qavat · ${esc(fl.name)}</div><p>${esc(d.persona)}</p><div class="chips">${tools.map(t => `<span class="chip">${t}</span>`).join('')}</div></div></div>
-    <h3>Skill'lar (${sk.length})</h3>` + (sk.map(k => `<details class="sk"><summary><b>${esc(k.title)}</b> <span>— ${esc(k.desc)}</span></summary>${md(k.body)}</details>`).join('') || '<p>Skill biriktirilmagan.</p>');
+    <h3>Skill'lar (${sk.length})</h3>` + (sk.map(k => `<details class="sk"><summary><b>${esc(k.title)}</b> <span>— ${esc(k.desc)}</span></summary>${md(k.body)}</details>`).join('') || '<p>Skill biriktirilmagan.</p>')
+    + ((d.vendorSkills || []).length ? `<h3>GitHub kutubxonasi (${d.vendorSkills.length})</h3><p style="color:var(--muted);font-size:.82rem">Xodim ularni kerak bo'lganda to'liq ochib o'qiydi. Manba: coreyhaines31/marketingskills (MIT).</p>` + d.vendorSkills.map(k => { const v = S.vendor[k] || { title: k, desc: '' }; return `<div class="sk"><b>${esc(v.title)}</b> <span style="color:var(--muted);font-size:.85em">— ${esc(String(v.desc).slice(0, 170))}…</span>${v.source ? ` <a href="${esc(v.source)}" target="_blank" rel="noopener">GitHub ↗</a>` : ''}${v.refs && v.refs.length ? ` <span style="color:var(--muted);font-size:.8em">· ${v.refs.length} ta qo'shimcha fayl</span>` : ''}</div>`; }).join('') : '');
   document.querySelector('#modal .box').classList.add('isprof'); setModal(true); $('mText').scrollTop = 0;
 }
 async function openResult(id, title) {
@@ -920,6 +921,7 @@ addEventListener('resize', fit); fit();
 
 (async function init() {
   try { S.skills = await (await fetch('/skills.json')).json(); } catch { S.skills = {}; }
+  try { S.vendor = await (await fetch('/vendor-skills.json')).json(); } catch { S.vendor = {}; }
   try { S.roster = await (await fetch('/roster.json')).json(); }
   catch { stage.innerHTML = '<div style="padding:40px;font-size:18px">Serverni ishga tushiring: <code>node server.js</code>, so\'ng <code>http://localhost:3000</code> ni oching.</div>'; return; }
   NF = Math.max(...S.roster.floors.map(f => f.n)); GT = TY + NF * FW; STAGE_H = GT + 210; stage.style.height = STAGE_H + 'px'; fit();
