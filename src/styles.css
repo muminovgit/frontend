@@ -323,3 +323,53 @@ textarea.input { resize: vertical; min-height: 84px; }
   text-align: left;
   font-size: 15px;
 }
+
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.type-tile {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 12px 4px 10px;
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  color: var(--fg);
+  box-shadow: var(--shadow);
+}
+.type-tile.on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-fg);
+}
+.type-ico {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: var(--peach);
+  color: var(--fg);
+}
+.type-tile.on .type-ico { background: rgba(255, 255, 255, 0.22); color: #fff; }
+.type-label { font-size: 12px; font-weight: 800; text-align: center; line-height: 1.15; }
+
+.attach-row { display: flex; gap: 6px; }
+.attach {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  color: var(--fg);
+}
+.attach.on { background: var(--brand); border-color: var(--brand); color: var(--brand-fg); }
+
+@media (max-width: 360px) {
+  .type-grid { grid-template-columns: repeat(3, 1fr); }
+}

@@ -14,6 +14,7 @@ export interface Memory {
   text: string;
   hasMedia: boolean;
   locked: boolean; // 18 yoshgacha qulflangan
+  tag?: string; // ko'rinadigan yorliq, masalan "Komik an"
   albumId?: string; // bo'lsa, asosiy lentadan pastdagi albomlar bo'limiga o'tadi
   createdAt: string;
 }

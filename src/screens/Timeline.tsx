@@ -192,7 +192,7 @@ function MemoryCard(p: MemoryCardProps) {
 
       <div className="row between">
         <div className="row wrap">
-          <span className="pill">{KIND_LABEL[memory.kind]}</span>
+          <span className="pill">{memory.tag ?? KIND_LABEL[memory.kind]}</span>
           {memory.locked && <span className="pill lav">Qulflangan</span>}
         </div>
         <button className="more-btn" onClick={p.onToggleMenu} aria-label="Amallar" aria-expanded={p.menuOpen}>⋯</button>
