@@ -311,3 +311,15 @@ textarea.input { resize: vertical; min-height: 84px; }
 }
 .menu-item:last-child { border-bottom: 0; }
 .menu-item.danger { color: var(--accent); }
+
+.album-head {
+  border: 0;
+  background: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  font-size: 15px;
+}

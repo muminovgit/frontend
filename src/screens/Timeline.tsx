@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useStore } from '../store';
 import { MemoryMedia } from '../components/MemoryMedia';
 import { deleteMedia } from '../storage';
-import { ageText, formatDay, isLockedNow, unlockDate, formatDate } from '../utils';
-import type { Memory } from '../types';
+import { ageText, formatDay, isLockedNow, unlockDate, formatDate, uid } from '../utils';
+import type { Album, Memory } from '../types';
 
 const KIND_LABEL: Record<Memory['kind'], string> = {
   photo: 'Foto',
@@ -20,11 +20,16 @@ export function Timeline() {
   const { state, update } = useStore();
   const child = state.child!;
   const [menuFor, setMenuFor] = useState<string | null>(null);
+  const [pickFor, setPickFor] = useState<string | null>(null);
+  const [openAlbum, setOpenAlbum] = useState<string | null>(null);
+  const [newAlbumName, setNewAlbumName] = useState('');
 
+  const albums = state.albums.filter((a) => a.childId === child.id);
+  const mainMemories = state.memories.filter((m) => !m.albumId);
   const milestones = state.milestones.filter((m) => m.childId === child.id);
 
   const entries: Entry[] = [
-    ...state.memories.map<Entry>((m) => ({ type: 'memory', key: `m-${m.id}`, date: m.date, createdAt: m.createdAt, memory: m })),
+    ...mainMemories.map<Entry>((m) => ({ type: 'memory', key: `m-${m.id}`, date: m.date, createdAt: m.createdAt, memory: m })),
     ...milestones.map<Entry>((m) => ({ type: 'milestone', key: `s-${m.id}`, date: m.date, createdAt: '', title: m.title })),
   ].sort((a, b) => {
     if (a.date !== b.date) return a.date < b.date ? 1 : -1;
@@ -39,12 +44,50 @@ export function Timeline() {
     grouped.set(e.date, list);
   }
 
+  const moveTo = (memoryId: string, albumId: string | undefined) => {
+    update((s) => ({ ...s, memories: s.memories.map((m) => (m.id === memoryId ? { ...m, albumId } : m)) }));
+    setPickFor(null);
+    setMenuFor(null);
+  };
+
+  const createAlbumAndMove = (memoryId: string) => {
+    const name = newAlbumName.trim();
+    if (!name) return;
+    const id = uid();
+    update((s) => ({
+      ...s,
+      albums: [...s.albums, { id, childId: child.id, name }],
+      memories: s.memories.map((m) => (m.id === memoryId ? { ...m, albumId: id } : m)),
+    }));
+    setNewAlbumName('');
+    setPickFor(null);
+    setMenuFor(null);
+  };
+
   const remove = async (id: string) => {
     if (!window.confirm("Bu xotirani butunlay o'chirasizmi?")) return;
     await deleteMedia(id);
     update((s) => ({ ...s, memories: s.memories.filter((m) => m.id !== id) }));
     setMenuFor(null);
   };
+
+  const cardProps = (memory: Memory) => ({
+    memory,
+    child,
+    albums,
+    menuOpen: menuFor === memory.id,
+    pickOpen: pickFor === memory.id,
+    newAlbumName,
+    onNewAlbumName: setNewAlbumName,
+    onToggleMenu: () => {
+      setPickFor(null);
+      setMenuFor(menuFor === memory.id ? null : memory.id);
+    },
+    onTogglePick: () => setPickFor(pickFor === memory.id ? null : memory.id),
+    onMove: (albumId: string | undefined) => moveTo(memory.id, albumId),
+    onCreateAlbum: () => createAlbumAndMove(memory.id),
+    onRemove: () => remove(memory.id),
+  });
 
   return (
     <div className="screen">
@@ -59,7 +102,7 @@ export function Timeline() {
         <button className="btn small-btn" style={{ marginTop: 12 }} onClick={() => { window.location.hash = '#/child3d'; }}>3D bola va ovozlar ›</button>
       </div>
 
-      {entries.length === 0 && (
+      {entries.length === 0 && albums.length === 0 && (
         <div className="card empty">
           <h3>Birinchi xotirani qo'shing</h3>
           <p className="muted small" style={{ marginTop: 6 }}>Foto, video, ovoz yoki qisqa matn. Pastdagi "+" tugmasini bosing.</p>
@@ -73,18 +116,31 @@ export function Timeline() {
             e.type === 'milestone' ? (
               <MilestoneCard key={e.key} title={e.title} />
             ) : (
-              <MemoryCard
-                key={e.key}
-                memory={e.memory}
-                child={child}
-                menuOpen={menuFor === e.memory.id}
-                onToggleMenu={() => setMenuFor(menuFor === e.memory.id ? null : e.memory.id)}
-                onRemove={() => remove(e.memory.id)}
-              />
+              <MemoryCard key={e.key} {...cardProps(e.memory)} />
             ),
           )}
         </section>
       ))}
+
+      {albums.length > 0 && (
+        <section className="stack" style={{ gap: 10 }}>
+          <div className="day">Albomlar</div>
+          {albums.map((a) => {
+            const items = state.memories.filter((m) => m.albumId === a.id);
+            const open = openAlbum === a.id;
+            return (
+              <div key={a.id} className="card stack" style={{ gap: 12 }}>
+                <button className="album-head" onClick={() => setOpenAlbum(open ? null : a.id)} aria-expanded={open}>
+                  <span><b>{a.name}</b> <span className="muted small">· {items.length} ta</span></span>
+                  <span aria-hidden="true">{open ? '▴' : '▾'}</span>
+                </button>
+                {open && items.map((m) => <MemoryCard key={m.id} {...cardProps(m)} />)}
+                {open && items.length === 0 && <p className="muted small">Bu albom bo'sh.</p>}
+              </div>
+            );
+          })}
+        </section>
+      )}
     </div>
   );
 }
@@ -104,12 +160,20 @@ function MilestoneCard({ title }: { title: string }) {
 interface MemoryCardProps {
   memory: Memory;
   child: { id: string; name: string; birthDate: string };
+  albums: Album[];
   menuOpen: boolean;
+  pickOpen: boolean;
+  newAlbumName: string;
+  onNewAlbumName: (v: string) => void;
   onToggleMenu: () => void;
+  onTogglePick: () => void;
+  onMove: (albumId: string | undefined) => void;
+  onCreateAlbum: () => void;
   onRemove: () => void;
 }
 
-function MemoryCard({ memory, child, menuOpen, onToggleMenu, onRemove }: MemoryCardProps) {
+function MemoryCard(p: MemoryCardProps) {
+  const { memory, child } = p;
   const locked = isLockedNow(child, memory.locked);
 
   return (
@@ -131,12 +195,30 @@ function MemoryCard({ memory, child, menuOpen, onToggleMenu, onRemove }: MemoryC
           <span className="pill">{KIND_LABEL[memory.kind]}</span>
           {memory.locked && <span className="pill lav">Qulflangan</span>}
         </div>
-        <button className="more-btn" onClick={onToggleMenu} aria-label="Amallar" aria-expanded={menuOpen}>⋯</button>
+        <button className="more-btn" onClick={p.onToggleMenu} aria-label="Amallar" aria-expanded={p.menuOpen}>⋯</button>
       </div>
 
-      {menuOpen && (
+      {p.menuOpen && (
         <div className="menu" role="menu">
-          <button className="menu-item danger" role="menuitem" onClick={onRemove}>O'chirish</button>
+          <button className="menu-item" role="menuitem" onClick={p.onTogglePick}>Albomga tashlash</button>
+          {memory.albumId && (
+            <button className="menu-item" role="menuitem" onClick={() => p.onMove(undefined)}>Asosiy lentaga qaytarish</button>
+          )}
+          <button className="menu-item danger" role="menuitem" onClick={p.onRemove}>O'chirish</button>
+        </div>
+      )}
+
+      {p.menuOpen && p.pickOpen && (
+        <div className="stack" style={{ gap: 8 }}>
+          <div className="row wrap" role="group" aria-label="Albom tanlash">
+            {p.albums.map((a) => (
+              <button key={a.id} className="chip" aria-pressed={memory.albumId === a.id} onClick={() => p.onMove(a.id)}>{a.name}</button>
+            ))}
+          </div>
+          <div className="row" style={{ gap: 8 }}>
+            <input className="input grow" value={p.newAlbumName} onChange={(e) => p.onNewAlbumName(e.target.value)} placeholder="Yangi albom nomi" maxLength={40} aria-label="Yangi albom nomi" />
+            <button className="btn small-btn" onClick={p.onCreateAlbum} disabled={p.newAlbumName.trim() === ''}>Yaratish</button>
+          </div>
         </div>
       )}
     </article>
