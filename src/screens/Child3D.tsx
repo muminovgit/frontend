@@ -3,15 +3,16 @@ import * as THREE from 'three';
 import { useStore } from '../store';
 import { getMedia, putMedia } from '../storage';
 import { animateFigure, buildFigure, type Figure, type Zone } from '../components/figure3d';
+import { useT } from '../useT';
 
-const ZONES: Record<Zone, { label: string; dat: string; word: string; anim: string; freq: number }> = {
-  head: { label: 'Bosh', dat: 'boshiga', word: 'Dada!', anim: 'nod', freq: 330 },
-  hand: { label: "Qo'l", dat: "qo'liga", word: 'Onajon!', anim: 'wave', freq: 440 },
-  body: { label: 'Tana', dat: 'tanasiga', word: 'Sevaman!', anim: 'happy', freq: 520 },
+const ZONES: Record<Zone, { anim: string; freq: number }> = {
+  head: { anim: 'nod', freq: 330 },
+  hand: { anim: 'wave', freq: 440 },
+  body: { anim: 'happy', freq: 520 },
 };
 
 const DEFAULT_HEIGHT = 86;
-const STEPS = ['Fon olib tashlanmoqda', '3D model yaratilmoqda', "Rig va animatsiya qo'shilmoqda"];
+const STEPS = ['3d.step_a', '3d.step_b', '3d.step_c'];
 const MEMBERS_SAMPLE = ['Asadbek', 'Madina', 'Buvi'];
 
 function beep(freq: number) {
@@ -39,6 +40,7 @@ function nowHm() {
 
 export function Child3D() {
   const { state } = useStore();
+  const t = useT();
   const child = state.child!;
   const latest = state.measurements
     .filter((m) => m.childId === child.id && m.heightCm !== undefined)
@@ -89,16 +91,16 @@ export function Child3D() {
     const z = ZONES[zone];
     setMode(z.anim);
     playVoice(zone);
-    showBubble(z.word);
-    addEvent(`${child.name} ${z.dat} tegdi`);
+    showBubble(t(`3d.word.${zone}`));
+    addEvent(t(`3d.touch_${zone}`, { name: child.name }));
   };
 
   const remoteTouch = (name: string) => {
     setMode('happy');
     playVoice('head');
-    showBubble(`${name} tegdi!`);
-    addEvent(`${name} ${child.name}ga tegdi · qurilmada ovoz chiqdi`);
-    setSendStatus(`${name}ga tegish yuborildi (namuna).`);
+    showBubble(t('3d.bubble_who', { who: name }));
+    addEvent(t('3d.remote_touch', { who: name, name: child.name }));
+    setSendStatus(t('3d.sent', { who: name }));
   };
 
   // Sahna: bir marta quriladi, animatsiya va tegishni boshqaradi.
@@ -174,7 +176,7 @@ export function Child3D() {
         zoneTapRef.current(zone);
       } else {
         setMode(['wave', 'nod', 'jump', 'happy'][Math.floor(Math.random() * 4)]);
-        showBubble('Salom!');
+        showBubble(t('3d.bubble_hi'));
       }
     };
 
@@ -213,7 +215,7 @@ export function Child3D() {
       const url = URL.createObjectURL(blob);
       urls.push(url);
       audioRef.current[zone] = new Audio(url);
-      setVoiceNames((prev) => ({ ...prev, [zone]: 'Saqlangan ovoz' }));
+      setVoiceNames((prev) => ({ ...prev, [zone]: t('3d.saved') }));
     });
     return () => {
       alive = false;
@@ -237,7 +239,7 @@ export function Child3D() {
       if (p >= 100) {
         window.clearInterval(timer);
         setMode('jump');
-        showBubble('Men tayyorman!');
+        showBubble(t('3d.bubble_ready'));
         addEvent('3D model yaratildi');
       }
     }, 90);
@@ -254,46 +256,46 @@ export function Child3D() {
     await putMedia(`voice:${zone}`, file);
     audioRef.current[zone] = new Audio(URL.createObjectURL(file));
     setVoiceNames((prev) => ({ ...prev, [zone]: file.name }));
-    addEvent(`${ZONES[zone].label} ovozi yangilandi`);
+    addEvent(t('3d.voice_updated', { zone: t(`3d.zone.${zone}`) }));
   };
 
   return (
     <div className="screen">
       <div className="row between">
-        <h2>3D {child.name}</h2>
+        <h2>{t('3d.title', { name: child.name })}</h2>
         <span className="pill sky tabular">{height} sm</span>
       </div>
-      <p className="muted">Fotodan 3D model yarating, tegib ko'ring, ovozini eshiting.</p>
+      <p className="muted">{t('3d.sub')}</p>
 
       <div className="card stack" style={{ gap: 12 }}>
-        <div className="label">1 · Foto va rozilik</div>
+        <div className="label">{t('3d.step1')}</div>
         <label className="switch" style={{ alignItems: 'flex-start', justifyContent: 'flex-start' }}>
           <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} style={{ marginTop: 3 }} />
-          <span>Ota-onaman. Bolaning fotosini 3D model yaratish uchun yuborishga roziman.</span>
+          <span>{t('3d.consent')}</span>
         </label>
         <label className="btn ghost" style={{ cursor: 'pointer' }}>
-          {photoName ? `Tanlandi: ${photoName}` : 'Foto tanlash'}
+          {photoName ? t('3d.photo_chosen', { name: photoName }) : t('3d.pick_photo')}
           <input type="file" accept="image/*" hidden onChange={(e) => onPhoto(e.target.files?.[0])} />
         </label>
         <div className="row">
-          {photoUrl && <img src={photoUrl} alt="Tanlangan foto" style={{ width: 64, height: 64, borderRadius: 16, objectFit: 'cover' }} />}
-          <p className="muted small">{photoName ? 'Foto tayyor' : 'Foto tanlanmagan'}</p>
+          {photoUrl && <img src={photoUrl} alt="" style={{ width: 64, height: 64, borderRadius: 16, objectFit: 'cover' }} />}
+          <p className="muted small">{photoName ? t('3d.photo_ready') : t('3d.photo_none')}</p>
         </div>
         <button className="btn" onClick={startGeneration} disabled={!consent || !photoName || gen.running}>
-          {gen.done ? 'Qayta yaratish' : gen.running ? 'Yaratilmoqda' : '3D model yaratish'}
+          {gen.done ? t('3d.regen') : gen.running ? t('3d.generating') : t('3d.generate')}
         </button>
         {(gen.running || gen.done) && (
           <div className="stack" style={{ gap: 8 }}>
             <div className="row between">
               <span style={{ fontWeight: 800, fontSize: 14 }}>
-                {gen.done ? 'Model tayyor' : STEPS[Math.min(STEPS.length - 1, Math.floor(gen.pct / 34))]}
+                {gen.done ? t('3d.ready') : t(STEPS[Math.min(STEPS.length - 1, Math.floor(gen.pct / 34))])}
               </span>
               <span className="label tabular">{gen.pct}%</span>
             </div>
             <div className="bar"><span style={{ width: `${gen.pct}%` }} /></div>
           </div>
         )}
-        <p className="note">Namuna: haqiqiy 3D xizmat ulanmagan. Jarayon simulyatsiya qilinadi.</p>
+        <p className="note">{t('3d.note')}</p>
       </div>
 
       <div className="card" style={{ padding: 0, overflow: 'hidden', position: 'relative' }}>
@@ -302,11 +304,11 @@ export function Child3D() {
           <span className="pill accent" style={{ position: 'absolute', top: 14, left: 14, fontSize: 15 }}>{bubble}</span>
         )}
       </div>
-      <p className="muted small" style={{ textAlign: 'center' }}>Bosh, qo'l yoki tanaga teging. Aylantirish uchun suring.</p>
+      <p className="muted small" style={{ textAlign: 'center' }}>{t('3d.hint')}</p>
 
       <div className="card stack" style={{ gap: 10 }}>
         <div className="row between">
-          <span className="label">Bo'y</span>
+          <span className="label">{t('3d.height')}</span>
           <b className="tabular">{height} sm</b>
         </div>
         <input
@@ -315,33 +317,33 @@ export function Child3D() {
           max={100}
           value={height}
           onChange={(e) => setHeight(Number(e.target.value))}
-          aria-label="Bo'y, sm"
+          aria-label={t('3d.height')}
           style={{ width: '100%', accentColor: 'var(--brand)' }}
         />
         <div className="row between">
-          <span className="muted small">70 sm</span>
-          <span className="muted small">100 sm</span>
+          <span className="muted small">70 {t('unit.cm')}</span>
+          <span className="muted small">100 {t('unit.cm')}</span>
         </div>
       </div>
 
       <div className="row wrap">
         {[
-          ['wave', 'Salom'],
-          ['nod', 'Onaylash'],
-          ['jump', 'Sakrash'],
-          ['happy', 'Quvonch'],
+          ['wave', t('3d.anim.wave')],
+          ['nod', t('3d.anim.nod')],
+          ['jump', t('3d.anim.jump')],
+          ['happy', t('3d.anim.happy')],
         ].map(([anim, label]) => (
           <button key={anim} className="chip" onClick={() => { setMode(anim); showBubble(`${label}!`); }}>{label}</button>
         ))}
       </div>
 
       <div className="card stack" style={{ gap: 12 }}>
-        <div className="label">2 · Ovozlar</div>
+        <div className="label">{t('3d.step2')}</div>
         {(['head', 'hand', 'body'] as Zone[]).map((zone) => (
           <div key={zone} className="row between" style={{ gap: 10 }}>
             <div className="grow">
-              <b>{ZONES[zone].label}</b>
-              <div className="muted small">{voiceNames[zone] ?? `Standart ovoz · "${ZONES[zone].word}"`}</div>
+              <b>{t(`3d.zone.${zone}`)}</b>
+              <div className="muted small">{voiceNames[zone] ?? `${t('3d.default_voice')} · "${t(`3d.word.${zone}`)}"`}</div>
             </div>
             <label className="chip" style={{ cursor: 'pointer' }}>
               Yuklash
@@ -352,24 +354,24 @@ export function Child3D() {
       </div>
 
       <div className="card stack" style={{ gap: 12 }}>
-        <div className="label">3 · Ota-onalar</div>
+        <div className="label">{t('3d.step3')}</div>
         {MEMBERS_SAMPLE.map((name) => (
           <div key={name} className="member">
             <div className="avatar sm">{name.charAt(0)}</div>
             <div className="who"><h3>{name}</h3></div>
-            <button className="chip" onClick={() => remoteTouch(name)}>Tegish</button>
+            <button className="chip" onClick={() => remoteTouch(name)}>{t('3d.touch')}</button>
           </div>
         ))}
         {sendStatus && <p className="muted small" aria-live="polite">{sendStatus}</p>}
       </div>
 
       <div className="card stack" style={{ gap: 10 }}>
-        <div className="label">Bildirishnomalar</div>
-        {events.length === 0 && <p className="muted small">Hozircha tegish yo'q.</p>}
+        <div className="label">{t('3d.notif')}</div>
+        {events.length === 0 && <p className="muted small">{t('3d.no_events')}</p>}
         {events.map((ev, i) => (
           <div key={`${ev.time}-${i}`} className="card" style={{ padding: '12px 14px', boxShadow: 'none' }}>
             <div style={{ fontWeight: 700, fontSize: 14 }}>{ev.text}</div>
-            <div className="muted small" style={{ marginTop: 4 }}>{ev.time} · Ota-onalarga yetkazildi</div>
+            <div className="muted small" style={{ marginTop: 4 }}>{ev.time} · {t('3d.delivered')}</div>
           </div>
         ))}
       </div>

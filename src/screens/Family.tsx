@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useStore } from '../store';
+import { useT } from '../useT';
+import { LangSwitch } from '../components/LangSwitch';
 import { uid } from '../utils';
 import type { MemberAccess, MemberRole } from '../types';
 
@@ -8,6 +10,7 @@ const ACCESS: MemberAccess[] = ['tahrirlay oladi', "ko'ra oladi"];
 
 export function Family() {
   const { state, update } = useStore();
+  const t = useT();
   const [name, setName] = useState('');
   const [role, setRole] = useState<MemberRole>('Ota');
   const [access, setAccess] = useState<MemberAccess>('tahrirlay oladi');
@@ -26,8 +29,7 @@ export function Family() {
 
   const makeInvite = () => {
     const code = uid();
-    const link = `${window.location.origin}${window.location.pathname}#/family?invite=${code}`;
-    setInviteLink(link);
+    setInviteLink(`${window.location.origin}${window.location.pathname}#/family?invite=${code}`);
     setCopied(false);
   };
 
@@ -41,53 +43,56 @@ export function Family() {
     }
   };
 
+  const accessLabel = (a: MemberAccess) => (a === 'tahrirlay oladi' ? t('family.edit') : t('family.view'));
+
   return (
     <div className="screen">
-      <h2>Oila</h2>
-      <p className="muted">Kim ko'radi va kim qo'sha oladi. Xotiralar faqat taklif qilingan a'zolarga ko'rinadi.</p>
+      <LangSwitch />
+      <h2>{t('family.title')}</h2>
+      <p className="muted">{t('family.sub')}</p>
 
       <div className="stack">
-        {state.members.length === 0 && <div className="card"><p className="muted small">Hozircha a'zo yo'q. Pastdan qo'shing.</p></div>}
+        {state.members.length === 0 && <div className="card"><p className="muted small">{t('family.none')}</p></div>}
         {state.members.map((m) => (
           <div key={m.id} className="card member">
             <div className="avatar sm">{m.name.charAt(0).toUpperCase()}</div>
             <div className="who">
               <h3>{m.name}</h3>
-              <p className="muted small">{m.role}</p>
+              <p className="muted small">{t(`family.role.${m.role}`)}</p>
             </div>
-            <span className="pill lav">{m.access === 'tahrirlay oladi' ? 'Tahrirlay oladi' : "Ko'ra oladi"}</span>
-            <button className="btn ghost small-btn" onClick={() => remove(m.id)} aria-label={`${m.name}ni olib tashlash`}>×</button>
+            <span className="pill lav">{accessLabel(m.access)}</span>
+            <button className="btn ghost small-btn" onClick={() => remove(m.id)} aria-label={t('family.remove', { name: m.name })}>×</button>
           </div>
         ))}
       </div>
 
       <div className="card stack" style={{ gap: 14 }}>
-        <h3>A'zo qo'shish</h3>
+        <h3>{t('family.add_t')}</h3>
         <label className="field">
-          <span>Ismi</span>
-          <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Masalan, Madina" maxLength={40} />
+          <span>{t('family.name')}</span>
+          <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder={t('family.name_ph')} maxLength={40} />
         </label>
-        <div className="row wrap" role="group" aria-label="Qarindoshlik">
+        <div className="row wrap" role="group" aria-label={t('family.relation')}>
           {ROLES.map((r) => (
-            <button key={r} className="chip" aria-pressed={role === r} onClick={() => setRole(r)}>{r}</button>
+            <button key={r} className="chip" aria-pressed={role === r} onClick={() => setRole(r)}>{t(`family.role.${r}`)}</button>
           ))}
         </div>
-        <div className="row wrap" role="group" aria-label="Huquq">
+        <div className="row wrap" role="group" aria-label={t('family.rights')}>
           {ACCESS.map((a) => (
-            <button key={a} className="chip" aria-pressed={access === a} onClick={() => setAccess(a)}>{a}</button>
+            <button key={a} className="chip" aria-pressed={access === a} onClick={() => setAccess(a)}>{accessLabel(a)}</button>
           ))}
         </div>
-        <button className="btn" onClick={add} disabled={name.trim() === ''}>Qo'shish</button>
+        <button className="btn" onClick={add} disabled={name.trim() === ''}>{t('common.add')}</button>
       </div>
 
       <div className="card stack" style={{ gap: 12 }}>
-        <h3>Taklif havolasi</h3>
-        <p className="muted small">Havolani oila a'zosiga yuboring. Hozircha havola faqat shu qurilmada ishlaydi, serverga ulash keyingi bosqichda.</p>
-        <button className="btn ghost" onClick={makeInvite}>Havola yaratish</button>
+        <h3>{t('family.invite_t')}</h3>
+        <p className="muted small">{t('family.invite_s')}</p>
+        <button className="btn ghost" onClick={makeInvite}>{t('family.make')}</button>
         {inviteLink && (
           <>
             <p className="small" style={{ wordBreak: 'break-all', background: 'var(--lavender)', padding: 10, borderRadius: 12 }}>{inviteLink}</p>
-            <button className="btn" onClick={copy}>{copied ? 'Nusxalandi' : 'Nusxa olish'}</button>
+            <button className="btn" onClick={copy}>{copied ? t('common.copied') : t('common.copy')}</button>
           </>
         )}
       </div>

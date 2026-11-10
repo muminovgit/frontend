@@ -12,6 +12,7 @@ const DB_NAME = 'xotira-hayot';
 const STORE = 'media';
 
 export const emptyState: AppState = {
+  lang: 'uz',
   child: null,
   memories: [],
   measurements: [],

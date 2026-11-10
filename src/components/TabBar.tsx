@@ -1,26 +1,29 @@
+import { useT } from '../useT';
+
 export type TabId = 'timeline' | 'growth' | 'add' | 'family';
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: 'timeline', label: 'Xotira' },
-  { id: 'growth', label: "O'sish" },
-  { id: 'add', label: 'Qo\'shish' },
-  { id: 'family', label: 'Oila' },
+const TABS: { id: TabId; key: string }[] = [
+  { id: 'timeline', key: 'tab.timeline' },
+  { id: 'growth', key: 'tab.growth' },
+  { id: 'add', key: 'tab.add' },
+  { id: 'family', key: 'tab.family' },
 ];
 
 export function TabBar({ current, onChange }: { current: TabId; onChange: (id: TabId) => void }) {
+  const t = useT();
   return (
-    <nav className="tabbar" aria-label="Asosiy menyu">
-      {TABS.map((t) => {
-        const isAdd = t.id === 'add';
+    <nav className="tabbar" aria-label="Menu">
+      {TABS.map((tab) => {
+        const isAdd = tab.id === 'add';
         return (
           <button
-            key={t.id}
+            key={tab.id}
             className={`tab${isAdd ? ' add' : ''}`}
-            aria-current={current === t.id ? 'page' : undefined}
-            onClick={() => onChange(t.id)}
+            aria-current={current === tab.id ? 'page' : undefined}
+            onClick={() => onChange(tab.id)}
           >
             <span className="ico" aria-hidden="true">{isAdd ? '+' : ''}</span>
-            <span>{t.label}</span>
+            <span>{t(tab.key)}</span>
           </button>
         );
       })}

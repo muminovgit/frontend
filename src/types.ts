@@ -13,8 +13,9 @@ export interface Memory {
   kind: MemoryKind;
   text: string;
   hasMedia: boolean;
-  locked: boolean; // 18 yoshgacha qulflangan
-  tag?: string; // ko'rinadigan yorliq, masalan "Komik an"
+  locked: boolean; // eski belgi: 18 yoshgacha qulflangan
+  unlockAt?: string; // zaman kapsulasi: ochiladigan sana (YYYY-MM-DD)
+  tag?: string; // tur kaliti: 'funny' | 'important' (tilga qarab ko'rsatiladi)
   albumId?: string; // bo'lsa, asosiy lentadan pastdagi albomlar bo'limiga o'tadi
   createdAt: string;
 }
@@ -51,6 +52,7 @@ export interface Member {
 }
 
 export interface AppState {
+  lang: 'uz' | 'ru' | 'en';
   child: Child | null;
   memories: Memory[];
   measurements: Measurement[];

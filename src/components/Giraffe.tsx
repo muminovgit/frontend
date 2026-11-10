@@ -53,7 +53,7 @@ export function HeightRuler({ heightCm, marks = [] }: { heightCm: number; marks?
   }
 
   return (
-    <svg className="chart" viewBox="0 0 300 250" role="img" aria-label={`Bo'y ${clamped} sm`}>
+    <svg className="chart" viewBox="0 0 300 250" role="img" aria-label={`${clamped}`}>
       <line x1={40} y1={TOP} x2={40} y2={BOTTOM} stroke="var(--muted)" strokeWidth={1.5} />
       <line x1={40} y1={BOTTOM} x2={290} y2={BOTTOM} stroke="var(--border)" strokeWidth={1.5} />
       {ticks}
@@ -120,7 +120,7 @@ export function LineChart({ points, unit, color }: { points: { label: string; va
   const line = points.map((p, i) => `${x(i)},${y(p.value)}`).join(' ');
 
   return (
-    <svg className="chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${unit} grafigi`}>
+    <svg className="chart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={unit}>
       <line x1={PAD_L} y1={H - PAD_B} x2={W - PAD_R} y2={H - PAD_B} stroke="var(--border)" />
       <text x={0} y={y(max) + 4} fontSize={10} fill="var(--muted)">{max.toFixed(0)}</text>
       <text x={0} y={y(min) + 4} fontSize={10} fill="var(--muted)">{min.toFixed(0)}</text>
