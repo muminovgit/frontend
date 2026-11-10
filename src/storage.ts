@@ -18,7 +18,6 @@ export const emptyState: AppState = {
   milestones: [],
   members: [],
   orders: [],
-  albums: [],
 };
 
 export function loadState(): AppState {
