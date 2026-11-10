@@ -5,13 +5,12 @@ import { Timeline } from './screens/Timeline';
 import { AddMemory } from './screens/AddMemory';
 import { Growth } from './screens/Growth';
 import { Family } from './screens/Family';
-import { Book } from './screens/Book';
 const Child3D = lazy(() => import('./screens/Child3D').then((m) => ({ default: m.Child3D })));
 import { TabBar, type TabId } from './components/TabBar';
 
 type Route = TabId | 'child3d';
 
-const ROUTES: Route[] = ['timeline', 'growth', 'add', 'family', 'book', 'child3d'];
+const ROUTES: Route[] = ['timeline', 'growth', 'add', 'family', 'child3d'];
 
 function routeFromHash(): Route {
   const h = window.location.hash.replace('#/', '') as Route;
@@ -47,7 +46,6 @@ export function App() {
     growth: <Growth />,
     add: <AddMemory onDone={() => go('timeline')} />,
     family: <Family />,
-    book: <Book />,
     child3d: (
       <Suspense fallback={<p className="muted">Yuklanmoqda…</p>}>
         <Child3D />

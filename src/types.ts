@@ -50,19 +50,11 @@ export interface Member {
   access: MemberAccess;
 }
 
-export interface Order {
-  id: string;
-  createdAt: string;
-  option: string;
-  price: number;
-}
-
 export interface AppState {
   child: Child | null;
   memories: Memory[];
   measurements: Measurement[];
   milestones: Milestone[];
   members: Member[];
-  orders: Order[];
   albums: Album[];
 }

@@ -1,11 +1,10 @@
-export type TabId = 'timeline' | 'growth' | 'add' | 'family' | 'book';
+export type TabId = 'timeline' | 'growth' | 'add' | 'family';
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'timeline', label: 'Xotira' },
   { id: 'growth', label: "O'sish" },
   { id: 'add', label: 'Qo\'shish' },
   { id: 'family', label: 'Oila' },
-  { id: 'book', label: 'Kitob' },
 ];
 
 export function TabBar({ current, onChange }: { current: TabId; onChange: (id: TabId) => void }) {

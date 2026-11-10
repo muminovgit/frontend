@@ -192,7 +192,7 @@ textarea.input { resize: vertical; min-height: 84px; }
   bottom: 0;
   width: min(480px, 100%);
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   padding: 8px 8px calc(10px + env(safe-area-inset-bottom, 0px));
   background: var(--surface);
   border-top: 1px solid var(--border);

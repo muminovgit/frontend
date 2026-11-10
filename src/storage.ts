@@ -17,7 +17,6 @@ export const emptyState: AppState = {
   measurements: [],
   milestones: [],
   members: [],
-  orders: [],
   albums: [],
 };
 
