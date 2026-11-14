@@ -91,9 +91,10 @@ function demoPrice(t){const d0=T.demo,out=E.io(P(t,T.bul-.15,.4));if(t<d0||out>=
 function bag(x,y,s,a){ctx.save();ctx.globalAlpha*=a;ctx.translate(x,y);ctx.scale(s,s);ctx.fillStyle=VI;rr(-120,-90,240,210,30);ctx.fill();ctx.strokeStyle=VI;ctx.lineWidth=16;ctx.beginPath();ctx.arc(0,-90,55,Math.PI,0);ctx.stroke();ctx.restore();logo(x,y+15*s,110*s,a)}
 function demoDeliver(t){const d0=T.demo,out=E.io(P(t,T.bul-.15,.4));if(t<d0||out>=1)return;const D=VA.demo,mapT=D.tMap;
   ctx.save();ctx.globalAlpha=1-out;ctx.translate(0,-out*120);
-  if(t<mapT+.3){const a=1-P(t,mapT,.3);const items=[['syrup',-260],['tab',0],['vitamins',260]];const bs=spring(t-d0-.2,2,.6);
-    items.forEach(([n,dx],i)=>{const q=E.io(P(t,d0+i*.15,.8)),im=IM[n],sz=210*(1-.6*q);const x=lerp(540+dx,540,q),y=lerp(820,1060,q)-Math.sin(q*Math.PI)*160;ctx.save();ctx.globalAlpha*=a*(1-P(q,.92,.08));ctx.translate(x,y);ctx.rotate((1-q)*(i-1)*.3);ctx.drawImage(im,-sz/2,-sz/2*im.height/im.width,sz,sz*im.height/im.width);ctx.restore()});
-    bag(540,1090,bs*(1+.08*Math.exp(-Math.max(0,t-d0-.95)*9)*Math.sin(Math.max(0,t-d0-.95)*30)),a)}
+  if(t<mapT+.3){const a=1-P(t,mapT,.3);const items=[['aidkit',-270],['capsule',0],['vitamins',270]];const bs=spring(t-d0-.2,2,.6);
+    items.forEach(([n,dx],i)=>{const q=E.io(P(t,d0+i*.15,.8)),sz=230*(1-.6*q);const x=lerp(540+dx,540,q),y=lerp(900,1100,q)-Math.sin(q*Math.PI)*150;ctx.save();ctx.globalAlpha*=a*(1-P(q,.92,.08))*clamp((t-d0-i*.15+.2)/.2);ctx.translate(x,y);ctx.rotate((1-q)*(i-1)*.3);
+      if(n==='capsule'){pillIcon(0,0,sz*.42)}else{const im=IM[n];ctx.drawImage(im,-sz/2,-sz/2*im.height/im.width,sz,sz*im.height/im.width)}ctx.restore()});
+    bag(540,1150,bs*(1+.08*Math.exp(-Math.max(0,t-d0-.95)*9)*Math.sin(Math.max(0,t-d0-.95)*30)),a)}
   if(t>=mapT){const k=E.expo(P(t,mapT,.5)),X=100,Y0=VA.dy??720,Wm=880,Hm=640;ctx.save();ctx.globalAlpha*=k;ctx.translate(0,(1-k)*160);
     ctx.save();rr(X,Y0,Wm,Hm,44);ctx.clip();ctx.fillStyle='#eef1f6';ctx.fillRect(X,Y0,Wm,Hm);ctx.fillStyle='#d9f2e6';[[.1,.1,.25,.3],[.65,.55,.3,.35]].forEach(([a,b,c,d])=>{rr(X+a*Wm,Y0+b*Hm,c*Wm,d*Hm,30);ctx.fill()});
     ctx.strokeStyle='#ffffff';ctx.lineWidth=18;for(let i=0;i<6;i++){ctx.beginPath();ctx.moveTo(X,Y0+80+i*110+rnd(i)*20);ctx.lineTo(X+Wm,Y0+40+i*115);ctx.stroke();ctx.beginPath();ctx.moveTo(X+70+i*160,Y0);ctx.lineTo(X+40+i*165+rnd(i+3)*30,Y0+Hm);ctx.stroke()}
@@ -135,5 +136,5 @@ function draw(t){ctx.setTransform(1,0,0,1,0,0);bg(t);const[sx,sy]=shake(t);ctx.t
   ctx.setTransform(1,0,0,1,0,0);flash(E.in(P(t,DUR-.35,.35)),'#110820');flash((1-P(t,0,.12))*.0)}
 function loadImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src})}
 window.ready=(async()=>{await Promise.all(['900 90px Montserrat','800 90px Montserrat','600 90px Montserrat','500 30px Inter','600 30px Inter','700 30px Inter','300px "Noto Color Emoji"'].map(f=>document.fonts.load(f,"Oʻ‘’'✓⬇⏱🛵🤧")));
-  for(const n of['syrup','tab','vitamins'])IM[n]=await loadImg('assets/'+n+'.png');IM.app=await loadImg('assets/app-page.png');layoutHeadline();draw(0);return true})();
+  for(const n of['aidkit','vitamins'])IM[n]=await loadImg('assets/'+n+'.png');IM.app=await loadImg('assets/app-page.png');layoutHeadline();draw(0);return true})();
 window.seek=t=>draw(Math.min(Math.max(t,0),DUR-1e-4));window.DUR=DUR;
