@@ -1,0 +1,7 @@
+part_*.mp4
+list_*.txt
+render.log
+raw-*.mp4
+audio/vo/*.mp3
+audio/*.wav
+!audio/vo/*.wav
