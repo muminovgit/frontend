@@ -1,0 +1,147 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Davo — Motion 3 "BFQ va vitaminlar"</title><style>
+@font-face{font-family:"Montserrat";src:url(assets/fonts/Montserrat-600.woff2);font-weight:600}
+@font-face{font-family:"Montserrat";src:url(assets/fonts/Montserrat-800.woff2);font-weight:800}
+@font-face{font-family:"Montserrat";src:url(assets/fonts/Montserrat-900.woff2);font-weight:900}
+@font-face{font-family:"Inter";src:url(assets/fonts/Inter-600.woff2);font-weight:600}
+@font-face{font-family:"Inter";src:url(assets/fonts/Inter-700.woff2);font-weight:700}
+html,body{margin:0;background:#000;width:1080px;height:1920px;overflow:hidden}canvas{position:absolute;left:0;top:0;display:block}</style></head><body>
+<canvas id="out" width="1080" height="1920"></canvas>
+<script src="lib/three.global.js"></script>
+<script>
+// Davo Delivery — Motion 3 "BFQ va vitaminlar" (15 s, cut to a 120 BPM grid: 1 beat = 0.5 s).
+// Three layers: back 2D (colour fields + giant type), WebGL 3D (capsules, products, helix, phone), front 2D (copy).
+// Every pixel is a function of t (window.seek). Products are generic (no third-party brands).
+const W=1080,H=1920,DUR=15;
+const Y='#ffce68',PK='#fb4669',VI='#5e3a9a',G='#01bdac',BLUE='#2f6bff',WH='#ffffff',INK='#120c1c';
+const T={hook:0,words:1,shapes:3,phone:6,bul:9,logo:12};
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),P=(t,s,d)=>clamp((t-s)/d),lerp=(a,b,k)=>a+(b-a)*k;
+const E={out:k=>1-Math.pow(1-k,3),in:k=>k*k*k,io:k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2,expo:k=>k>=1?1:1-Math.pow(2,-10*k),expoIn:k=>k<=0?0:Math.pow(2,10*k-10)};
+function spring(t,f=2.4,z=.5){if(t<=0)return 0;const w=2*Math.PI*f,wd=w*Math.sqrt(1-z*z);return 1-Math.exp(-z*w*t)*(Math.cos(wd*t)+z*w/wd*Math.sin(wd*t))}
+function rnd(i){const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)}
+// three offscreen layers composited into ONE visible canvas each frame (multi-canvas DOM compositing can lag behind seek)
+const mk=()=>{const c=document.createElement('canvas');c.width=1080;c.height=1920;return c};const LB=mk(),LG=mk(),LO=mk(),OUT=document.getElementById('out').getContext('2d');
+const bctx=OUT,octx=OUT;   // back + front draw straight into the output canvas; only the WebGL layer is composited
+const F=(w,s,f='Montserrat')=>`${w} ${s}px "${f}"`;
+function txt(c,s,x,y,size,o={}){c.save();c.globalAlpha*=o.a??1;c.font=F(o.w??900,size,o.f);c.textAlign=o.al??'center';c.textBaseline='middle';c.fillStyle=o.c??WH;if(o.stroke){c.lineWidth=o.lw??6;c.strokeStyle=o.stroke;c.strokeText(s,x,y)}else c.fillText(s,x,y);c.restore()}
+function tw(c,s,size,w=900){c.save();c.font=F(w,size);const v=c.measureText(s).width;c.restore();return v}
+function fit(c,s,maxW,start,w=900){let z=start;while(tw(c,s,z,w)>maxW&&z>20)z-=4;return z}
+function rr(c,x,y,w,h,r){c.beginPath();c.roundRect(x,y,w,h,r)}
+function check(c,x,y,s,k,col,lw){if(k<=0)return;c.save();c.strokeStyle=col;c.lineWidth=lw;c.lineCap='round';c.lineJoin='round';const p=[[-.5,0],[-.15,.35],[.55,-.4]],L1=Math.hypot(.35,.35),L2=Math.hypot(.7,.75),tot=(L1+L2)*k;
+  c.beginPath();c.moveTo(x+p[0][0]*s,y+p[0][1]*s);if(tot<=L1){const q=tot/L1;c.lineTo(x+lerp(p[0][0],p[1][0],q)*s,y+lerp(p[0][1],p[1][1],q)*s)}else{c.lineTo(x+p[1][0]*s,y+p[1][1]*s);const q=(tot-L1)/L2;c.lineTo(x+lerp(p[1][0],p[2][0],q)*s,y+lerp(p[1][1],p[2][1],q)*s)}c.stroke();c.restore()}
+function cross(c,u){const a=10.5*u,b=29*u;c.beginPath();c.moveTo(-a,-b);c.lineTo(a,-b);c.lineTo(a,-a);c.lineTo(b,-a);c.lineTo(b,a);c.lineTo(a,a);c.lineTo(a,b);c.lineTo(-a,b);c.lineTo(-a,a);c.lineTo(-b,a);c.lineTo(-b,-a);c.lineTo(-a,-a);c.closePath()}
+function logo2d(c,x,y,s,a=1){c.save();c.globalAlpha*=a;c.translate(x,y);c.fillStyle=WH;c.shadowColor='rgba(0,0,0,.3)';c.shadowBlur=s*.15;rr(c,-s/2,-s/2,s,s,s*.24);c.fill();c.shadowColor='transparent';const u=s/131;
+  [[Y,-1,-1],[PK,1,-1],[VI,-1,1],[G,1,1]].forEach(([col,sx,sy])=>{c.fillStyle=col;c.beginPath();c.arc(sx*20*u,sy*20*u,28.5*u,0,7);c.fill()});c.fillStyle=WH;cross(c,u);c.fill();c.restore()}
+
+// ================================================================ 3D
+const renderer=new THREE.WebGLRenderer({canvas:LG,antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(1);renderer.setSize(W,H,false);renderer.setClearColor(0x000000,0);renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.1;
+renderer.shadowMap.enabled=false;
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(36,W/H,.05,200);
+scene.add(new THREE.HemisphereLight(0xffffff,0x3a2050,1.1));const key=new THREE.DirectionalLight(0xffffff,2.6);key.position.set(3,6,6);scene.add(key);const rim=new THREE.DirectionalLight(0xffd6f0,1.6);rim.position.set(-5,2,-4);scene.add(rim);
+const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:o.r??.32,metalness:o.m??0,map:o.map??null,transparent:!!o.op,opacity:o.op??1,emissive:o.e??0,emissiveIntensity:o.ei??1,side:o.side??THREE.FrontSide});
+const mesh=(g,m,x=0,y=0,z=0)=>{const o=new THREE.Mesh(g,m);o.position.set(x,y,z);return o};
+function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t}
+// two-tone capsule made of two halves (cylinder + hemisphere each) so it can split open
+function capsule(ca,cb,r=.42,h=.7){const g=new THREE.Group(),halves=[];for(const[s,c]of[[1,ca],[-1,cb]]){const hg=new THREE.Group();const m=M(c,{r:.18});hg.add(mesh(new THREE.CylinderGeometry(r,r,h/2,40),m,0,s*h/4,0));const sp=mesh(new THREE.SphereGeometry(r,40,20,0,Math.PI*2,s>0?0:Math.PI/2,Math.PI/2),m,0,s*h/2,0);hg.add(sp);g.add(hg);halves.push(hg)}g.userData.halves=halves;return g}
+function labelTex(word,bg,fg){return canvasTex(1024,256,(c,w,h)=>{c.fillStyle=bg;c.fillRect(0,0,w,h);c.fillStyle=fg;c.font=F(900,120);c.textAlign='center';c.textBaseline='middle';c.fillText(word,w/2,h/2+6);c.fillRect(0,0,w,14);c.fillRect(0,h-14,w,14)})}
+function jar(word,body,lid,lab,fg,r=.7,h=1.2){const g=new THREE.Group();g.add(mesh(new THREE.CylinderGeometry(r,r,h,48),M(body,{r:.25})));g.add(mesh(new THREE.CylinderGeometry(r*1.04,r*1.04,h*.22,48),M(lid,{r:.3}),0,h/2+h*.08,0));
+  const band=mesh(new THREE.CylinderGeometry(r*1.012,r*1.012,h*.5,64,1,true,-Math.PI*.55,Math.PI*1.1),M(0xffffff,{map:labelTex(word,lab,fg),r:.5}),0,-h*.05,0);g.add(band);return g}
+// hook capsule + burst
+const HOOK=capsule(0xfb4669,0xffffff,.9,1.6);scene.add(HOOK);
+const BURST=new THREE.InstancedMesh(new THREE.SphereGeometry(.09,14,10),M(0xffffff,{r:.2}),80);const bcol=new THREE.Color();for(let i=0;i<80;i++)BURST.setColorAt(i,bcol.set([Y,PK,G,VI,WH][i%5]));scene.add(BURST);
+// products for the word beats
+const PRODUCTS=[jar('PROTEIN',0x5e3a9a,0xffce68,'#ffce68','#120c1c',.85,1.3),jar('KREATIN',0xffffff,0x01bdac,'#01bdac','#ffffff',.7,1.15),jar('MAGNIY',0xfb4669,0xffffff,'#ffffff','#fb4669',.42,1.6),capsule(0xffce68,0x5e3a9a,.55,1.0)];
+PRODUCTS.forEach(p=>scene.add(p));
+// capsule field -> DNA helix
+const NC=150,CAPG=new THREE.CapsuleGeometry(.16,.32,8,16),FIELD=new THREE.InstancedMesh(CAPG,M(0xffffff,{r:.2}),NC);for(let i=0;i<NC;i++)FIELD.setColorAt(i,bcol.set([Y,PK,G,VI,WH][i%5]));scene.add(FIELD);
+// phone with an app-like category screen (generic products, no brands)
+const PH=new THREE.Group();const body=mesh(new THREE.BoxGeometry(3.2,6.6,.32),M(0x111117,{r:.3,m:.3}));PH.add(body);
+const SCR=document.createElement('canvas');SCR.width=720;SCR.height=1480;const scrTex=new THREE.CanvasTexture(SCR);scrTex.colorSpace=THREE.SRGBColorSpace;
+const screen=mesh(new THREE.PlaneGeometry(3.0,6.4),new THREE.MeshBasicMaterial({map:scrTex}),0,0,.165);PH.add(screen);scene.add(PH);
+const ITEMS=[['Protein','kukun · 900 g',VI,Y],['Kreatin','kukun · 300 g',G,WH],['Magniy B6','tabletka · 50 dona',PK,WH],['Vitamin D3','kapsula · 60 dona',Y,VI],['Omega-3','kapsula · 90 dona',BLUE,WH],['Multivitamin','tabletka · 30 dona',G,Y]];
+function drawScreen(k,scroll){const c=SCR.getContext('2d'),w=720,h=1480;c.fillStyle='#f5f6fa';c.fillRect(0,0,w,h);c.fillStyle='#e6f7fb';c.fillRect(0,0,w,330);
+  txt(c,'9:41',70,48,28,{w:700,f:'Inter',c:INK});c.fillStyle=WH;rr(c,36,96,w-72,86,43);c.fill();txt(c,'Izlash',110,140,30,{al:'left',w:600,f:'Inter',c:'#8a8f99'});
+  txt(c,'Vitaminlar va BADlar',36,250,46,{al:'left',w:900,c:INK});
+  ITEMS.forEach(([n,s,c1,c2],i)=>{const col=i%2,row=Math.floor(i/2),x=36+col*330,y=320+row*370-scroll,a=E.out(clamp(k*3-i*.25));if(a<=0)return;c.save();c.globalAlpha=a;c.translate(0,(1-a)*60);
+    c.fillStyle=WH;rr(c,x,y,312,350,30);c.fill();c.fillStyle=c1;rr(c,x+96,y+40,120,170,22);c.fill();c.fillStyle=c2;rr(c,x+96,y+30,120,36,12);c.fill();c.fillStyle='rgba(255,255,255,.85)';rr(c,x+108,y+100,96,50,10);c.fill();
+    txt(c,n,x+24,y+250,34,{al:'left',w:800,c:INK});txt(c,s,x+24,y+290,24,{al:'left',w:600,f:'Inter',c:'#7a8090'});txt(c,'✓ mavjud',x+24,y+325,22,{al:'left',w:700,f:'Inter',c:'#01a596'});c.restore()});
+  scrTex.needsUpdate=true}
+// logo petals
+const PET=[[0xffce68,-1,1],[0xfb4669,1,1],[0x5e3a9a,-1,-1],[0x01bdac,1,-1]].map(([c,sx,sy])=>{const m=mesh(new THREE.SphereGeometry(.5,40,24),M(c,{r:.22}));m.userData={sx,sy};scene.add(m);return m});
+const dm=new THREE.Object3D();
+function look(p,tg,fov=36){cam.position.copy(p);cam.fov=fov;cam.lookAt(tg);cam.updateProjectionMatrix()}
+function hideAll(){HOOK.visible=BURST.visible=FIELD.visible=PH.visible=false;PRODUCTS.forEach(p=>p.visible=false);PET.forEach(p=>p.visible=false)}
+
+// ================================================================ timeline
+const BGS=[[0,'#120c1c'],[1,Y],[1.5,PK],[2,G],[2.5,VI],[3,'#120c1c'],[6,'#f2f3f8'],[9,PK],[10,G],[11,BLUE],[12,'#f2f3f8']];
+function bgAt(t){let c=BGS[0][1];for(const[s,col]of BGS)if(t>=s)c=col;return c}
+const WORDS=['PROTEIN','KREATIN','MAGNIY','VITAMIN'];
+function hit(t,b,d=.5){return E.expo(P(t,b,d))}
+function draw(t){
+  let sx=0,sy=0;for(const k of[.22,.42,1,1.5,2,2.5,3,9,10,11,12.95]){const d=t-k;if(d<0||d>.5)continue;const e=16*Math.exp(-d*12);sx+=e*Math.sin(d*90);sy+=e*Math.cos(d*70)}
+  OUT.setTransform(1,0,0,1,sx,sy);
+  // -------- back layer: colour field (+ iris wipe on each change) and giant outlined type
+  const B=bctx;let prev='#120c1c',cur=bgAt(t),tc=0;for(const[s,col]of BGS){if(t>=s){if(s>0){tc=s}}}for(let i=1;i<BGS.length;i++)if(BGS[i][0]===tc)prev=BGS[i-1][1];
+  B.fillStyle=prev;B.fillRect(-40,-40,W+80,H+80);const ir=E.expo(P(t,tc,.32));B.fillStyle=cur;B.beginPath();B.arc(540,960,ir*1300,0,7);B.fill();
+  if(t>=T.words&&t<T.shapes){const i=Math.min(3,Math.floor((t-T.words)/.5)),u=t-(T.words+i*.5),z=fit(B,WORDS[i],1700,420);const sl=lerp(260,-260,u/.5);
+    const zz=fit(B,WORDS[i],1000,230);for(let r=0;r<5;r++){B.save();B.globalAlpha=.55;txt(B,WORDS[i],540+(r%2?1:-1)*sl*1.5,260+r*330,zz,{stroke:i===0?INK:'rgba(255,255,255,.9)',lw:5});B.restore()}
+    txt(B,WORDS[i],540,1560,fit(B,WORDS[i],960,150),{c:i===0?INK:WH,a:E.out(P(u,0,.12))})}
+  if(t>=T.shapes&&t<T.phone){B.save();B.globalAlpha=.08;for(let i=0;i<14;i++){B.fillStyle=WH;B.fillRect(0,(i*160+t*300)%2240-160,W,4)}B.restore()}
+  if(t>=T.bul&&t<T.logo){const i=Math.min(2,Math.floor(t-T.bul));B.save();B.globalAlpha=.14;const s=['LITSENZIYALI','ARZON','24/7'][i];for(let r=0;r<9;r++){const x=((r%2?1:-1)*(t*260)%800);txt(B,s,540+x,180+r*220,170,{c:WH})}B.restore()}
+
+  // -------- 3D
+  hideAll();
+  if(t<T.words){ // HOOK: capsule slams in, splits, vitamins burst
+    HOOK.visible=true;const s=t<.22?lerp(3.2,1,E.in(t/.22)):1+.1*Math.exp(-(t-.22)*9)*Math.cos((t-.22)*30);HOOK.scale.setScalar(s);HOOK.rotation.set(.4,t*1.2,-.5+t*.4);
+    const sp=E.expo(P(t,.42,.4));HOOK.userData.halves[0].position.y=sp*1.4;HOOK.userData.halves[1].position.y=-sp*1.4;HOOK.userData.halves[0].rotation.z=sp*.5;HOOK.userData.halves[1].rotation.z=-sp*.5;
+    if(t>.42){BURST.visible=true;const d=t-.42;for(let i=0;i<80;i++){const th=rnd(i)*6.28,ph=Math.acos(2*rnd(i+1)-1),v=2.5+rnd(i+2)*4;dm.position.set(Math.sin(ph)*Math.cos(th)*v*d,Math.cos(ph)*v*d-.8*d*d,Math.sin(ph)*Math.sin(th)*v*d*.6);dm.scale.setScalar((1-d*.6)*(.6+rnd(i+3)*1.2));dm.updateMatrix();BURST.setMatrixAt(i,dm.matrix)}BURST.instanceMatrix.needsUpdate=true}
+    look(V(Math.sin(t*.8)*.6,.2,lerp(7,8.5,t)),V(0,0,0),36)}
+  else if(t<T.shapes){ // WORD BEATS: one product per beat, whip-spin in, camera push
+    const i=Math.min(3,Math.floor((t-T.words)/.5)),u=t-(T.words+i*.5),p=PRODUCTS[i];p.visible=true;const k=spring(u,2.8,.42);p.scale.setScalar(lerp(.2,1.25,Math.min(1.15,k)));p.rotation.set(.25,lerp(-2.5,0,E.expo(u/.35))+u*.8,lerp(.6,-.12,E.expo(u/.35)));p.position.set(0,lerp(-1.2,.1,E.expo(u/.3)),0);
+    look(V(0,.2,lerp(7.5,6.2,u/.5)),V(0,.1,0),36)}
+  else if(t<T.phone){ // SHAPE PLAY: capsule grid ripples, then folds into a DNA helix; camera cranes around it
+    FIELD.visible=true;const u=t-T.shapes,fold=E.io(P(u,1.0,1.1));for(let i=0;i<NC;i++){const gx=i%10,gy=Math.floor(i/10);const ax=(gx-4.5)*.62,ay=(gy-7)*.62,wave=Math.sin(u*6-gx*.5-gy*.4)*.35;
+      const strand=i%2,hi=Math.floor(i/2),hh=(hi/(NC/2)-.5)*9,ang=hi*.42+u*1.6+strand*Math.PI;const hx=Math.cos(ang)*1.4,hz=Math.sin(ang)*1.4;
+      dm.position.set(lerp(ax,hx,fold),lerp(ay,hh,fold),lerp(wave,hz,fold));dm.rotation.set(lerp(Math.PI/2+wave,0,fold),lerp(u*2+gx*.2,ang,fold),lerp(0,Math.PI/2,fold));const ek=E.expo(P(u,i*.004,.35));dm.scale.setScalar(ek);dm.updateMatrix();FIELD.setMatrixAt(i,dm.matrix)}FIELD.instanceMatrix.needsUpdate=true;
+    const orb=E.io(P(u,1.0,2));look(V(Math.sin(orb*Math.PI*.9)*lerp(.01,9,orb),lerp(0,1.5,orb),lerp(10.5,Math.cos(orb*Math.PI*.9)*9,orb)),V(0,0,0),lerp(40,44,orb))}
+  else if(t<T.bul){ // PHONE: fly-through lands on the app category, cards cascade, the screen scrolls
+    PH.visible=true;const u=t-T.phone,land=E.expo(P(u,0,.7));PH.rotation.set(lerp(-.9,-.08,land)+Math.sin(u*1.4)*.03,lerp(1.2,-.22,land)+Math.sin(u)*.05,lerp(.4,.03,land));PH.position.set(0,lerp(-3,-.25,land),0);
+    drawScreen(P(u,.35,1.2),E.io(P(u,1.8,.9))*260);look(V(0,.75,lerp(5,12,E.out(P(u,0,.6)))),V(0,.75,0),38)}
+  else if(t<T.logo){ // BULLETS: a capsule slams on each beat, colour shift per bullet
+    const i=Math.min(2,Math.floor(t-T.bul)),u=t-(T.bul+i),p=PRODUCTS[3];p.visible=true;const k=spring(u,2.4,.45);p.scale.setScalar(lerp(.3,.9,Math.min(1.1,k)));p.rotation.set(.5+u,u*2.2+i,.8);p.position.set(lerp(3,2.1,E.expo(u/.3)),lerp(3.2,2.7,E.expo(u/.3)),0);
+    look(V(0,0,9),V(0,0,0),36)}
+  else{ // LOGO: four petal spheres converge into the 2x2 mark, then the crisp 2D logo takes over
+    const u=t-T.logo;PET.forEach((m,i)=>{m.visible=u<1.0;const k=E.io(P(u,i*.05,.6)),a=i/4*6.28+u*3;m.position.set(lerp(Math.cos(a)*3.2,m.userData.sx*.152,k),lerp(Math.sin(a)*3.2+1.05,m.userData.sy*.152+1.61,k),lerp(-2,0,k));m.scale.setScalar(lerp(.6,.434,k))});
+    look(V(0,1.05,8),V(0,1.05,0),36)}
+  renderer.render(scene,cam);
+
+  // -------- front layer: copy
+  OUT.drawImage(LG,0,0);const O=octx;
+  if(t<T.words){const k=spring(t-.42,2.6,.5);if(t>.42){O.save();O.translate(540,1500);O.rotate(-.05);const s=lerp(2.2,1,Math.min(1,E.expo(P(t,.42,.2))));O.scale(s,s);txt(O,'BFQ & VITAMINLAR',0,0,fit(O,'BFQ & VITAMINLAR',980,120),{c:WH});O.restore()}}
+  if(t>=T.shapes&&t<T.phone){const u=t-T.shapes,out=E.expoIn(P(t,T.phone-.25,.25));{const g=O.createLinearGradient(0,0,0,900);g.addColorStop(0,'rgba(18,12,28,.92)');g.addColorStop(.7,'rgba(18,12,28,.75)');g.addColorStop(1,'rgba(18,12,28,0)');O.save();O.globalAlpha=E.out(P(u,0,.3))*(1-out);O.fillStyle=g;O.fillRect(0,0,W,900);O.restore()}const L=[['Biologik',WH],["qo'shimchalarni",WH],['uyingizga',INK,Y],['yetkazib beramiz',WH]];
+    L.forEach(([s,c,hl],i)=>{const t0=T.shapes+.15+i*.12,k=spring(t-t0,2.6,.5);if(t<t0)return;const z=fit(O,s,940,110);O.save();O.globalAlpha=1-out;O.translate(540,300+i*125-out*60);const sc=lerp(.3,1,Math.min(1.12,k));O.scale(sc,sc);
+      if(hl){const ww=tw(O,s,z)+50;O.fillStyle=hl;rr(O,-ww/2,-z*.6,ww*E.out(P(t,t0+.15,.25)),z*1.2,24);O.fill()}txt(O,s,0,4,z,{c});O.restore()})}
+  if(t>=T.phone&&t<T.bul){const u=t-T.phone,k=E.expo(P(u,.5,.4)),out=E.expoIn(P(t,T.bul-.25,.25));txt(O,'Ilovada toping',540,300-(1-k)*60,84,{c:INK,a:k*(1-out)});
+    const bk=spring(u-1.2,2.4,.5);if(u>1.2){O.save();O.globalAlpha=1-out;O.translate(810,1660);O.rotate(-.06);O.scale(bk,bk);rr(O,-200,-56,400,112,56);O.fillStyle=PK;O.fill();txt(O,'200+ dorixona',0,4,40,{c:WH});O.restore()}}
+  if(t>=T.bul&&t<T.logo){const BU=[['Faqat litsenziyali','mahsulotlar',WH],['Eng arzonini','tanlang',INK],['24/7*','yetkazib berish',WH]];const i=Math.min(2,Math.floor(t-T.bul)),u=t-(T.bul+i);const [a,b,c]=BU[i];
+    const z1=fit(O,a,960,150),k=spring(u,2.8,.45),k2=spring(u-.12,2.8,.45);O.save();O.translate(540,900);O.scale(lerp(.3,1,Math.min(1.1,k)),lerp(.3,1,Math.min(1.1,k)));txt(O,a,0,0,z1,{c});O.restore();
+    O.save();O.translate(540,1060);O.scale(lerp(.3,1,Math.min(1.1,k2)),lerp(.3,1,Math.min(1.1,k2)));txt(O,b,0,0,fit(O,b,960,110),{c,w:800});O.restore();
+    O.save();O.translate(540,1250);O.fillStyle=c===WH?'rgba(255,255,255,.95)':INK;O.beginPath();O.arc(0,0,58*E.out(P(u,.1,.2)),0,7);O.fill();check(O,0,4,56,P(u,.2,.25),c===WH?(i===0?PK:BLUE):G,10);O.restore();
+    [0,1,2].forEach(j=>{O.fillStyle=j<=i?(c===WH?WH:INK):'rgba(255,255,255,.35)';rr(O,540-90+j*66,1420,48,10,5);O.fill()});
+    txt(O,'*Yetkazish vaqti va ish tartibi hudud va buyurtmaga qarab farq qilishi mumkin.',540,1650,21,{w:600,f:'Inter',c:c===WH?'rgba(255,255,255,.8)':'rgba(18,12,28,.7)'})}
+  if(t>=T.logo){const u=t-T.logo,k=P(u,.95,.15);const ls=lerp(370,300,E.io(P(u,1.0,.6)));const ly=lerp(752,640,E.io(P(u,1.0,.6)));if(u>=.95){logo2d(O,540,ly,ls,k)}
+    const nk=E.expo(P(u,1.25,.45));O.save();O.beginPath();O.rect(0,860,W,200);O.clip();txt(O,'Davo Delivery',540,950+(1-nk)*230,112,{c:INK});O.restore();
+    txt(O,'Vitaminlar va BADlar — uyingizgacha',540,1060,40,{w:800,c:VI,a:E.out(P(u,1.45,.4))});
+    const bk=spring(u-1.55,2,.55);O.save();O.translate(540,1240);O.scale(bk,bk);O.fillStyle=BLUE;O.shadowColor='rgba(47,107,255,.45)';O.shadowBlur=40;rr(O,-420,-74,840,148,74);O.fill();O.shadowColor='transparent';txt(O,'Ilovani yuklab oling',0,4,58,{w:800,c:WH});O.restore();
+    const sk=E.out(P(u,1.8,.35));['App Store','Google Play'].forEach((s,i)=>{const x=i?700:380;O.save();O.globalAlpha=sk;rr(O,x-150,1370,300,68,34);O.fillStyle=INK;O.fill();txt(O,s,x,1405,32,{w:700,f:'Inter',c:WH});O.restore()});
+    txt(O,'*Yetkazish vaqti va ish tartibi hudud va buyurtmaga qarab farq qilishi mumkin.',540,1650,21,{w:600,f:'Inter',c:'rgba(18,12,28,.6)',a:sk})}
+  // beat flash on hard cuts
+  for(const c of[T.words,T.shapes,T.phone,T.bul,T.logo]){const d=t-c;if(d>=0&&d<.12){O.save();O.globalAlpha=(1-d/.12)*.55;O.fillStyle=WH;O.fillRect(0,0,W,H);O.restore()}}
+  // camera shake on the slams (applied to all three layers via CSS transform)
+  OUT.setTransform(1,0,0,1,0,0)}
+window.ready=(async()=>{await Promise.all(['900 90px Montserrat','800 90px Montserrat','600 30px Inter','700 30px Inter'].map(f=>document.fonts.load(f,"Oʻ‘’'✓&")));
+  PRODUCTS.forEach((p,i)=>{if(p.children[2]&&p.children[2].material.map){p.children[2].material.map=labelTex(WORDS[i],['#ffce68','#01bdac','#ffffff'][i],['#120c1c','#ffffff','#fb4669'][i])}});draw(0);return true})();
+// resolve after two animation frames so the compositor has presented this frame before the screenshot
+window.seek=t=>{draw(Math.min(Math.max(t,0),DUR-1e-4));return new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))};window.DUR=DUR;
+</script></body></html>
