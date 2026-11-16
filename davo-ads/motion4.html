@@ -41,22 +41,21 @@ function bg(t){const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#fde3
   for(let i=0;i<14;i++){const tw2=.5+.5*Math.sin(t*2.2+i*1.7);sparkle(rnd(i)*W,200+rnd(i+20)*1500,6+rnd(i+40)*12,.6*tw2)}}
 
 // ---------------------------------------------------------------- S1 hook: serum drop -> ripple -> "Go'zallik" (serif italic)
-function hook(t){const out=E.io(P(t,T.head-.25,.45));if(out>=1)return;ctx.save();ctx.globalAlpha=1-out;ctx.translate(0,-out*120);
+function hook(t){const out=E.io(P(t,T.head-.25,.45));ctx.save();ctx.globalAlpha=1-out;
   const fall=E.in(P(t,0,.55)),dy=lerp(-120,880,fall),land=t-.55;
   if(land<0){ctx.save();ctx.translate(540,dy);ctx.scale(1,1+fall*.5);const g=ctx.createRadialGradient(-14,-20,4,0,0,60);g.addColorStop(0,'#fff');g.addColorStop(.35,'#ff8fb3');g.addColorStop(1,ROSE);ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(0,-80);ctx.bezierCurveTo(40,-30,56,10,56,30);ctx.arc(0,30,56,0,Math.PI);ctx.bezierCurveTo(-56,10,-40,-30,0,-80);ctx.fill();ctx.restore()}
   else{for(let r=0;r<3;r++){const q=P(land,r*.14,1.3);if(q<=0||q>=1)continue;ctx.save();ctx.strokeStyle=r===1?GOLD:ROSE;ctx.globalAlpha*=(1-q)*.8;ctx.lineWidth=6*(1-q)+1.5;ctx.beginPath();ctx.ellipse(540,880,60+E.out(q)*520,(60+E.out(q)*520)*.32,0,0,7);ctx.stroke();ctx.restore()}
     const sp=spring(land,2.2,.5);blob(540,880-Math.sin(clamp(land/.4)*Math.PI)*60,48*Math.min(1.1,sp),'#ff9cbd','rgba(232,81,127,.9)',1-P(land,.6,.4))}
-  // "Go'zallik": letters rise with tracking that tightens
-  const word="Go‘zallik";if(t>=T.word){const u=t-T.word,ls=lerp(60,0,E.out(clamp(u/1.1)));const z=210,wv=tw(word,z,600,'Playfair',true,ls);let x=540-wv/2;
-    [...word].forEach((ch,i)=>{const k=E.out(P(u,i*.06,.6)),cw=tw(ch,z,600,'Playfair',true)+ls;ctx.save();ctx.beginPath();ctx.rect(0,560,W,300);ctx.clip();txt(ch,x+cw/2-ls/2,760+(1-k)*170,z,{f:'Playfair',it:true,w:600,c:ROSE});ctx.restore();x+=cw});
-    const sk=E.out(P(u,.7,.6));ctx.save();ctx.globalAlpha*=sk;ctx.strokeStyle=GOLD;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(540-180*sk,940);ctx.lineTo(540+180*sk,940);ctx.stroke();ctx.restore();
-    txt('VA PARVARISH',540,1000,40,{w:800,c:INK,a:sk,ls:lerp(30,14,sk)})}
-  ctx.restore()}
+  ctx.restore();
+  // "Kosmetika": letters rise with tracking that tightens; from T.head the headline takes this exact word over as its first line
+  const word=HW;if(t>=T.word&&t<T.head){const u=t-T.word,ls=lerp(60,0,E.out(clamp(u/1.1)));const z=HZ(),wv=tw(word,z,600,'Playfair',true,ls);let x=540-wv/2;
+    [...word].forEach((ch,i)=>{const k=E.out(P(u,i*.06,.6)),cw=tw(ch,z,600,'Playfair',true)+ls;ctx.save();ctx.beginPath();ctx.rect(0,700-z*.85,W,z*1.6);ctx.clip();txt(ch,x+cw/2-ls/2,700+(1-k)*z*.9,z,{f:'Playfair',it:true,w:600,c:ROSE});ctx.restore();x+=cw})}}
+const HW='Kosmetika';const HZ=()=>fit(HW,960,210,600,'Playfair',true);
 
 // ---------------------------------------------------------------- S2 headline (held ~3 s)
 function headline(t){if(t<T.head)return;const out=E.io(P(t,T.phone-.1,.5)),move=E.io(P(t,T.phone-.1,.6));
-  const L=[['Kosmetika',ROSE,'Playfair',true,600,170],['va parvarish vositalarini',INK,'Montserrat',false,800,76],['yetkazib beramiz',WH,'Montserrat',false,900,92,ROSE]];
-  L.forEach(([s,c,f,it,w,z0,hl],i)=>{const t0=T.head+i*.28,k=E.out(P(t,t0,.7));if(t<t0)return;const z=fit(s,960,z0,w,f,it);const y=lerp([700,860,990][i],[270,380,475][i],move),sc=lerp(1,[.62,.82,.82][i],move);
+  const L=[[HW,ROSE,'Playfair',true,600,210],['va parvarish vositalarini',INK,'Montserrat',false,800,76],['yetkazib beramiz',WH,'Montserrat',false,900,92,ROSE]];
+  L.forEach(([s,c,f,it,w,z0,hl],i)=>{const t0=T.head+Math.max(0,i-1)*.32,k=i===0?1:E.out(P(t,t0,.7));if(t<t0)return;const z=fit(s,960,z0,w,f,it);const y=lerp([700,870,1000][i],[270,380,475][i],move),sc=lerp(1,[.6,.82,.82][i],move);
     ctx.save();ctx.translate(540,y+(1-k)*60);ctx.scale(sc,sc);ctx.globalAlpha=k*(1-out*0);if(hl){const ww=tw(s,z,w,f,it)+70,hk=E.out(P(t,t0+.35,.5));ctx.fillStyle=hl;rr(-ww/2,-z*.7,ww*hk,z*1.4,z*.7);ctx.fill()}
     txt(s,0,4,z,{f,it,w,c});ctx.restore()});
   if(t>=T.bul-.5){} }
@@ -91,13 +90,13 @@ function bullets(t){if(t<T.bul||t>=T.cta+.2)return;const u=t-T.bul,i=Math.min(2,
   ctx.save();ctx.globalAlpha=1-out;txt('*Yetkazish vaqti va ish tartibi hudud va buyurtmaga qarab farq qilishi mumkin.',540,1650,21,{w:600,f:'Inter',c:'rgba(42,22,38,.6)'});ctx.restore()}
 
 // ---------------------------------------------------------------- S5 CTA (held ~2 s)
-function cta(t){if(t<T.cta)return;const u=t-T.cta;logo(540,700,260,E.out(P(u,0,.4)),E.out(P(u,.05,.7)));
-  for(let r=0;r<2;r++){const q=P(u,.25+r*.1,1.0);if(q>0&&q<1){ctx.save();ctx.strokeStyle=r?GOLD:ROSE;ctx.globalAlpha=(1-q)*.8;ctx.lineWidth=5*(1-q)+1.5;ctx.beginPath();ctx.arc(540,700,170+E.out(q)*420,0,7);ctx.stroke();ctx.restore()}}
-  const nk=E.out(P(u,.4,.7));txt('Davo Delivery',540,920+(1-nk)*40,104,{c:INK,a:nk});txt('Go‘zallik — eshigingizgacha',540,1020,52,{f:'Playfair',it:true,w:600,c:ROSE,a:E.out(P(u,.7,.6))});
-  const bk=E.out(P(u,1.0,.6));ctx.save();ctx.globalAlpha=bk;ctx.translate(540,1200+(1-bk)*40);ctx.fillStyle=BLUE;ctx.shadowColor='rgba(47,107,255,.35)';ctx.shadowBlur=40;rr(-420,-74,840,148,74);ctx.fill();ctx.shadowColor='transparent';
+function cta(t){if(t<T.cta)return;const u=t-T.cta;logo(540,720,260,E.out(P(u,0,.4)),E.out(P(u,.05,.7)));
+  for(let r=0;r<2;r++){const q=P(u,.25+r*.1,1.0);if(q>0&&q<1){ctx.save();ctx.strokeStyle=r?GOLD:ROSE;ctx.globalAlpha=(1-q)*.8;ctx.lineWidth=5*(1-q)+1.5;ctx.beginPath();ctx.arc(540,720,170+E.out(q)*420,0,7);ctx.stroke();ctx.restore()}}
+  const nk=E.out(P(u,.4,.7));txt('Davo Delivery',540,920+(1-nk)*40,104,{c:INK,a:nk});
+  const bk=E.out(P(u,1.0,.6));ctx.save();ctx.globalAlpha=bk;ctx.translate(540,1110+(1-bk)*40);ctx.fillStyle=BLUE;ctx.shadowColor='rgba(47,107,255,.35)';ctx.shadowBlur=40;rr(-420,-74,840,148,74);ctx.fill();ctx.shadowColor='transparent';
   const sh=P(u,1.8,.8);if(sh>0&&sh<1){ctx.save();rr(-420,-74,840,148,74);ctx.clip();const x=lerp(-560,560,sh),g=ctx.createLinearGradient(x-90,0,x+90,0);g.addColorStop(0,'rgba(255,255,255,0)');g.addColorStop(.5,'rgba(255,255,255,.5)');g.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=g;ctx.fillRect(-420,-74,840,148);ctx.restore()}
   txt('Ilovani yuklab oling',0,4,58,{w:800,c:WH});ctx.restore();
-  const sk=E.out(P(u,1.3,.5));['App Store','Google Play'].forEach((s,i)=>{const x=i?700:380;ctx.save();ctx.globalAlpha=sk;rr(x-150,1330,300,68,34);ctx.fillStyle=INK;ctx.fill();txt(s,x,1365,32,{w:700,f:'Inter',c:WH});ctx.restore()});
+  const sk=E.out(P(u,1.3,.5));['App Store','Google Play'].forEach((s,i)=>{const x=i?700:380;ctx.save();ctx.globalAlpha=sk;rr(x-150,1240,300,68,34);ctx.fillStyle=INK;ctx.fill();txt(s,x,1275,32,{w:700,f:'Inter',c:WH});ctx.restore()});
   txt('*Yetkazish vaqti va ish tartibi hudud va buyurtmaga qarab farq qilishi mumkin.',540,1650,21,{w:600,f:'Inter',c:'rgba(42,22,38,.6)',a:sk})}
 
 function draw(t){ctx.setTransform(1,0,0,1,0,0);bg(t);hook(t);
