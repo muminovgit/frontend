@@ -1,0 +1,141 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Davo — Motion 5 "Bolalar"</title><style>
+@font-face{font-family:"Montserrat";src:url(assets/fonts/Montserrat-600.woff2);font-weight:600}
+@font-face{font-family:"Montserrat";src:url(assets/fonts/Montserrat-800.woff2);font-weight:800}
+@font-face{font-family:"Montserrat";src:url(assets/fonts/Montserrat-900.woff2);font-weight:900}
+@font-face{font-family:"Inter";src:url(assets/fonts/Inter-600.woff2);font-weight:600}
+@font-face{font-family:"Inter";src:url(assets/fonts/Inter-700.woff2);font-weight:700}
+html,body{margin:0;background:#000;width:1080px;height:1920px;overflow:hidden}canvas{display:block}</style></head><body><canvas id="out" width="1080" height="1920"></canvas>
+<script src="lib/three.global.js"></script>
+<script>
+// Davo Delivery — Motion 5 "Bolalar" (18 s, slow pacing: every line holds >= 1.25 s).
+// Concept: TOY BOX. 3D alphabet blocks drop and spell BOLALAR, soap bubbles drift, the app's real "Yosh bolalar uchun"
+// screen sits in a 3D phone while product cards orbit it like a carousel. 3D (Three.js, offscreen) + 2D type,
+// composited into one canvas per frame. Every pixel = f(t).
+const W=1080,H=1920,DUR=18;
+const Y='#ffce68',PK='#fb4669',VI='#5e3a9a',G='#01bdac',BLUE='#2f6bff',WH='#ffffff',INK='#1d2340',SKY='#e8f4ff',CREAM='#fff7ec';
+const T={blocks:0,head:2.9,phone:6.1,bul:11.4,cta:15.2};
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),P=(t,s,d)=>clamp((t-s)/d),lerp=(a,b,k)=>a+(b-a)*k;
+const E={out:k=>1-Math.pow(1-k,3),in:k=>k*k*k,io:k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2,sine:k=>.5-.5*Math.cos(Math.PI*k),expo:k=>k>=1?1:1-Math.pow(2,-10*k),back:k=>{const c=1.6;return 1+(c+1)*Math.pow(k-1,3)+c*Math.pow(k-1,2)}};
+function spring(t,f=2.4,z=.5){if(t<=0)return 0;const w=2*Math.PI*f,wd=w*Math.sqrt(1-z*z);return 1-Math.exp(-z*w*t)*(Math.cos(wd*t)+z*w/wd*Math.sin(wd*t))}
+function rnd(i){const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)}
+const OUT=document.getElementById('out').getContext('2d');const mk=()=>{const c=document.createElement('canvas');c.width=W;c.height=H;return c};const LG=mk();const IM={};
+const F=(w,s,f='Montserrat')=>`${w} ${s}px "${f}"`;
+function txt(c,s,x,y,size,o={}){c.save();c.globalAlpha*=o.a??1;c.font=F(o.w??900,size,o.f);c.textAlign=o.al??'center';c.textBaseline='middle';c.fillStyle=o.c??INK;c.fillText(s,x,y);c.restore()}
+function tw(c,s,size,w=900,f='Montserrat'){c.save();c.font=F(w,size,f);const v=c.measureText(s).width;c.restore();return v}
+function fit(c,s,maxW,start,w=900){let z=start;while(tw(c,s,z,w)>maxW&&z>20)z-=2;return z}
+function rr(c,x,y,w,h,r){c.beginPath();c.roundRect(x,y,w,h,r)}
+function check(c,x,y,s,k,col,lw){if(k<=0)return;c.save();c.strokeStyle=col;c.lineWidth=lw;c.lineCap='round';c.lineJoin='round';const p=[[-.5,0],[-.15,.35],[.55,-.4]],L1=Math.hypot(.35,.35),L2=Math.hypot(.7,.75),tot=(L1+L2)*k;
+  c.beginPath();c.moveTo(x+p[0][0]*s,y+p[0][1]*s);if(tot<=L1){const q=tot/L1;c.lineTo(x+lerp(p[0][0],p[1][0],q)*s,y+lerp(p[0][1],p[1][1],q)*s)}else{c.lineTo(x+p[1][0]*s,y+p[1][1]*s);const q=(tot-L1)/L2;c.lineTo(x+lerp(p[1][0],p[2][0],q)*s,y+lerp(p[1][1],p[2][1],q)*s)}c.stroke();c.restore()}
+function cross(c,u){const a=10.5*u,b=29*u;c.beginPath();c.moveTo(-a,-b);c.lineTo(a,-b);c.lineTo(a,-a);c.lineTo(b,-a);c.lineTo(b,a);c.lineTo(a,a);c.lineTo(a,b);c.lineTo(-a,b);c.lineTo(-a,a);c.lineTo(-b,a);c.lineTo(-b,-a);c.lineTo(-a,-a);c.closePath()}
+function logo2d(c,x,y,s,a=1,bloom=1){c.save();c.globalAlpha*=a;c.translate(x,y);c.fillStyle=WH;c.shadowColor='rgba(29,35,64,.18)';c.shadowBlur=s*.2;c.shadowOffsetY=s*.06;rr(c,-s/2,-s/2,s,s,s*.24);c.fill();c.shadowColor='transparent';const u=s/131;
+  [[Y,-1,-1],[PK,1,-1],[VI,-1,1],[G,1,1]].forEach(([col,sx,sy],i)=>{const k=clamp(bloom*1.5-i*.12);if(k<=0)return;c.fillStyle=col;c.beginPath();c.arc(sx*20*u*k,sy*20*u*k,28.5*u*E.out(k),0,7);c.fill()});c.fillStyle=WH;c.save();const cc=clamp(bloom*1.3-.3);c.scale(cc,cc);cross(c,u);c.fill();c.restore();c.restore()}
+
+// ================================================================ 3D world
+const renderer=new THREE.WebGLRenderer({canvas:LG,antialias:true,alpha:true,preserveDrawingBuffer:true});renderer.setPixelRatio(1);renderer.setSize(W,H,false);renderer.setClearColor(0,0);
+renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
+const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(36,W/H,.05,200);
+scene.add(new THREE.HemisphereLight(0xffffff,0xffe2c8,1.25));const key=new THREE.DirectionalLight(0xfff4e6,2.3);key.position.set(4,8,6);scene.add(key);const rim=new THREE.DirectionalLight(0xcfe6ff,1.2);rim.position.set(-5,3,-4);scene.add(rim);
+const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+const M=(c,o={})=>new THREE.MeshStandardMaterial({color:c,roughness:o.r??.45,metalness:0,map:o.map??null,transparent:!!o.op,opacity:o.op??1,emissive:o.e??0,emissiveIntensity:o.ei??1,depthWrite:o.dw??true});
+function canvasTex(w,h,draw){const c=document.createElement('canvas');c.width=w;c.height=h;draw(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=8;return t}
+// alphabet blocks
+const WORD='BOLALAR',BC=['#ffce68','#fb4669','#01bdac','#7c5cff','#2f6bff','#ff9a3c','#5e3a9a'];
+function faceTex(ch,col,i){return canvasTex(256,256,(c,w,h)=>{c.fillStyle=col;c.fillRect(0,0,w,h);c.fillStyle='rgba(255,255,255,.9)';rr(c,18,18,w-36,h-36,30);c.fill();c.fillStyle=col;rr(c,30,30,w-60,h-60,24);c.fill();
+  if(ch){c.fillStyle=WH;c.font=F(900,170);c.textAlign='center';c.textBaseline='middle';c.fillText(ch,w/2,h/2+10)}else{c.fillStyle='rgba(255,255,255,.85)';c.beginPath();if(i%2){c.arc(w/2,h/2,52,0,7)}else{c.moveTo(w/2,h/2-60);c.lineTo(w/2+60,h/2+48);c.lineTo(w/2-60,h/2+48);c.closePath()}c.fill()}})}
+const BLOCKS=[...WORD].map((ch,i)=>{const col=BC[i];const side=new THREE.MeshStandardMaterial({map:faceTex('',col,i),roughness:.5});const front=new THREE.MeshStandardMaterial({map:faceTex(ch,col,i),roughness:.5});
+  const m=new THREE.Mesh(new THREE.BoxGeometry(1,1,1),[side,side,side,side,front,side]);scene.add(m);return m});
+// floor shadow discs (soft contact shadows without a shadow map)
+const shTex=canvasTex(128,128,(c)=>{const g=c.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,'rgba(60,40,90,.35)');g.addColorStop(1,'rgba(60,40,90,0)');c.fillStyle=g;c.fillRect(0,0,128,128)});
+const SHADOWS=BLOCKS.map(()=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(1.6,1.6),new THREE.MeshBasicMaterial({map:shTex,transparent:true,depthWrite:false}));m.rotation.x=-Math.PI/2;scene.add(m);return m});
+// soap bubbles
+const bubTex=canvasTex(256,256,(c)=>{const g=c.createRadialGradient(128,128,90,128,128,128);g.addColorStop(0,'rgba(255,255,255,0)');g.addColorStop(.75,'rgba(190,225,255,.25)');g.addColorStop(.9,'rgba(255,190,230,.6)');g.addColorStop(1,'rgba(255,255,255,0)');c.fillStyle=g;c.fillRect(0,0,256,256);
+  c.fillStyle='rgba(255,255,255,.85)';c.beginPath();c.ellipse(90,80,26,14,-.6,0,7);c.fill()});
+const BUBS=Array.from({length:16},(_,i)=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:bubTex,transparent:true,depthWrite:false}));scene.add(s);return s});
+// phone with the real app screen
+const PH=new THREE.Group();PH.add(new THREE.Mesh(new THREE.BoxGeometry(3.3,6.7,.3),M(0x1a1d2a,{r:.35})));
+const screenMat=new THREE.MeshBasicMaterial({color:0xffffff});const screen=new THREE.Mesh(new THREE.PlaneGeometry(3.08,6.48),screenMat);screen.position.z=.155;PH.add(screen);scene.add(PH);
+// product cards (generic, drawn — no third-party brands) orbiting the phone
+const PROD=[['Podguzniklar','yumshoq va quruq',BLUE],['Pelyonkalar','bir martalik',G],['Nam salfetkalar','spirtsiz',Y],['Bolalar kremi','parvarish uchun',PK],['Butilka','so‘rg‘ichli',VI]];
+function drawProduct(c,i,x,y,s){c.save();c.translate(x,y);c.scale(s,s);const col=PROD[i][2];
+  if(i===0){c.fillStyle=col;rr(c,-90,-110,180,220,26);c.fill();c.fillStyle='rgba(255,255,255,.9)';c.beginPath();c.moveTo(-60,-30);c.quadraticCurveTo(0,10,60,-30);c.lineTo(48,50);c.quadraticCurveTo(0,80,-48,50);c.closePath();c.fill();c.fillStyle=Y;c.beginPath();c.arc(0,-70,18,0,7);c.fill()}
+  if(i===1){[0,1,2].forEach(k=>{c.fillStyle=['#bff1eb','#7fe0d4',col][k];rr(c,-100,30-k*46,200,52,16);c.fill();c.fillStyle='rgba(255,255,255,.6)';c.fillRect(-100,52-k*46,200,4)})}
+  if(i===2){c.fillStyle=col;rr(c,-110,-70,220,150,50);c.fill();c.fillStyle='rgba(255,255,255,.95)';c.beginPath();c.ellipse(0,-10,56,26,0,0,7);c.fill();c.fillStyle='rgba(29,35,64,.15)';c.beginPath();c.ellipse(0,-10,40,14,0,0,7);c.fill()}
+  if(i===3){c.save();c.rotate(-.35);c.fillStyle=WH;c.strokeStyle='rgba(29,35,64,.12)';c.lineWidth=4;rr(c,-46,-110,92,190,30);c.fill();c.stroke();c.fillStyle=col;rr(c,-46,-40,92,60,8);c.fill();c.fillStyle=Y;rr(c,-30,80,60,44,10);c.fill();c.restore()}
+  if(i===4){c.fillStyle='rgba(255,255,255,.95)';c.strokeStyle='rgba(29,35,64,.12)';c.lineWidth=4;rr(c,-56,-60,112,170,40);c.fill();c.stroke();c.fillStyle=col;rr(c,-60,-84,120,34,12);c.fill();c.fillStyle='#ffd6a8';c.beginPath();c.ellipse(0,-112,26,34,0,0,7);c.fill();
+    c.strokeStyle='rgba(124,92,255,.35)';c.lineWidth=5;for(let k=0;k<3;k++){c.beginPath();c.moveTo(-30,0+k*30);c.lineTo(-10,0+k*30);c.stroke()}}
+  c.restore()}
+const CARDS=PROD.map((p,i)=>{const tex=canvasTex(512,640,(c,w,h)=>{c.fillStyle=WH;rr(c,0,0,w,h,48);c.fill();c.fillStyle=CREAM;rr(c,24,24,w-48,360,36);c.fill();
+  const g=c.createRadialGradient(w/2,200,10,w/2,200,180);g.addColorStop(0,p[2]+'55');g.addColorStop(1,p[2]+'00');c.fillStyle=g;c.fillRect(24,24,w-48,360);drawProduct(c,i,w/2,210,1.25);
+  txt(c,p[0],w/2,450,fit(c,p[0],440,52),{c:INK});txt(c,p[1],w/2,505,30,{w:600,f:'Inter',c:'#7a8099'});c.fillStyle='rgba(1,189,172,.14)';rr(c,w/2-120,546,240,54,27);c.fill();txt(c,'✓ mavjud',w/2,574,28,{w:700,f:'Inter',c:'#01857a'})});
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(2.0,2.5),new THREE.MeshBasicMaterial({map:tex,transparent:true}));scene.add(m);return m});
+function look(p,tg,fov=36){cam.position.copy(p);cam.fov=fov;cam.lookAt(tg);cam.updateProjectionMatrix()}
+
+// ================================================================ backdrop (2D, painted straight into OUT)
+function bgPaint(c,t){const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#dff0ff');g.addColorStop(.55,'#fff3e6');g.addColorStop(1,'#ffe7ef');c.fillStyle=g;c.fillRect(-40,-40,W+80,H+80);
+  // paper-cut clouds and confetti dots
+  c.save();c.globalAlpha=.9;[[160,330,1],[880,520,.8],[300,1580,1.1]].forEach(([x,y,s],i)=>{const dx=Math.sin(t*.35+i)*30;c.fillStyle=WH;c.beginPath();[[0,0,80],[70,-25,60],[130,5,70],[60,25,70]].forEach(([a,b,r])=>{c.moveTo(x+dx+a*s+r*s,y+b*s);c.arc(x+dx+a*s,y+b*s,r*s,0,7)});c.fill()});c.restore();
+  for(let i=0;i<26;i++){const x=rnd(i)*W,y=(rnd(i+9)*H+t*(20+rnd(i+3)*30))%H;c.fillStyle=BC[i%7];c.globalAlpha=.35;c.beginPath();c.arc(x,y,4+rnd(i+5)*6,0,7);c.fill()}c.globalAlpha=1}
+
+// ================================================================ frame
+function draw(t){
+  let sx=0,sy=0;for(let i=0;i<7;i++){const d=t-(.18+i*.3+.38);if(d<0||d>.4)continue;const e=7*Math.exp(-d*14);sx+=e*Math.sin(d*90);sy+=e*Math.cos(d*70)}
+  OUT.setTransform(1,0,0,1,sx,sy);bgPaint(OUT,t);
+  // ---------------- 3D state
+  BLOCKS.forEach(b=>b.visible=false);SHADOWS.forEach(s=>s.visible=false);BUBS.forEach(b=>b.visible=false);PH.visible=false;CARDS.forEach(c=>c.visible=false);
+  if(t<T.phone+.2){ // blocks drop one by one, land with squash, then step back as the headline arrives
+    const rec=E.io(P(t,T.head-.2,1.1)),gone=E.io(P(t,T.phone-.4,.6));
+    BLOCKS.forEach((b,i)=>{const t0=.18+i*.3,d=t-t0;if(d<0)return;b.visible=gone<1;const tf=.38,x=(i-3)*1.08;let y,sq=1;
+      if(d<tf){y=lerp(7,.5,(d/tf)**2)}else{const q=d-tf;y=.5+.9*Math.exp(-q*6)*Math.abs(Math.sin(q*10));sq=1-.22*Math.exp(-q*14)*Math.cos(q*28)}
+      const wob=Math.exp(-Math.max(0,d-tf)*3)*Math.sin(d*12)*.25;b.position.set(x,y+(i%2?0:0),lerp(0,-1.5,rec)+(i%2?.12:-.12)*rec);b.scale.set(1/Math.sqrt(sq),sq,1/Math.sqrt(sq));b.rotation.set(lerp((1-clamp(d/tf))*1.2,0,1)*0+wob*.4,(i-3)*.05*rec+wob,(i%2?1:-1)*.06*rec);
+      if(gone>0){b.position.y=y-gone*4;b.rotation.z+=gone*(i%2?1.2:-1.2)}
+      const s=SHADOWS[i];s.visible=gone<1;s.position.set(x,.005,b.position.z);s.scale.setScalar(lerp(.4,1,clamp(1-(y-.5)/6)))});
+    BUBS.forEach((b,i)=>{const t0=1.2+i*.22;if(t<t0)return;b.visible=true;const d=t-t0,s=(.35+rnd(i)*.6)*E.out(clamp(d/.4));b.scale.setScalar(s);b.position.set((rnd(i+1)-.5)*12+Math.sin(d*1.3+i)*.5,1.5+d*(1.2+rnd(i+2)*.8),(rnd(i+3)-.5)*4);b.scale.multiplyScalar(2.2);b.material.opacity=1-P(d,3.2,.8)});
+    const cur=Math.min(6,Math.max(0,(t-.18-.3)/.3)),rev=E.io(P(t,2.2,.75)),cx=(cur-3)*1.08*(1-rev);look(V(cx,lerp(lerp(2.0,2.6,rev),7.5,rec),lerp(lerp(13.5,21,rev),30,rec)),V(cx,lerp(.8,-2.6,rec),0),36)}
+  else{ // phone with the real screen; product cards orbit it and stop in front one after another
+    const u=t-T.phone,land=E.expo(P(u,0,.8)),out=E.io(P(t,T.bul-.35,.6));PH.visible=true;
+    PH.position.set(0,lerp(-8,-1.75,land)-out*8,0);PH.rotation.set(lerp(-.6,-.06,land)+Math.sin(u*.9)*.02,lerp(.8,-.18,land)+Math.sin(u*.7)*.04,lerp(.2,.02,land));
+    const step=Math.max(0,(u-1.3)/0.75),idx=Math.floor(step),fr=step-idx,ang=-(idx+E.io(clamp((fr-.45)/.55)))*(Math.PI*2/5);
+    CARDS.forEach((c,i)=>{if(u<1.0)return;c.visible=out<1;const a=ang+i*(Math.PI*2/5),R=3.1,app=E.out(P(u,1.0+i*.06,.6));const front=Math.cos(a);
+      c.position.set(Math.sin(a)*R*app,lerp(-1.9,-.9,app)-out*8+Math.sin(u*1.4+i)*.06,Math.cos(a)*R*app+.6);c.rotation.set(0,a*.35,0);c.scale.setScalar((.55+.45*clamp(front*1.1))*app);c.renderOrder=front>0?2:0;c.material.opacity=lerp(.55,1,clamp(front))});
+    look(V(0,.6,lerp(16,11.5,land)),V(0,.25,0),40)}
+  renderer.render(scene,cam);OUT.drawImage(LG,0,0);
+
+  // ---------------- 2D type
+  const O=OUT;
+  // hook caption under the blocks
+  if(t<T.head){const k=E.out(P(t,2.35,.5));txt(O,'Chaqaloq va bolalar uchun',540,1290,56,{w:800,c:INK,a:k})}
+  // headline (held ~3 s)
+  if(t>=T.head&&t<T.bul){const out=E.io(P(t,T.phone-.2,.5)),mv=E.io(P(t,T.phone-.2,.7));const L=[['Chaqaloq va bolalar',INK,0],['parvarish vositalarini',INK,0],['yetkazib beramiz',WH,PK]];
+    L.forEach(([s,c,hl],i)=>{const t0=T.head+i*.3,k=E.out(P(t,t0,.6)),kk=spring(t-t0,2.2,.5);if(t<t0)return;const z=fit(O,s,940,i===2?100:96);const y=lerp(1230+i*120,[270,370,470][i],mv),sc=lerp(1,.78,mv);
+      O.save();O.translate(540,y+(1-k)*50);O.scale(sc*lerp(.6,1,Math.min(1.1,kk)),sc*lerp(.6,1,Math.min(1.1,kk)));O.globalAlpha=k;if(hl){const ww=tw(O,s,z)+60;O.fillStyle=hl;rr(O,-ww/2,-z*.66,ww*E.out(P(t,t0+.3,.45)),z*1.32,z*.66);O.fill()}txt(O,s,0,4,z,{c});O.restore()});
+    if(t>=T.phone+1.3){const step=Math.max(0,(t-T.phone-1.3)/.75),idx=Math.floor(step)%5,a=E.out(P(step-Math.floor(step),.5,.3));const s=PROD[(idx+1)%5][0];
+      O.save();O.globalAlpha=(1-E.io(P(t,T.bul-.35,.4)));rr(O,540-230,1640,460,76,38);O.fillStyle='rgba(29,35,64,.82)';O.fill();txt(O,'Ilovada: '+PROD[step-Math.floor(step)>.7?(idx+1)%5:idx][0],540,1679,32,{w:800,c:WH});O.restore()}}
+  // bullets (each ~1.25 s)
+  if(t>=T.bul&&t<T.cta+.2){const BUL=[['Faqat litsenziyali','mahsulotlar',G],['Eng arzonini','tanlang',Y],['24/7*','yetkazib berish',PK]];const u=t-T.bul,i=Math.min(2,Math.floor(u/1.25)),v=u-i*1.25,out=E.io(P(t,T.cta-.3,.5));const [a,b,col]=BUL[i];
+    const k=E.out(P(v,0,.5)),ko=i<2?E.io(P(v,1.0,.25)):0;O.save();O.globalAlpha=k*(1-ko)*(1-out);O.translate(0,(1-k)*80-ko*80);
+    // a toy block carries the check mark
+    O.save();O.translate(540,820);O.rotate(Math.sin(v*4)*.05*(1-k)+(1-k)*.4);const bs=lerp(.4,1,E.back(clamp(v/.5)));O.scale(bs,bs);O.fillStyle=col;rr(O,-80,-80,160,160,28);O.fill();O.fillStyle='rgba(255,255,255,.9)';rr(O,-66,-66,132,132,22);O.fill();O.fillStyle=col;rr(O,-56,-56,112,112,18);O.fill();check(O,0,6,70,P(v,.2,.35),WH,12);O.restore();
+    txt(O,a,540,1000,fit(O,a,940,100),{c:INK});txt(O,b,540,1110,fit(O,b,940,76,800),{w:800,c:INK});O.restore();
+    for(let j=0;j<3;j++){O.fillStyle=j<=i?PK:'rgba(251,70,105,.25)';rr(O,540-84+j*60,1220,44,10,5);O.fill()}
+    txt(O,'*Yetkazish vaqti va ish tartibi hudud va buyurtmaga qarab farq qilishi mumkin.',540,1650,21,{w:600,f:'Inter',c:'rgba(29,35,64,.6)',a:1-out})}
+  // CTA
+  if(t>=T.cta){const u=t-T.cta;logo2d(O,540,720,260,E.out(P(u,0,.4)),E.out(P(u,.05,.7)));
+    for(let r=0;r<2;r++){const q=P(u,.25+r*.1,1.0);if(q>0&&q<1){O.save();O.strokeStyle=r?Y:PK;O.globalAlpha=(1-q)*.8;O.lineWidth=6*(1-q)+1.5;O.beginPath();O.arc(540,720,170+E.out(q)*420,0,7);O.stroke();O.restore()}}
+    const nk=E.out(P(u,.4,.7));txt(O,'Davo Delivery',540,930+(1-nk)*40,104,{c:INK,a:nk});
+    const bk=E.out(P(u,.9,.6));O.save();O.globalAlpha=bk;O.translate(540,1110+(1-bk)*40);O.fillStyle=BLUE;O.shadowColor='rgba(47,107,255,.35)';O.shadowBlur=40;rr(O,-420,-74,840,148,74);O.fill();O.shadowColor='transparent';
+    const sh=P(u,1.7,.8);if(sh>0&&sh<1){O.save();rr(O,-420,-74,840,148,74);O.clip();const x=lerp(-560,560,sh),g=O.createLinearGradient(x-90,0,x+90,0);g.addColorStop(0,'rgba(255,255,255,0)');g.addColorStop(.5,'rgba(255,255,255,.5)');g.addColorStop(1,'rgba(255,255,255,0)');O.fillStyle=g;O.fillRect(-420,-74,840,148);O.restore()}
+    txt(O,'Ilovani yuklab oling',0,4,58,{w:800,c:WH});O.restore();
+    const sk=E.out(P(u,1.2,.5));['App Store','Google Play'].forEach((s,i)=>{const x=i?700:380;O.save();O.globalAlpha=sk;rr(O,x-150,1240,300,68,34);O.fillStyle=INK;O.fill();txt(O,s,x,1275,32,{w:700,f:'Inter',c:WH});O.restore()});
+    txt(O,'*Yetkazish vaqti va ish tartibi hudud va buyurtmaga qarab farq qilishi mumkin.',540,1650,21,{w:600,f:'Inter',c:'rgba(29,35,64,.6)',a:sk})}
+  OUT.setTransform(1,0,0,1,0,0);
+  const f=E.in(P(t,DUR-.35,.35));if(f>0){OUT.globalAlpha=f;OUT.fillStyle='#fff3e6';OUT.fillRect(0,0,W,H);OUT.globalAlpha=1}}
+function loadImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src})}
+window.ready=(async()=>{await Promise.all(['900 90px Montserrat','800 90px Montserrat','600 30px Inter','700 30px Inter'].map(f=>document.fonts.load(f,"Oʻ‘’'✓")));
+  IM.scr=await loadImg('assets/screens/bolalar-category.png');const st=new THREE.CanvasTexture((()=>{const c=document.createElement('canvas');c.width=786;c.height=1652;c.getContext('2d').drawImage(IM.scr,0,0,786,1652,0,0,786,1652);return c})());st.colorSpace=THREE.SRGBColorSpace;screenMat.map=st;screenMat.needsUpdate=true;
+  // rebuild card + block textures now that fonts are loaded
+  CARDS.forEach((m,i)=>{const p=PROD[i];m.material.map=canvasTex(512,640,(c,w,h)=>{c.fillStyle=WH;rr(c,0,0,w,h,48);c.fill();c.fillStyle=CREAM;rr(c,24,24,w-48,360,36);c.fill();const g=c.createRadialGradient(w/2,200,10,w/2,200,180);g.addColorStop(0,p[2]+'55');g.addColorStop(1,p[2]+'00');c.fillStyle=g;c.fillRect(24,24,w-48,360);drawProduct(c,i,w/2,210,1.25);
+    txt(c,p[0],w/2,450,fit(c,p[0],440,52),{c:INK});txt(c,p[1],w/2,505,30,{w:600,f:'Inter',c:'#7a8099'});c.fillStyle='rgba(1,189,172,.14)';rr(c,w/2-120,546,240,54,27);c.fill();txt(c,'✓ mavjud',w/2,574,28,{w:700,f:'Inter',c:'#01857a'})});m.material.needsUpdate=true});
+  BLOCKS.forEach((b,i)=>{b.material[4].map=faceTex(WORD[i],BC[i],i);b.material[4].needsUpdate=true});
+  draw(0);return true})();
+window.seek=t=>{draw(Math.min(Math.max(t,0),DUR-1e-4));return new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))};window.DUR=DUR;
+</script></body></html>
