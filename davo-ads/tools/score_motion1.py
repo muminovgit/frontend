@@ -2,11 +2,13 @@
 import subprocess, sys, numpy as np, wave, os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 args = [a for a in sys.argv[1:] if not a.startswith("--")]; gain = float(args[0]) if args else 0.0
+# --slow: 0.8x picture -> every event lands 1.25x later; sounds keep their natural length/pitch, tempo drops 124 -> ~99 BPM
+STRETCH = 1.25 if "--slow" in sys.argv else 1.0
 T = dict(pull=2.75, a1=3.2, a2=4.9, a3=6.6, a4=9.0, a5=11.0, cta=13.0); DUR = 15.0
-SR = 48000; N = int(SR * DUR); L = np.zeros(N); R = np.zeros(N); rng = np.random.default_rng(9)
+SR = 48000; N = int(SR * DUR * STRETCH); L = np.zeros(N); R = np.zeros(N); rng = np.random.default_rng(9)
 def ts(d): return np.arange(int(d * SR)) / SR
 def add(sig, t0, g=1.0, pan=0.0):
-    i = int(round(t0 * SR)); j = min(N, i + len(sig))
+    i = int(round(t0 * STRETCH * SR)); j = min(N, i + len(sig))
     if j <= i or i >= N: return
     a = max(0, i); s = sig[a - i:j - i]; L[a:j] += s * g * (1 - pan); R[a:j] += s * g * (1 + pan)
 def lp(x, a):
@@ -17,8 +19,8 @@ def hp(x, a): return x - lp(x, a)
 def nf(m): return 440 * 2 ** ((m - 69) / 12)
 def noise(d): return rng.standard_normal(int(d * SR))
 # --- overthinking bed: detuned drone + accelerating ticking clock + rising heartbeat
-t = ts(T["a1"]); drone = sum(np.sin(2 * np.pi * nf(m) * (1 + .004 * k) * t) for k, m in enumerate([45, 52, 56, 51])) / 4
-add(lp(drone, .05) * np.minimum(1, t / .5) * (.5 + .5 * t / T["a1"]) * .22, 0)
+t = ts(T["a1"] * STRETCH); drone = sum(np.sin(2 * np.pi * nf(m) * (1 + .004 * k) * t) for k, m in enumerate([45, 52, 56, 51])) / 4
+add(lp(drone, .05) * np.minimum(1, t / .5) * (.5 + .5 * t / (T["a1"] * STRETCH)) * .22, 0)
 tt = 0.0; i = 0
 while tt < T["pull"]:
     x = ts(.03); add(hp(noise(.03), .5) * np.exp(-x * 200) * (.10 if i % 2 else .14), tt, pan=.4 if i % 2 else -.4)
@@ -89,13 +91,14 @@ if "--no-vo" not in sys.argv:
     for name, t0, g, pan in [("q1", .25, .75, -.35), ("q2", .95, .7, .35), ("q3", 1.5, .7, -.3), ("q4", 1.95, .7, .3),
                              ("a1", 3.3, .9, 0), ("a2", 5.0, .9, 0), ("a3", 6.75, .9, 0), ("a4", 9.1, .9, 0), ("a5", 11.1, .9, 0), ("a6", 12.98, .9, 0)]:
         x = loadw(os.path.join(ROOT, f"audio/vo3/{name}.wav")); x = x / np.abs(x).max() * g
-        a = int(t0 * SR); b = min(N, a + len(x)); vL[a:b] += x[:b - a, 0] * (1 - pan); vR[a:b] += x[:b - a, 1] * (1 + pan)
+        a = int(t0 * STRETCH * SR); b = min(N, a + len(x)); vL[a:b] += x[:b - a, 0] * (1 - pan); vR[a:b] += x[:b - a, 1] * (1 + pan)
 env = np.abs(vL) + np.abs(vR); kk = int(.12 * SR); env = np.convolve(env, np.ones(kk) / kk, "same"); env = np.convolve(env, np.ones(kk) / kk, "same")
 duck = 1 - .6 * np.clip(env / (env.max() * .25 + 1e-9), 0, 1)
 m = np.abs(np.stack([L, R], 1)).max(); L = L / m * .55 * duck + vL; R = R / m * .55 * duck + vR
 mix = np.stack([L, R], 1); fo = int(.3 * SR); mix[-fo:] *= np.linspace(1, 0, fo)[:, None]
 mix = np.tanh(mix / np.abs(mix).max() * 1.2) / np.tanh(1.2) * .9
-pre = os.path.join(ROOT, "audio/pre-motion1.wav"); out = os.path.join(ROOT, "audio/score-motion1.wav")
+tag = "-slow" if STRETCH != 1 else ""
+pre = os.path.join(ROOT, f"audio/pre-motion1{tag}.wav"); out = os.path.join(ROOT, f"audio/score-motion1{tag}.wav")
 with wave.open(pre, "wb") as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes((mix * 32767).astype("<i2").tobytes())
 r = subprocess.run(["ffmpeg", "-hide_banner", "-nostats", "-i", pre, "-af", "ebur128", "-f", "null", "-"], capture_output=True, text=True).stderr
