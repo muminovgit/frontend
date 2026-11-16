@@ -5,7 +5,7 @@
 import subprocess, sys, numpy as np, wave, os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 args = [a for a in sys.argv[1:] if not a.startswith("--")]; gain = float(args[0]) if args else 0.0
-T = dict(head=2.9, phone=6.1, bul=11.4, cta=15.2); DUR = 18.0
+T = dict(head=0, grid=.55, phone=3.1, bul=9.4, cta=13.2); DUR = 16.0
 SR = 48000; N = int(SR * DUR); L = np.zeros(N); R = np.zeros(N); rng = np.random.default_rng(55)
 def ts(d): return np.arange(int(d * SR)) / SR
 def add(sig, t0, g=1.0, pan=0.0):
@@ -45,10 +45,10 @@ def swish(tp, d=.4, g=.12, pan=0.0):
     x = ts(d); a = np.linspace(.02, .3, len(x)); n = noise(d); y = np.empty_like(n); s = 0.0
     for i, v in enumerate(n): s += a[i] * (v - s); y[i] = s
     add(y * np.sin(np.pi * x / d) ** 2 * g * 2.4, tp - d * .6, pan=pan)
-# ---- blocks: one wooden knock per landing, climbing C major; a music-box answer when the word completes
-scale = [60, 62, 64, 65, 67, 69, 72]
-for i in range(7): knock(.18 + i * .3 + .38, scale[i] + 12, .42, pan=(i - 3) * .12); rattle(.18 + i * .3 + .4, .04)
-for i, m in enumerate([84, 88, 91, 96]): musicbox(2.45 + i * .1, m, .08, pan=(i % 2 - .5) * .5)
+# ---- opening: headline words knock in, then the six real category tiles pop with a climbing xylophone
+for i in range(3): knock(.05 + i * .14, [72, 76, 79][i], .35, pan=(i - 1) * .2)
+for i in range(6): xylo(T["grid"] + i * .12 + .05, [72, 74, 76, 79, 81, 84][i], .11, pan=(i % 3 - 1) * .4); rattle(T["grid"] + i * .12 + .07, .04)
+for i, m in enumerate([84, 88, 91, 96]): musicbox(1.4 + i * .1, m, .06, pan=(i % 2 - .5) * .5)
 # ---- groove from the headline on: 96 BPM, kick / claps / rattle, nylon plucks + music-box melody
 BPM = 96; beat = 60 / BPM; t0g = T["head"]
 prog = [[60, 64, 67], [55, 59, 62], [57, 60, 64], [53, 57, 60]]
@@ -65,11 +65,9 @@ while t0g + k * beat / 2 < DUR - .5:
     k += 1
 x = ts(DUR - t0g); add(sum(np.sin(2 * np.pi * nf(m) * x) for m in [48, 55, 60]) / 3 * .04 * np.minimum(1, x / 1.5), t0g)
 # ---- events
-for i in range(16): bubble(1.2 + i * .22 + 3.0 + rng.random() * .6, .06, pan=rng.random() - .5)
-swish(T["head"] + .1, .5, .12)
-for i in range(3): xylo(T["head"] + i * .3, [72, 76, 79][i], .09)
+for i in range(6): bubble(T["phone"] - .4 + i * .05, .07, pan=rng.random() - .5)
 swish(T["phone"] + .3, .7, .16, pan=.3)
-for s in range(6): t0 = T["phone"] + 1.3 + s * .75 + .4; xylo(t0, [79, 81, 84, 86, 88, 91][s], .08, pan=.3); swish(t0 + .05, .3, .07, pan=-.3)
+for s in range(7): t0 = T["phone"] + 1.3 + s * .85 + .45; xylo(t0, [79, 81, 84, 86, 88, 91, 93][s], .08, pan=.3); swish(t0 + .05, .3, .07, pan=-.3)
 for i in range(3): t0 = T["bul"] + i * 1.25; knock(t0 + .05, [72, 76, 79][i], .3); xylo(t0 + .25, [84, 88, 91][i], .09)
 for i, m in enumerate([72, 76, 79, 84, 88, 91]): musicbox(T["cta"] + .05 + i * .08, m, .08, pan=(i % 2 - .5) * .5)
 kick(T["cta"], .6)
