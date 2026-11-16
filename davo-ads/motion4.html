@@ -1,0 +1,111 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Davo — Motion 4 "Kosmetika"</title><style>
+@font-face{font-family:"Montserrat";src:url(assets/fonts/Montserrat-600.woff2);font-weight:600}
+@font-face{font-family:"Montserrat";src:url(assets/fonts/Montserrat-800.woff2);font-weight:800}
+@font-face{font-family:"Montserrat";src:url(assets/fonts/Montserrat-900.woff2);font-weight:900}
+@font-face{font-family:"Inter";src:url(assets/fonts/Inter-600.woff2);font-weight:600}
+@font-face{font-family:"Inter";src:url(assets/fonts/Inter-700.woff2);font-weight:700}
+@font-face{font-family:"Playfair";src:url(assets/fonts/Playfair-lat.woff2);font-weight:400 900;font-style:normal}
+@font-face{font-family:"Playfair";src:url(assets/fonts/Playfair-latext.woff2);font-weight:400 900;font-style:normal;unicode-range:U+0100-024F,U+02B0-02FF,U+1E00-1EFF}
+@font-face{font-family:"Playfair";src:url(assets/fonts/Playfair-italic-lat.woff2);font-weight:400 900;font-style:italic}
+@font-face{font-family:"Playfair";src:url(assets/fonts/Playfair-italic-latext.woff2);font-weight:400 900;font-style:italic;unicode-range:U+0100-024F,U+02B0-02FF,U+1E00-1EFF}
+html,body{margin:0;background:#000}canvas{display:block}</style></head><body><canvas id="c" width="1080" height="1920"></canvas>
+<script>
+// Davo Delivery — Motion 4 "Kosmetika" (18 s, paced slower on purpose: every line holds >= 1.3 s on screen).
+// Concept: BEAUTY EDITORIAL — blush gradients, glossy blobs, serif italics, a serum drop as the hook, and the
+// app's real Figma screens (partner logos blurred until confirmed). Every pixel = f(t).
+const W=1080,H=1920,DUR=18;
+const Y='#ffce68',PK='#fb4669',VI='#5e3a9a',G='#01bdac',BLUE='#2f6bff',WH='#ffffff',INK='#2a1626',ROSE='#e8517f',GOLD='#c9a36a';
+const T={drop:0,word:.85,head:2.4,phone:5.6,swap:8.6,add:10.3,bul:11.4,cta:15.2};
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),P=(t,s,d)=>clamp((t-s)/d),lerp=(a,b,k)=>a+(b-a)*k;
+const E={out:k=>1-Math.pow(1-k,3),in:k=>k*k*k,io:k=>k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2,sine:k=>.5-.5*Math.cos(Math.PI*k),expo:k=>k>=1?1:1-Math.pow(2,-10*k),expoIn:k=>k<=0?0:Math.pow(2,10*k-10)};
+function spring(t,f=2.4,z=.5){if(t<=0)return 0;const w=2*Math.PI*f,wd=w*Math.sqrt(1-z*z);return 1-Math.exp(-z*w*t)*(Math.cos(wd*t)+z*w/wd*Math.sin(wd*t))}
+function rnd(i){const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)}
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');const IM={};
+function font(w,s,f,it){return `${it?'italic ':''}${w} ${s}px "${f}"`}
+function txt(s,x,y,size,o={}){ctx.save();ctx.globalAlpha*=o.a??1;ctx.font=font(o.w??900,size,o.f??'Montserrat',o.it);ctx.textAlign=o.al??'center';ctx.textBaseline='middle';ctx.fillStyle=o.c??INK;if(o.ls)ctx.letterSpacing=o.ls+'px';ctx.fillText(s,x,y);ctx.restore()}
+function tw(s,size,w=900,f='Montserrat',it=false,ls=0){ctx.save();ctx.font=font(w,size,f,it);if(ls)ctx.letterSpacing=ls+'px';const v=ctx.measureText(s).width;ctx.restore();return v}
+function fit(s,maxW,start,w=900,f='Montserrat',it=false){let z=start;while(tw(s,z,w,f,it)>maxW&&z>20)z-=2;return z}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function check(x,y,s,k,col,lw){if(k<=0)return;ctx.save();ctx.strokeStyle=col;ctx.lineWidth=lw;ctx.lineCap='round';ctx.lineJoin='round';const p=[[-.5,0],[-.15,.35],[.55,-.4]],L1=Math.hypot(.35,.35),L2=Math.hypot(.7,.75),tot=(L1+L2)*k;
+  ctx.beginPath();ctx.moveTo(x+p[0][0]*s,y+p[0][1]*s);if(tot<=L1){const q=tot/L1;ctx.lineTo(x+lerp(p[0][0],p[1][0],q)*s,y+lerp(p[0][1],p[1][1],q)*s)}else{ctx.lineTo(x+p[1][0]*s,y+p[1][1]*s);const q=(tot-L1)/L2;ctx.lineTo(x+lerp(p[1][0],p[2][0],q)*s,y+lerp(p[1][1],p[2][1],q)*s)}ctx.stroke();ctx.restore()}
+function cross(u){const a=10.5*u,b=29*u;ctx.beginPath();ctx.moveTo(-a,-b);ctx.lineTo(a,-b);ctx.lineTo(a,-a);ctx.lineTo(b,-a);ctx.lineTo(b,a);ctx.lineTo(a,a);ctx.lineTo(a,b);ctx.lineTo(-a,b);ctx.lineTo(-a,a);ctx.lineTo(-b,a);ctx.lineTo(-b,-a);ctx.lineTo(-a,-a);ctx.closePath()}
+function logo(x,y,s,a=1,bloom=1){ctx.save();ctx.globalAlpha*=a;ctx.translate(x,y);ctx.fillStyle=WH;ctx.shadowColor='rgba(120,40,80,.18)';ctx.shadowBlur=s*.2;ctx.shadowOffsetY=s*.06;rr(-s/2,-s/2,s,s,s*.24);ctx.fill();ctx.shadowColor='transparent';const u=s/131;
+  [[Y,-1,-1],[PK,1,-1],[VI,-1,1],[G,1,1]].forEach(([c,sx,sy],i)=>{const k=clamp(bloom*1.5-i*.12);if(k<=0)return;ctx.fillStyle=c;ctx.beginPath();ctx.arc(sx*20*u*k,sy*20*u*k,28.5*u*E.out(k),0,7);ctx.fill()});ctx.fillStyle=WH;ctx.save();const c=clamp(bloom*1.3-.3);ctx.scale(c,c);cross(u);ctx.fill();ctx.restore();ctx.restore()}
+function flash(a,c='#fff'){if(a<=0)return;ctx.save();ctx.globalAlpha=clamp(a);ctx.fillStyle=c;ctx.fillRect(-80,-80,W+160,H+160);ctx.restore()}
+
+// ---------------------------------------------------------------- backdrop: blush gradient, drifting glossy blobs, sparkles
+function blob(x,y,r,c1,c2,a=1){ctx.save();ctx.globalAlpha*=a;const g=ctx.createRadialGradient(x-r*.35,y-r*.4,r*.05,x,y,r);g.addColorStop(0,'#ffffff');g.addColorStop(.25,c1);g.addColorStop(1,c2);ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill();ctx.restore()}
+function sparkle(x,y,r,a){if(a<=0)return;ctx.save();ctx.globalAlpha=a;ctx.fillStyle=WH;ctx.translate(x,y);ctx.beginPath();ctx.moveTo(0,-r);ctx.quadraticCurveTo(0,0,r,0);ctx.quadraticCurveTo(0,0,0,r);ctx.quadraticCurveTo(0,0,-r,0);ctx.quadraticCurveTo(0,0,0,-r);ctx.fill();ctx.restore()}
+function bg(t){const g=ctx.createLinearGradient(0,0,W,H);g.addColorStop(0,'#fde3ec');g.addColorStop(.55,'#f7e9f4');g.addColorStop(1,'#efe4fb');ctx.fillStyle=g;ctx.fillRect(-80,-80,W+160,H+160);
+  blob(140+Math.sin(t*.5)*40,300+Math.cos(t*.4)*50,170,'#ffb3cb','rgba(251,70,105,.0)',.8);blob(960+Math.cos(t*.45)*40,1500+Math.sin(t*.5)*60,220,'#d9c2ff','rgba(94,58,154,0)',.8);blob(930,420+Math.sin(t*.6)*40,90,'#ffe2a8','rgba(255,206,104,0)',.7);
+  for(let i=0;i<14;i++){const tw2=.5+.5*Math.sin(t*2.2+i*1.7);sparkle(rnd(i)*W,200+rnd(i+20)*1500,6+rnd(i+40)*12,.6*tw2)}}
+
+// ---------------------------------------------------------------- S1 hook: serum drop -> ripple -> "Go'zallik" (serif italic)
+function hook(t){const out=E.io(P(t,T.head-.25,.45));if(out>=1)return;ctx.save();ctx.globalAlpha=1-out;ctx.translate(0,-out*120);
+  const fall=E.in(P(t,0,.55)),dy=lerp(-120,880,fall),land=t-.55;
+  if(land<0){ctx.save();ctx.translate(540,dy);ctx.scale(1,1+fall*.5);const g=ctx.createRadialGradient(-14,-20,4,0,0,60);g.addColorStop(0,'#fff');g.addColorStop(.35,'#ff8fb3');g.addColorStop(1,ROSE);ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(0,-80);ctx.bezierCurveTo(40,-30,56,10,56,30);ctx.arc(0,30,56,0,Math.PI);ctx.bezierCurveTo(-56,10,-40,-30,0,-80);ctx.fill();ctx.restore()}
+  else{for(let r=0;r<3;r++){const q=P(land,r*.14,1.3);if(q<=0||q>=1)continue;ctx.save();ctx.strokeStyle=r===1?GOLD:ROSE;ctx.globalAlpha*=(1-q)*.8;ctx.lineWidth=6*(1-q)+1.5;ctx.beginPath();ctx.ellipse(540,880,60+E.out(q)*520,(60+E.out(q)*520)*.32,0,0,7);ctx.stroke();ctx.restore()}
+    const sp=spring(land,2.2,.5);blob(540,880-Math.sin(clamp(land/.4)*Math.PI)*60,48*Math.min(1.1,sp),'#ff9cbd','rgba(232,81,127,.9)',1-P(land,.6,.4))}
+  // "Go'zallik": letters rise with tracking that tightens
+  const word="Go‘zallik";if(t>=T.word){const u=t-T.word,ls=lerp(60,0,E.out(clamp(u/1.1)));const z=210,wv=tw(word,z,600,'Playfair',true,ls);let x=540-wv/2;
+    [...word].forEach((ch,i)=>{const k=E.out(P(u,i*.06,.6)),cw=tw(ch,z,600,'Playfair',true)+ls;ctx.save();ctx.beginPath();ctx.rect(0,560,W,300);ctx.clip();txt(ch,x+cw/2-ls/2,760+(1-k)*170,z,{f:'Playfair',it:true,w:600,c:ROSE});ctx.restore();x+=cw});
+    const sk=E.out(P(u,.7,.6));ctx.save();ctx.globalAlpha*=sk;ctx.strokeStyle=GOLD;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(540-180*sk,940);ctx.lineTo(540+180*sk,940);ctx.stroke();ctx.restore();
+    txt('VA PARVARISH',540,1000,40,{w:800,c:INK,a:sk,ls:lerp(30,14,sk)})}
+  ctx.restore()}
+
+// ---------------------------------------------------------------- S2 headline (held ~3 s)
+function headline(t){if(t<T.head)return;const out=E.io(P(t,T.phone-.1,.5)),move=E.io(P(t,T.phone-.1,.6));
+  const L=[['Kosmetika',ROSE,'Playfair',true,600,170],['va parvarish vositalarini',INK,'Montserrat',false,800,76],['yetkazib beramiz',WH,'Montserrat',false,900,92,ROSE]];
+  L.forEach(([s,c,f,it,w,z0,hl],i)=>{const t0=T.head+i*.28,k=E.out(P(t,t0,.7));if(t<t0)return;const z=fit(s,960,z0,w,f,it);const y=lerp([700,860,990][i],[270,380,475][i],move),sc=lerp(1,[.62,.82,.82][i],move);
+    ctx.save();ctx.translate(540,y+(1-k)*60);ctx.scale(sc,sc);ctx.globalAlpha=k*(1-out*0);if(hl){const ww=tw(s,z,w,f,it)+70,hk=E.out(P(t,t0+.35,.5));ctx.fillStyle=hl;rr(-ww/2,-z*.7,ww*hk,z*1.4,z*.7);ctx.fill()}
+    txt(s,0,4,z,{f,it,w,c});ctx.restore()});
+  if(t>=T.bul-.5){} }
+function headlineOut(t){return E.io(P(t,T.bul-.6,.5))}
+
+// ---------------------------------------------------------------- S3 phone: real category screen scroll -> product details -> add to bag
+const PW=600,PSC=PW/786,PVH=1060;   // phone screen width/height on canvas; source scale
+function phoneFrame(x,y,w,h,rot,draw){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.shadowColor='rgba(120,40,80,.28)';ctx.shadowBlur=70;ctx.shadowOffsetY=30;ctx.fillStyle='#17101a';rr(-w/2-18,-h/2-18,w+36,h+36,70);ctx.fill();ctx.shadowColor='transparent';
+  ctx.save();rr(-w/2,-h/2,w,h,54);ctx.clip();ctx.translate(-w/2,-h/2);draw();ctx.restore();ctx.restore()}
+function phone(t){if(t<T.phone-.1||t>=T.bul+.4)return;const ent=spring(t-T.phone,1.4,.7),ex=E.io(P(t,T.bul-.3,.6));const cx=540,cy=lerp(1300,1180,E.out(P(t,T.phone,1)))+ (1-Math.min(1,ent))*900+ex*1200;
+  const swap=E.io(P(t,T.swap,.7));
+  // screen A: category (scroll slowly past the blurred partners to the popular list)
+  if(swap<1)phoneFrame(cx-swap*1100,cy,PW,PVH,lerp(-.04,-.12,swap)+Math.sin(t*.8)*.006,()=>{const sc=E.sine(P(t,T.phone+.8,2.0))*560;ctx.drawImage(IM.cat,0,sc,786,PVH/PSC,0,0,PW,PVH);
+    const tp=P(t,T.swap-.45,.4);if(tp>0&&tp<1){ctx.save();ctx.strokeStyle=ROSE;ctx.globalAlpha=1-tp;ctx.lineWidth=6;ctx.beginPath();ctx.arc(PW*.5,(660-sc)*PSC+40,20+tp*90,0,7);ctx.stroke();ctx.restore()}});
+  // screen B: product details (real screen), gentle scroll, then "Savatga qo'shish" press
+  if(swap>0)phoneFrame(cx+(1-swap)*1100,cy,PW,PVH,lerp(.12,.03,swap)+Math.sin(t*.8)*.006,()=>{const sc=E.sine(P(t,T.swap+.9,1.1))*180;ctx.drawImage(IM.det,0,sc,786,PVH/PSC,0,0,PW,PVH);
+    const bh=150*PSC;ctx.drawImage(IM.det,0,2776-170,786,170,0,PVH-170*PSC,PW,170*PSC);
+    const pr=t>T.add&&t<T.add+.18;if(pr){ctx.fillStyle='rgba(0,0,0,.08)';ctx.fillRect(0,PVH-170*PSC,PW,170*PSC)}
+    const rp=P(t,T.add,.6);if(rp>0&&rp<1){ctx.save();ctx.strokeStyle=WH;ctx.globalAlpha=1-rp;ctx.lineWidth=6;ctx.beginPath();ctx.arc(PW/2,PVH-80*PSC,20+rp*160,0,7);ctx.stroke();ctx.restore()}});
+  // "+1 savatda" chip
+  if(t>T.add+.1){const b=spring(t-T.add-.1,2.2,.5);ctx.save();ctx.globalAlpha=1-ex;ctx.translate(830,cy-560);ctx.rotate(.06);ctx.scale(b,b);rr(-170,-52,340,104,52);ctx.fillStyle=ROSE;ctx.fill();txt('+1 savatda',0,4,42,{c:WH});ctx.restore()}}
+
+// ---------------------------------------------------------------- S4 bullets, one at a time, each held ~1.3 s
+const BUL=[['Faqat litsenziyali','mahsulotlar'],['Eng arzonini','tanlang'],['24/7*','yetkazib berish']];
+function bullets(t){if(t<T.bul||t>=T.cta+.2)return;const u=t-T.bul,i=Math.min(2,Math.floor(u/1.25)),v=u-i*1.25,out=E.io(P(t,T.cta-.3,.5));const [a,b]=BUL[i];
+  ctx.save();ctx.globalAlpha=1-out;const k=E.out(P(v,0,.55)),ko=i<2?E.io(P(v,1.0,.25)):0;ctx.translate(0,(1-k)*80-ko*80);ctx.globalAlpha*=k*(1-ko);
+  ctx.fillStyle='rgba(255,255,255,.75)';ctx.shadowColor='rgba(120,40,80,.12)';ctx.shadowBlur=50;rr(90,760,900,420,60);ctx.fill();ctx.shadowColor='transparent';
+  ctx.fillStyle=[G,GOLD,ROSE][i];ctx.beginPath();ctx.arc(540,860,58,0,7);ctx.fill();check(540,866,58,P(v,.25,.35),WH,10);
+  txt(a,540,1000,fit(a,820,110,600,'Playfair',true),{f:'Playfair',it:true,w:600,c:ROSE});txt(b,540,1100,fit(b,820,70,800),{w:800,c:INK});ctx.restore();
+  // progress dots
+  for(let j=0;j<3;j++){ctx.fillStyle=j<=i?ROSE:'rgba(232,81,127,.25)';rr(540-84+j*60,1240,44,10,5);ctx.fill()}
+  ctx.save();ctx.globalAlpha=1-out;txt('*Yetkazish vaqti va ish tartibi hudud va buyurtmaga qarab farq qilishi mumkin.',540,1650,21,{w:600,f:'Inter',c:'rgba(42,22,38,.6)'});ctx.restore()}
+
+// ---------------------------------------------------------------- S5 CTA (held ~2 s)
+function cta(t){if(t<T.cta)return;const u=t-T.cta;logo(540,700,260,E.out(P(u,0,.4)),E.out(P(u,.05,.7)));
+  for(let r=0;r<2;r++){const q=P(u,.25+r*.1,1.0);if(q>0&&q<1){ctx.save();ctx.strokeStyle=r?GOLD:ROSE;ctx.globalAlpha=(1-q)*.8;ctx.lineWidth=5*(1-q)+1.5;ctx.beginPath();ctx.arc(540,700,170+E.out(q)*420,0,7);ctx.stroke();ctx.restore()}}
+  const nk=E.out(P(u,.4,.7));txt('Davo Delivery',540,920+(1-nk)*40,104,{c:INK,a:nk});txt('Go‘zallik — eshigingizgacha',540,1020,52,{f:'Playfair',it:true,w:600,c:ROSE,a:E.out(P(u,.7,.6))});
+  const bk=E.out(P(u,1.0,.6));ctx.save();ctx.globalAlpha=bk;ctx.translate(540,1200+(1-bk)*40);ctx.fillStyle=BLUE;ctx.shadowColor='rgba(47,107,255,.35)';ctx.shadowBlur=40;rr(-420,-74,840,148,74);ctx.fill();ctx.shadowColor='transparent';
+  const sh=P(u,1.8,.8);if(sh>0&&sh<1){ctx.save();rr(-420,-74,840,148,74);ctx.clip();const x=lerp(-560,560,sh),g=ctx.createLinearGradient(x-90,0,x+90,0);g.addColorStop(0,'rgba(255,255,255,0)');g.addColorStop(.5,'rgba(255,255,255,.5)');g.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=g;ctx.fillRect(-420,-74,840,148);ctx.restore()}
+  txt('Ilovani yuklab oling',0,4,58,{w:800,c:WH});ctx.restore();
+  const sk=E.out(P(u,1.3,.5));['App Store','Google Play'].forEach((s,i)=>{const x=i?700:380;ctx.save();ctx.globalAlpha=sk;rr(x-150,1330,300,68,34);ctx.fillStyle=INK;ctx.fill();txt(s,x,1365,32,{w:700,f:'Inter',c:WH});ctx.restore()});
+  txt('*Yetkazish vaqti va ish tartibi hudud va buyurtmaga qarab farq qilishi mumkin.',540,1650,21,{w:600,f:'Inter',c:'rgba(42,22,38,.6)',a:sk})}
+
+function draw(t){ctx.setTransform(1,0,0,1,0,0);bg(t);hook(t);
+  if(t>=T.head&&t<T.bul+.2){ctx.save();ctx.globalAlpha=1-headlineOut(t);headline(t);ctx.restore()}
+  phone(t);bullets(t);cta(t);
+  flash((1-P(t,T.cta,.25))*(t>=T.cta?.5:0));flash(E.in(P(t,DUR-.35,.35)),'#fbe7f0')}
+function loadImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src})}
+window.ready=(async()=>{await Promise.all(['900 90px Montserrat','800 90px Montserrat','600 30px Inter','700 30px Inter','italic 600 90px Playfair','600 90px Playfair'].map(f=>document.fonts.load(f,"Oʻ‘’'✓—")));
+  IM.cat=await loadImg('assets/screens/kosmetika-category.png');IM.det=await loadImg('assets/screens/kosmetika-details.png');draw(0);return true})();
+window.seek=t=>draw(Math.min(Math.max(t,0),DUR-1e-4));window.DUR=DUR;
+</script></body></html>
