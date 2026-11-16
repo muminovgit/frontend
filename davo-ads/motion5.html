@@ -104,7 +104,8 @@ function draw(t){
   if(t>=T.head&&t<T.bul){const mv=E.io(P(t,T.phone-.2,.7));const L=[['Chaqaloq va bolalar',INK,0],['parvarish vositalarini',INK,0],['yetkazib beramiz',WH,PK]];
     L.forEach(([s,c,hl],i)=>{const t0=T.head+.05+i*.14,k=E.out(P(t,t0,.35)),kk=spring(t-t0,2.6,.5);if(t<t0)return;const z=fit(O,s,940,i===2?100:96);const y=lerp([290,405,525][i],[270,370,470][i],mv),sc=lerp(1,.78,mv);
       O.save();O.translate(540,y+(1-k)*50);O.scale(sc*lerp(.6,1,Math.min(1.1,kk)),sc*lerp(.6,1,Math.min(1.1,kk)));O.globalAlpha=k;if(hl){const ww=tw(O,s,z)+60;O.fillStyle=hl;rr(O,-ww/2,-z*.66,ww*E.out(P(t,t0+.12,.35)),z*1.32,z*.66);O.fill()}txt(O,s,0,4,z,{c});O.restore()});
-    // (the card's own label names the category; no extra caption)}
+    // (the card's own label names the category; no extra caption)
+  }
   // bullets (each ~1.25 s)
   if(t>=T.bul&&t<T.cta+.2){const BUL=[['Faqat litsenziyali','mahsulotlar',G],['Eng arzonini','tanlang',Y],['24/7*','yetkazib berish',PK]];const u=t-T.bul,i=Math.min(2,Math.floor(u/1.25)),v=u-i*1.25,out=E.io(P(t,T.cta-.3,.5));const [a,b,col]=BUL[i];
     const k=E.out(P(v,0,.5)),ko=i<2?E.io(P(v,1.0,.25)):0;O.save();O.globalAlpha=k*(1-ko)*(1-out);O.translate(0,(1-k)*80-ko*80);
