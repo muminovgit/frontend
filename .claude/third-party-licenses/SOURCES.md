@@ -11,3 +11,4 @@
 
 Not installed: remotion-dev/skills (no licence file in the repo; Remotion itself needs a paid company licence for teams > 3 — install with `npx skills add remotion-dev/skills` if wanted).
 API-key skills (elevenlabs, acestep/ltx2/qwen-edit via runpod or modal, ideogram4, media-use HeyGen/Gemini parts) need keys set in the environment's secrets — never paste keys in chat.
+| sound-effects, music, setup-api-key | github.com/elevenlabs/skills @ 64271c1 | MIT |
