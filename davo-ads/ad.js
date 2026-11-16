@@ -37,7 +37,12 @@ function layoutHeadline(){const words=VA.headline.split(' ');let size=VA.hsize||
   for(;size>=60;size-=4){lines=[[]];let w=0;const maxW=920;for(const wd of words){const ww=tw(wd,size,900);if(w+ww>maxW&&lines[lines.length-1].length){lines.push([]);w=0}lines[lines.length-1].push(wd);w+=ww+size*.28}if(lines.length<=(VA.hlines||4))break}
   const out=[];let idx=0;lines.forEach((ln,li)=>{const tot=ln.reduce((a,wd)=>a+tw(wd,size,900),0)+(ln.length-1)*size*.28;let x=540-tot/2;ln.forEach(wd=>{const ww=tw(wd,size,900);out.push({wd,x:x+ww/2,y:VA.hy+li*size*1.12,i:idx,hl:VA.highlight.includes(idx)});idx++;x+=ww+size*.28})});
   HL={words:out,size}}
-function headline(t){const ex=VA.hexit?ease(P(t,VA.hexit,.4)):0;for(const w of HL.words){const t0=T.words+w.i*(VA.wstep||.075),k=spring(t-t0,2.6,.5);if(t<t0)continue;
+// VA.bigWord: the first word opens alone, huge, next to the hook emoji, then flies into its headline slot.
+function headline(t){const ex=VA.hexit?ease(P(t,VA.hexit,.4)):0,BW=VA.bigWord;for(const w of HL.words){
+  if(BW&&w.i===0){const t0=T.hook+(BW.delay??.05),k=spring(t-t0,2.4,.45);if(t<t0)continue;const m=E.io(P(t,BW.move,BW.dur));
+    ctx.save();ctx.translate(lerp(540,w.x,m),lerp(BW.y,w.y,m));const s=lerp(BW.size/HL.size,1,m)*lerp(.3,1,Math.min(1.12,k));ctx.scale(s,s);ctx.globalAlpha=clamp((t-t0)/.1);
+    const ww=tw(w.wd,HL.size,900);ctx.save();ctx.fillStyle=PK;ctx.globalAlpha*=.95;rr(-ww/2-14,-HL.size*.55,(ww+28)*E.out(P(t,t0+.12,.3)),HL.size*1.1,18);ctx.fill();ctx.restore();txt(w.wd,0,4,HL.size,{w:900,c:WH});ctx.restore();continue}
+  const t0=(BW?BW.move+BW.dur*.55+(w.i-1)*(VA.wstep||.075):T.words+w.i*(VA.wstep||.075)),k=spring(t-t0,2.6,.5);if(t<t0)continue;
   ctx.save();ctx.translate(w.x,w.y+(1-Math.min(1,k))*40-ex*60);const s=lerp(.3,1,Math.min(1.15,k));ctx.scale(s,s);ctx.globalAlpha=clamp((t-t0)/.12)*(1-ex);
   if(w.hl){ctx.save();const ww=tw(w.wd,HL.size,900);const hk=E.out(P(t,t0+.25,.35));ctx.fillStyle=PK;ctx.globalAlpha*=.95;rr(-ww/2-14,-HL.size*.55,(ww+28)*hk,HL.size*1.1,18);ctx.fill();ctx.restore()}
   txt(w.wd,0,4,HL.size,{w:900,c:WH});ctx.restore()}}

@@ -6,7 +6,7 @@ args = [a for a in sys.argv[1:] if not a.startswith("--")]
 vid = args[0]; gain = float(args[1]) if len(args) > 1 else 0.0
 # timelines mirror window.VARIANT.T in ad-XX.html
 V = {"01": dict(words=7, step=.075, demo=1.9, bul=4.7, cta=6.3, dur=8.6, kind="price", win=3.65),
-     "08": dict(words=7, step=.075, demo=2.0, bul=5.6, cta=7.2, dur=9.5, kind="deliver", tmap=3.3),
+     "08": dict(words=7, step=.075, demo=2.3, bul=5.9, cta=7.5, dur=9.8, kind="deliver", tmap=3.6, big=1.45),
      "02": dict(words=12, step=.06, demo=2.0, bul=6.1, cta=7.6, dur=9.9, kind="search")}[vid]
 SR = 48000; DUR = V["dur"]; N = int(SR * DUR)
 L = np.zeros(N); R = np.zeros(N); rng = np.random.default_rng(int(vid))
@@ -67,7 +67,11 @@ def riser(t0, t1, g=.1):
     d = t1 - t0; t = ts(d); f = 300 + 1500 * (t / d) ** 2; add(np.sin(2 * np.pi * np.cumsum(f) / SR) * (t / d) ** 2 * g, t0)
 
 whoosh(.16, .22, .3); subhit(.18, .9); pop(.2, 500, .25)                                   # hook slam
-for i in range(V["words"]): pop(.3 + i * V["step"], 620 + (i % 4) * 90, .11, pan=(i % 3 - 1) * .3)   # word pops
+if V.get("big"):                                                                                  # big first word with the hook, then it flies into the headline
+    pop(.08, 420, .3); whoosh(V["big"] + .3, .4, .2)
+    for i in range(1, V["words"]): pop(V["big"] + .25 + (i - 1) * V["step"], 620 + (i % 4) * 90, .11, pan=(i % 3 - 1) * .3)
+else:
+    for i in range(V["words"]): pop(.3 + i * V["step"], 620 + (i % 4) * 90, .11, pan=(i % 3 - 1) * .3)   # word pops
 whoosh(V["demo"] + .2, .4, .2)
 if V["kind"] == "price":
     for i in range(3): riser(V["demo"] + .45 + i * .18, V["demo"] + 1.35 + i * .18, .05); pop(V["demo"] + 1.35 + i * .18, 500 + i * 120, .12)
