@@ -1,0 +1,211 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:720px;height:1280px;background:#000;overflow:hidden;font-family:Inter,sans-serif;color:#fff}
+#cam{position:absolute;inset:0}
+.sc{position:absolute;inset:0;display:none;overflow:hidden;background:#000}
+.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 45%,rgba(0,0,0,.7) 100%)}
+.shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,rgba(0,0,0,0) 20%,rgba(0,0,0,0) 58%,rgba(0,0,0,.8) 100%)}
+.c{position:absolute;left:44px;right:44px;top:50%;transform:translateY(-50%);text-align:center}
+.D{font-family:'Inter Display',Inter,sans-serif;font-weight:900;letter-spacing:-.03em;line-height:.98}
+.mono{font-family:'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase}
+.pink{color:#ff4fa3}.red{color:#ff3434}
+#sub{position:absolute;left:36px;right:36px;bottom:230px;text-align:center;font-weight:800;font-size:44px;line-height:1.18;text-shadow:0 3px 16px rgba(0,0,0,.95),0 0 4px rgba(0,0,0,.9);z-index:8}
+#sub span{color:rgba(255,255,255,.32)}#sub span.on{color:#fff}#sub span.hl.on{color:#ff4fa3}
+#sub.quote{font-style:italic}
+#hud{position:absolute;top:58px;left:26px;right:26px;display:flex;gap:8px;z-index:9}
+.chip{flex:1;background:rgba(12,12,12,.78);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:8px 12px}
+.chip .k{font-family:'JetBrains Mono',monospace;font-size:13px;color:#9a9a9a;letter-spacing:.1em}
+.chip .v{font-weight:800;font-size:25px;margin-top:2px;font-variant-numeric:tabular-nums}
+#disc{position:absolute;left:0;right:0;bottom:120px;text-align:center;z-index:9;font-family:'JetBrains Mono',monospace;font-size:16px;color:rgba(255,255,255,.55);letter-spacing:.08em}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;z-index:20}
+#fade{position:absolute;inset:0;background:#000;opacity:0;z-index:19}
+.card{background:rgba(14,14,14,.92);border:2px solid #ff3434;border-radius:18px;padding:30px 30px 34px;text-align:left}
+.lab{display:inline-block;background:#ff3434;color:#fff;font-weight:900;font-size:28px;padding:6px 16px;border-radius:6px;transform:rotate(-3deg);margin-bottom:18px}
+.phone{position:absolute;left:70px;right:70px;top:150px;bottom:150px;background:#0e1621;border-radius:44px;border:3px solid #2a3442;overflow:hidden;box-shadow:0 0 120px rgba(80,140,255,.25)}
+.ph-top{display:flex;justify-content:space-between;padding:22px 30px 8px;font-weight:700;font-size:22px;color:#cfd8e3}
+.ph-head{display:flex;align-items:center;gap:16px;padding:14px 24px;background:#17212b;border-bottom:1px solid #222d3a}
+.av{width:58px;height:58px;border-radius:50%;background:#5a6b7d;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:26px}
+.msg{max-width:84%;background:#182533;border-radius:18px 18px 18px 6px;padding:16px 20px;font-size:27px;line-height:1.3;margin:14px 22px;opacity:0}
+.typing{margin:14px 22px;background:#182533;border-radius:18px;padding:16px 22px;width:110px;display:none;gap:8px}
+.typing i{width:12px;height:12px;border-radius:50%;background:#7f91a4;display:inline-block;margin-right:6px}
+.opt{display:flex;align-items:center;gap:18px;background:#141414;border:3px solid #333;border-radius:18px;padding:18px 22px;margin:14px 0;text-align:left;font-weight:800;font-size:33px;line-height:1.15}
+.opt b{flex:none;display:inline-flex;width:64px;height:64px;border-radius:14px;align-items:center;justify-content:center;background:#ff4fa3;font-size:38px}
+.search{background:#fff;color:#222;border-radius:40px;padding:22px 30px;font-size:28px;font-weight:600;text-align:left;display:flex;gap:16px;align-items:center}
+.ring{position:absolute;border:5px solid #ff3434;border-radius:50%;box-shadow:0 0 30px rgba(255,52,52,.6)}
+</style></head><body>
+<div id="cam">
+
+<div class="sc" id="S1"><img class="bg" src="i9.jpg"><div class="vig"></div></div>
+
+<div class="sc" id="S2"><div class="c">
+  <div class="mono" style="font-size:22px;color:#ff4fa3;margin-bottom:18px">1-qism · Topilma</div>
+  <div class="D" style="font-size:96px">BOZORDAN<br>TOPILGAN</div></div></div>
+
+<div class="sc" id="S3"><img class="bg" src="i6.jpg"><div class="shade"></div></div>
+<div class="sc" id="S4"><img class="bg" src="i11.jpg"><div class="shade"></div></div>
+<div class="sc" id="S5"><img class="bg" src="i13.jpg"><div class="shade"></div></div>
+<div class="sc" id="S6"><img class="bg" src="i14.jpg"><div class="shade"></div></div>
+<div class="sc" id="S7"><img class="bg" src="i12.jpg"><div class="vig"></div><div class="shade"></div></div>
+
+<div class="sc" id="S8" style="background:#0b0f16">
+  <div class="c" style="top:44%">
+    <div class="search"><span style="font-size:30px">🔍</span><span id="q"></span><span id="caret" style="color:#1a73e8">|</span></div>
+    <div id="load" style="height:5px;background:#1a73e8;margin:26px 10px 0;border-radius:3px;width:0"></div>
+  </div></div>
+
+<div class="sc" id="S9"><img class="bg" src="i12.jpg" style="filter:blur(12px) brightness(.35)">
+  <div class="c"><div class="card" id="fact">
+    <div class="lab">HAQIQAT</div>
+    <div style="font-size:31px;font-weight:700;line-height:1.38">
+      1969-yil. Hot Wheels <span class="pink">“Beach Bomb”</span> prototipi — surf taxtalari <b>orqadan</b> kiradi.<br><br>
+      Ishlab chiqarishga kirmagan.<br><br>
+      Pushti rangdagisi — dunyodagi eng qimmat Hot Wheels:</div>
+    <div class="D pink" style="font-size:88px;margin-top:14px">~$150 000</div>
+  </div></div></div>
+
+<div class="sc" id="S10"><img class="bg" src="i9.jpg" style="filter:brightness(.3)">
+  <div class="c" style="top:40%">
+    <div class="mono" style="font-size:22px;color:#aaa">Sen to'lading</div>
+    <div class="D" style="font-size:64px;margin:6px 0 26px">50 000 so'm</div>
+    <div class="mono" style="font-size:22px;color:#aaa">Uning qiymati</div>
+    <div class="D pink" id="val" style="font-size:118px">$0</div>
+    <div class="D" id="valsum" style="font-size:40px;color:#ddd;margin-top:10px;opacity:0">≈ 2 milliard so'm</div>
+  </div></div>
+
+<div class="sc" id="S11"><div class="c"><div class="D" id="prob" style="font-size:70px">Lekin<br><span class="red">bitta muammo</span><br>bor.</div></div></div>
+
+<div class="sc" id="S12"><img class="bg" src="i11.jpg" style="filter:grayscale(.85) sepia(.35) brightness(.75) contrast(1.1)"><div class="vig"></div>
+  <div class="mono" style="position:absolute;top:150px;left:0;right:0;text-align:center;font-size:20px;color:#ddd">◀◀ Kecha · 10:42</div></div>
+
+<div class="sc" id="S13"><img class="bg" src="i8.jpg" style="filter:brightness(.8) contrast(1.15)"><div class="vig"></div>
+  <div id="unk" style="position:absolute;left:40px;top:780px;opacity:0">
+    <div class="D" style="font-size:64px">???</div>
+    <div style="display:inline-block;background:#ff3434;font-weight:900;font-size:22px;padding:5px 12px;margin-top:6px">QUTINI SURATGA OLDI</div></div></div>
+
+<div class="sc" id="S14" style="background:radial-gradient(ellipse at center,#0f1a2b 0%,#03060b 75%)">
+  <div class="phone">
+    <div class="ph-top"><span>02:14</span><span>▮▮▮ 23%</span></div>
+    <div class="ph-head"><div class="av">?</div><div><div style="font-weight:800;font-size:26px">Noma'lum raqam</div><div style="font-size:19px;color:#7f91a4" id="stat">online</div></div></div>
+    <div id="chat" style="padding-top:20px">
+      <div class="msg" id="m1">Assalomu alaykum. Kecha bozordan quti olgansiz.</div>
+      <div class="msg" id="m2">Ichidagi <b style="color:#ff7ab8">pushti mashinani</b> sotasizmi?</div>
+      <div class="msg" id="m3"><b>Narxini o'zingiz ayting.</b></div>
+      <div class="typing" id="typ"><i></i><i></i><i></i></div>
+    </div></div></div>
+
+<div class="sc" id="S15"><img class="bg" src="i10.jpg" style="filter:brightness(.55) saturate(.4) hue-rotate(180deg) sepia(.2)"><div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(40,90,200,.35),rgba(0,0,0,.6))"></div><div class="vig"></div></div>
+
+<div class="sc" id="S16" style="background:#0b0b0b"><div class="c" style="padding:0">
+  <div class="mono" style="font-size:22px;color:#ff4fa3;text-align:left">Sen qaror qilasan</div>
+  <div class="D" style="font-size:78px;text-align:left;margin:8px 0 22px">NIMA QILASAN?</div>
+  <div class="opt" id="o1"><b>A</b>Javob berasan</div>
+  <div class="opt" id="o2"><b>B</b>Bloklaysan</div>
+  <div class="opt" id="o3"><b>C</b>Cholni topib, qutining sirini so'raysan</div>
+  <div style="font-weight:800;font-size:30px;margin-top:26px;text-align:left" id="foot">Izohga <span class="pink">A, B yoki C</span> yoz.<br><span style="color:#aaa;font-size:26px">Eng ko'p ovoz — 2-qism shu bilan davom etadi.</span></div>
+</div></div>
+
+<div class="sc" id="S17" style="background:#ff4fa3"><div class="c">
+  <div class="D" style="font-size:84px;color:#111">2-QISM<br>ERTAGA</div>
+  <div style="display:inline-block;margin-top:30px;background:#111;color:#fff;font-weight:900;font-size:34px;padding:16px 34px;border-radius:40px">+ Obuna bo'l</div></div></div>
+
+</div>
+<div id="hud">
+  <div class="chip"><div class="k">SARFLANDI</div><div class="v" id="h1">—</div></div>
+  <div class="chip"><div class="k">QIYMATI</div><div class="v pink" id="h2">???</div></div>
+  <div class="chip"><div class="k">XAVF</div><div class="v" id="h3">5%</div></div>
+</div>
+<div id="sub"></div>
+<div id="disc">Hikoya to'qima · Faktlar haqiqiy</div>
+<div id="fade"></div><div id="flash"></div>
+
+<script>
+const TOTAL=100;
+// id,start,end, kb:[s0,s1,ox,oy]
+const SC=[['S1',0,5.5,[1.0,1.18,50,42]],['S2',5.5,7.0],['S3',7.0,13.0,[1.25,1.05,50,55]],['S4',13.0,19.0,[1.0,1.35,42,78]],
+['S5',19.0,25.5,[1.05,1.22,62,30]],['S6',25.5,31.5,[1.12,1.0,50,60]],['S7',31.5,37.5,[1.0,1.32,52,64]],['S8',37.5,41.5],
+['S9',41.5,50.5],['S10',50.5,56.5,[1.0,1.08,50,45]],['S11',56.5,59.5],['S12',59.5,64.0,[1.0,1.55,86,38]],['S13',64.0,68.0,[1.15,1.4,50,22]],
+['S14',68.0,81.0],['S15',81.0,85.5,[2.8,3.0,50,1]],['S16',85.5,97.0],['S17',97.0,100.0]];
+const SUB=[[0.3,2.8,"Sen hozir qo'lingda 150 000 dollar ushlab turibsan.",[3,4]],[3.0,5.3,"Va buni hali hech kim bilmaydi…"],
+[7.2,9.6,"Kecha. Yakshanba. Yangiobod bozori."],[9.8,12.8,"Sen eski radio izlab kelgan eding."],
+[13.2,15.8,"Lekin bir cholning oldidagi"],[15.9,18.8,"bitta quti ko'zingga tushdi."],
+[19.3,22.0,"— Hammasi 50 ming.",[2,3],1],[22.1,25.3,"— Nevaramniki edi. Endi kerakmas.",[],1],
+[25.7,28.4,"Uyda qutini stolga ag'darding."],[28.5,31.3,"Eski mashinalar. Bo'yog'i ko'chgan."],
+[31.8,34.0,"Faqat bittasi boshqacha edi."],[34.2,37.3,"Pushti. Orqasida ikkita surf taxtasi.",[0]],
+[37.6,39.6,"Qiziqib, internetdan qidirding…"],[48.4,50.3,"Qo'llaring titray boshladi."],
+[50.8,53.4,"Agar bu haqiqiy bo'lsa…"],[53.5,56.3,"50 ming so'mga deyarli 2 milliard topding.",[3,4]],
+[59.7,63.8,"Pul to'layotganingda orqangda bir yigit turgan edi."],[64.3,67.8,"U qutini suratga oldi.",[1,2]],
+[68.2,70.6,"Soat tungi ikki. Telefoningga xabar keldi."],[81.3,85.2,"U raqamingni qayerdan oldi?…"]];
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const eio=x=>x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2;const eo=x=>1-Math.pow(1-x,3);
+const lerp=(a,b,x)=>a+(b-a)*x;
+function rnd(n){const x=Math.sin(n*127.1)*43758.5453;return x-Math.floor(x)}
+let lastSub=-1;
+function subs(t){const el=$('sub');let k=SUB.findIndex(s=>t>=s[0]&&t<s[1]);
+  if(k<0){el.style.opacity=0;return}
+  const [a,b,txt,hl=[],q]=SUB[k];
+  if(k!==lastSub){const w=txt.split(' ');el.innerHTML=w.map((x,i)=>`<span class="${hl.includes(i)?'hl':''}">${x}</span>`).join(' ');el.className=q?'quote':'';lastSub=k}
+  const n=Math.ceil(cl((t-a)/((b-a)*0.6))*el.children.length);
+  [...el.children].forEach((s,i)=>s.classList.toggle('on',i<n));
+  el.style.opacity=cl((t-a)/0.15)*cl((b-t)/0.15);
+  el.style.transform=`translateY(${(1-eo(cl((t-a)/0.25)))*14}px)`;}
+function fmt(n){return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ')}
+window.render=function(t){
+  let cur=0;
+  SC.forEach(([id,a,b,kb],k)=>{const on=t>=a&&t<b;$(id).style.display=on?'block':'none';
+    if(on){cur=k;const img=$(id).querySelector('.bg');
+      if(img&&kb){const p=eio(cl((t-a)/(b-a)));img.style.transformOrigin=`${kb[2]}% ${kb[3]}%`;img.style.transform=`scale(${lerp(kb[0],kb[1],p)})`;}}});
+  const [cid,ca,cb]=SC[cur];
+  // fade from/to black at cuts (short dip)
+  $('fade').style.opacity=Math.max(cl(1-(t-ca)/0.25),cl(1-(cb-t)/0.2))*0.85*(cur===0&&t<0.2?1:1);
+  subs(t);
+  // HUD
+  const hudOn=t>=7.0&&!(t>=85.5)&&!(t>=56.5&&t<59.5);
+  $('hud').style.opacity=hudOn?cl((t-7)/0.4):0;
+  $('h1').textContent=t<21.2?'—':"50 000 so'm";
+  $('h1').style.color=(t>=21.2&&t<22.2)?'#ff4fa3':'#fff';
+  const v=t<51.5?null:Math.round(150000*eo(cl((t-51.5)/2)));
+  $('h2').textContent=v===null?'???':'$'+fmt(v);
+  let risk=5; if(t>=65.3)risk=25; if(t>=77.5)risk=40;
+  $('h3').textContent=risk+'%'; $('h3').style.color=risk>=25?'#ff3434':'#fff';
+  $('disc').style.opacity=(t>=7.2&&t<12.8)?cl((t-7.2)/0.4)*cl((12.8-t)/0.4):0;
+  // S2 title
+  $('S2').querySelector('.c').style.transform=`translateY(-50%) scale(${lerp(1.25,1,eo(cl((t-5.5)/0.35)))})`;
+  // S8 search typing
+  const q="pushti volkswagen surf o'yinchoq mashina";const qn=Math.floor(cl((t-37.8)/2.0)*q.length);
+  $('q').textContent=q.slice(0,qn);$('caret').style.opacity=Math.floor(t*3)%2?1:0;
+  $('load').style.width=(cl((t-40.0)/1.3)*100)+'%';
+  // S9 fact card pop
+  const fp=eo(cl((t-41.6)/0.4));$('fact').style.transform=`scale(${lerp(0.85,1,fp)})`;$('fact').style.opacity=fp;
+  // S10 counter
+  const vv=Math.round(150000*eo(cl((t-51.5)/2)));$('val').textContent='$'+fmt(vv);
+  $('valsum').style.opacity=cl((t-53.6)/0.4);
+  // S11
+  $('prob').style.transform=`scale(${1+0.06*cl((t-56.5)/3)})`;
+  // S13 shutter
+  $('unk').style.opacity=cl((t-65.4)/0.2);
+  // S14 chat
+  const ms=[['m1',71.5],['m2',74.5],['m3',77.5]];
+  ms.forEach(([id,a])=>{const p=cl((t-a)/0.2);$(id).style.opacity=p;$(id).style.transform=`translateY(${(1-eo(p))*20}px)`});
+  const typing=ms.some(([id,a])=>t>=a-1.2&&t<a);$('typ').style.display=typing?'block':'none';
+  [...$('typ').children].forEach((d,i)=>d.style.opacity=0.35+0.65*(0.5+0.5*Math.sin(t*10-i)));
+  $('stat').textContent=typing?'yozmoqda…':'online';
+  // phone shake at notification
+  const ph=document.querySelector('.phone');const vib=(t>=68.3&&t<69.1)||(t>=69.4&&t<70.0);
+  ph.style.transform=vib?`translateX(${Math.sin(t*120)*6}px)`:'none';
+  // S16 options
+  [['o1',86.2],['o2',86.7],['o3',87.2]].forEach(([id,a])=>{const p=cl((t-a)/0.2);$(id).style.opacity=p;$(id).style.transform=`translateX(${(1-eo(p))*-80}px)`;
+    $(id).style.borderColor=t>88?`rgba(255,79,163,${0.4+0.4*Math.sin(t*6)})`:'#333'});
+  $('foot').style.opacity=cl((t-87.8)/0.3);
+  // flash events
+  let fl=0; [[5.5,.5],[34.2,.35],[41.5,.4],[56.6,.3],[65.3,.9],[85.5,.5]].forEach(([a,m])=>{if(t>=a&&t<a+0.18)fl=Math.max(fl,m*(1-(t-a)/0.18))});
+  $('flash').style.opacity=fl;
+  // camera micro shake on impacts
+  let sh=0;[[5.5],[50.5],[56.6],[65.3],[85.5]].forEach(([a])=>{if(t>=a)sh+=10*Math.exp(-(t-a)*7)});
+  $('cam').style.transform=`translate(${(rnd(Math.floor(t*30))-.5)*sh}px,${(rnd(Math.floor(t*30)+7)-.5)*sh}px)`;
+};
+render(0);
+</script></body></html>
