@@ -1,0 +1,162 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:720px;height:1280px;background:#000;overflow:hidden;font-family:Inter,sans-serif;color:#fff}
+#cam{position:absolute;inset:0;transform-origin:50% 50%}
+.layer{position:absolute;inset:0;display:none;overflow:hidden}
+.img{position:absolute;transform-origin:0 0}
+.c{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;padding:0 36px}
+.D{font-family:'Inter Display',Inter,sans-serif;font-weight:900;letter-spacing:-.04em;line-height:.9}
+.mono{font-family:'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.red{color:#ff2a2a}.yel{color:#ffd400}
+.rgb{text-shadow:-6px 0 rgba(255,0,60,.85),6px 0 rgba(0,220,255,.85)}
+.stamp{display:inline-block;border:8px solid currentColor;padding:6px 22px;transform:rotate(-8deg)}
+#flash{position:absolute;inset:0;background:#fff;pointer-events:none;opacity:0}
+#lines{position:absolute;inset:0}
+.light{width:150px;height:150px;border-radius:50%;background:#2a2a2a;margin:22px auto;border:6px solid #111}
+.opt{display:flex;align-items:center;gap:20px;background:#151515;border:3px solid #333;border-radius:18px;padding:18px 24px;margin:14px 0;text-align:left;font-weight:900;font-size:50px}
+.opt b{display:inline-flex;width:70px;height:70px;border-radius:14px;align-items:center;justify-content:center;background:#ff2a2a;font-size:44px}
+#bar{position:absolute;top:22px;left:24px;right:24px;height:6px;background:rgba(255,255,255,.15);border-radius:3px;z-index:9}
+#bar i{position:absolute;left:0;top:0;bottom:0;background:#ff2a2a;border-radius:3px}
+.vign{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 35%,rgba(0,0,0,.8) 100%)}
+</style></head><body>
+<div id="cam">
+
+<div class="layer" id="A" style="background:#0b0b0b"><div class="c">
+  <div class="light" id="L1"></div><div class="light" id="L2"></div><div class="light" id="L3"></div><div class="light" id="L4"></div>
+  <div class="D" id="Acount" style="font-size:90px;margin-top:20px"></div>
+</div></div>
+
+<div class="layer" id="B" style="background:#ff2a2a"><div class="c"><div class="D rgb" style="font-size:250px">1968</div></div></div>
+
+<div class="layer" id="C" style="background:#000"><div class="c">
+  <div class="mono" style="font-size:30px;color:#888">Kunduzi</div>
+  <div class="D" style="font-size:118px">MUHANDIS.</div></div></div>
+
+<div class="layer" id="D" style="background:#000"><div class="c">
+  <div class="mono" style="font-size:30px;color:#888">Kechasi</div>
+  <div class="D red rgb" id="Dbig" style="font-size:112px">POYGACHI.</div></div></div>
+
+<div class="layer" id="E">
+  <img class="img" id="imgE" src="car.jpg"><canvas id="lines" width="720" height="1280"></canvas><div class="vign"></div>
+  <div class="c" style="top:24%"><div class="D yel" id="Estamp" style="font-size:86px"><span class="stamp">RAMCHARGERS</span></div></div>
+  <div class="c" style="top:80%"><div class="mono" style="font-size:28px">Chrysler muhandislari jamoasi</div></div>
+</div>
+
+<div class="layer" id="F" style="background:#000">
+  <img class="img" id="imgF" src="car.jpg" style="filter:brightness(.35) saturate(1.4)"><div class="vign"></div>
+  <div class="c"><div class="D rgb" id="hp" style="font-size:250px">0</div><div class="D red" style="font-size:90px">OT KUCHI</div>
+  <div class="mono" style="font-size:28px;margin-top:20px;color:#bbb">426 HEMI motor</div></div></div>
+
+<div class="layer" id="G" style="background:#0b0b0b"><div class="c">
+  <div class="mono" style="font-size:32px;color:#888">400 metr</div>
+  <div class="D yel" id="sw" style="font-size:200px;font-variant-numeric:tabular-nums">0.0</div>
+  <div class="D" style="font-size:74px">SONIYA</div></div></div>
+
+<div class="layer" id="H" style="background:#fff;color:#000"><div class="c">
+  <div class="mono" style="font-size:32px;color:#555">Butun dunyoda</div>
+  <div class="D" style="font-size:96px">ATIGI</div>
+  <div class="D red" id="n80" style="font-size:300px">0</div>
+  <div class="D" style="font-size:96px">TA.</div></div></div>
+
+<div class="layer" id="I" style="background:#000">
+  <img class="img" id="imgI" src="car.jpg" style="filter:grayscale(1) brightness(.4)"><div class="vign"></div>
+  <div class="c"><div class="mono" style="font-size:32px;color:#aaa;margin-bottom:24px">Zavod unga bermagan:</div>
+  <div class="D red" id="Istamp" style="font-size:80px"><span class="stamp">KAFOLAT</span></div>
+  <div class="mono" style="font-size:28px;margin-top:40px">"as is" — qanday bo'lsa, shunday</div></div></div>
+
+<div class="layer" id="J" style="background:#000"><div class="c">
+  <div class="D" id="Jtxt" style="font-size:76px;color:#ddd">Va xuddi<br>o'sha yili…</div></div></div>
+
+<div class="layer" id="K" style="background:#000">
+  <img class="img" id="imgK" src="car.jpg"><div class="vign"></div>
+  <div class="c" style="top:82%"><div class="D yel" style="font-size:80px">HOT WHEELS</div><div class="D rgb" style="font-size:96px">TUG'ILDI.</div></div></div>
+
+<div class="layer" id="L" style="background:#000">
+  <img class="img" id="imgL" src="car.jpg"><canvas id="lines2" width="720" height="1280" style="position:absolute;inset:0"></canvas><div class="vign"></div>
+  <div class="c" style="top:16%"><div class="D" style="font-size:64px">Afsona — kaftingda.</div></div></div>
+
+<div class="layer" id="M" style="background:#0b0b0b"><div class="c" style="padding:0 44px">
+  <div class="D" style="font-size:64px;text-align:left;margin-bottom:26px">Haqiqiy Hemi Dart<br><span class="red">bugun qancha turadi?</span></div>
+  <div class="opt" id="o1"><b>A</b>$40 000</div>
+  <div class="opt" id="o2"><b>B</b>$150 000</div>
+  <div class="opt" id="o3"><b>C</b>$500 000</div>
+  <div class="mono" id="Mfoot" style="font-size:28px;margin-top:30px;text-align:left;color:#ffd400">Izohga A, B yoki C yoz ↓<br><span style="color:#fff">Javob — 2-qismda. Obuna bo'l.</span></div>
+</div></div>
+
+</div>
+<div id="bar"><i id="bari"></i></div>
+<div id="flash"></div>
+
+<script>
+const IW=1125,IH=2000,T0=1.6,BT=0.4,TOTAL=21.6;
+const SC=[['A',0,1.6],['B',1.6,2.4],['C',2.4,3.2],['D',3.2,4.0],['E',4.0,6.4],['F',6.4,8.0],['G',8.0,9.6],
+['H',9.6,11.2],['I',11.2,12.8],['J',12.8,14.0],['K',14.0,16.0],['L',16.0,17.6],['M',17.6,21.6]];
+const $=id=>document.getElementById(id);
+const cl=(x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const eo=x=>1-Math.pow(1-x,3);
+const lerp=(a,b,x)=>a+(b-a)*x;
+function place(el,fx,fy,s,dx=0,dy=0){el.style.width=IW*s+'px';el.style.height=IH*s+'px';el.style.left=(360-fx*s+dx)+'px';el.style.top=(640-fy*s+dy)+'px'}
+function rnd(n){const x=Math.sin(n*127.1)*43758.5453;return x-Math.floor(x)}
+function speed(cv,t,strength){const g=cv.getContext('2d');g.clearRect(0,0,720,1280);
+  for(let i=0;i<46;i++){const y=rnd(i)*1280,len=120+rnd(i+9)*360,sp=2600+rnd(i+3)*2400;
+    const x=((rnd(i+5)*1800 - t*sp)%1800+1800)%1800-400;
+    g.strokeStyle=`rgba(255,255,255,${0.10+0.25*rnd(i+1)}*strength)`;g.strokeStyle=`rgba(255,255,255,${(0.08+0.22*rnd(i+1))*strength})`;
+    g.lineWidth=1+rnd(i+2)*3;g.beginPath();g.moveTo(x,y);g.lineTo(x+len,y);g.stroke();}}
+window.render=function(t){
+  let cur=0;
+  SC.forEach(([id,a,b],k)=>{const on=t>=a&&t<b;$(id).style.display=on?'block':'none';if(on)cur=k});
+  $('bari').style.width=(t/TOTAL*100)+'%';
+  // beat phase (music starts at 1.6, gap 12.8-14.0)
+  const inMusic=t>=T0&&!(t>=12.8&&t<14.0);
+  const bp=inMusic?((t-T0)%BT)/BT:1;
+  const punch=inMusic?Math.exp(-bp*6):0;
+  // camera
+  let sx=0,sy=0,sc=1+0.045*punch;
+  const sinceCut=Math.min(...SC.map(([i,a])=>t>=a?t-a:99));
+  const shake=Math.exp(-sinceCut*9)*16 + punch*4;
+  sx=(rnd(Math.floor(t*30))-.5)*shake; sy=(rnd(Math.floor(t*30)+50)-.5)*shake;
+  if(cur===9){sc=1+0.12*cl((t-12.8)/1.2); sx=sy=(rnd(Math.floor(t*30))-.5)*cl((t-12.8)/1.2)*10}
+  $('cam').style.transform=`translate(${sx}px,${sy}px) scale(${sc})`;
+  // flash on cuts
+  let fl=Math.max(0,1-sinceCut/0.09)*0.75; if(t>=14.0&&t<14.25)fl=1-(t-14)/0.25; if(t>=1.2&&t<1.35)fl=Math.max(fl,0.6);
+  $('flash').style.opacity=fl;
+  // A: drag tree
+  const lights=['L1','L2','L3','L4'];
+  lights.forEach((l,i)=>{const lit=t>=i*0.4;const c=i<3?'#ffb000':'#19ff5a';
+    $(l).style.background=lit?c:'#2a2a2a';$(l).style.boxShadow=lit?`0 0 60px ${c}`:'none'});
+  $('Acount').textContent=t<0.4?'3':t<0.8?'2':t<1.2?'1':'GO!';
+  $('Acount').style.color=t>=1.2?'#19ff5a':'#fff';
+  // B 1968 scale in
+  $('B').firstChild.style.transform=`translateY(-50%) scale(${lerp(1.6,1,eo(cl((t-1.6)/0.18)))})`;
+  // D big
+  const dp=cl((t-3.45)/0.12);$('Dbig').style.opacity=dp;$('Dbig').style.transform=`scale(${lerp(1.8,1,eo(dp))})`;
+  // E photo + speed
+  const ep=cl((t-4)/2.4);place($('imgE'),lerp(470,550,ep),lerp(890,920,ep),lerp(1.35,1.95,ep)+0.06*punch,lerp(260,0,eo(cl((t-4)/0.25))),0);
+  speed($('lines'),t,1);
+  const st=cl((t-4.8)/0.12);$('Estamp').style.opacity=st;$('Estamp').style.transform=`scale(${lerp(2.2,1,eo(st))})`;
+  // F hp counter
+  place($('imgF'),512,905,2.1+0.08*punch);
+  $('hp').textContent=Math.round(425*eo(cl((t-6.5)/1.1)));
+  // G stopwatch to ~10
+  const g=cl((t-8.0)/1.4);$('sw').textContent=(t<9.4?(10*g).toFixed(1):'~10');
+  // H 80
+  $('n80').textContent=Math.round(80*eo(cl((t-9.8)/0.9)));
+  // I stamp
+  place($('imgI'),512,905,1.7);
+  const ip=cl((t-11.6)/0.12);$('Istamp').style.opacity=ip;$('Istamp').style.transform=`scale(${lerp(2.4,1,eo(ip))})`;
+  $('Istamp').querySelector('.stamp').textContent=t<12.2?'KAFOLAT':'KAFOLATSIZ';
+  // J build
+  $('Jtxt').style.opacity=cl((t-12.9)/0.3);
+  // K reveal full card
+  const kp=cl((t-14)/2);place($('imgK'),lerp(380,520,eo(kp)),lerp(560,700,eo(kp)),lerp(1.25,1.0,eo(kp))+0.05*punch);
+  // L zoom card car
+  const lp=cl((t-16)/1.6);place($('imgL'),540,915,lerp(1.6,2.3,lp)+0.06*punch);speed($('lines2'),t,0.7);
+  // M options pop on beats
+  [['o1',17.8],['o2',18.2],['o3',18.6]].forEach(([id,a])=>{const p=cl((t-a)/0.15);$(id).style.opacity=p;$(id).style.transform=`translateX(${(1-eo(p))*-120}px)`});
+  $('Mfoot').style.opacity=cl((t-19.0)/0.2);
+  const pulse=t>19?(0.5+0.5*Math.sin(t*12)):0;['o1','o2','o3'].forEach(id=>$(id).style.borderColor=`rgba(255,42,42,${pulse})`);
+};
+render(0);
+</script></body></html>
