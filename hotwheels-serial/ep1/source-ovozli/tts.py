@@ -47,9 +47,16 @@ SCENES = [
 ]
 GAP = {"n2": 0.6, "s1": 1.6, "s2": 1.4, "s3": 1.6, "n23": 0.2, "n24": 0.2, "n25": 0.2, "n26": 0.5, "n12": 0.3, "n13": 0.3, "n14": 0.6, "n16": 0.2}
 
+NARRATOR = os.environ.get("NARRATOR", "edge")   # "silero" -> narrator lines from silero_<id>.wav
+
+def phonetic(text):
+    return text.replace("Hot Wheels", "Xot Vils").replace("Beach Bomb", "Bich Bomb")
+
 async def synth(lid, voice, text):
     mp3 = f"{OUT}/v_{lid}.mp3"; wav = f"{OUT}/v_{lid}.wav"
-    if not os.path.exists(mp3):
+    if voice == "N" and NARRATOR == "silero":
+        mp3 = f"{OUT}/silero/sil_{lid}.wav"
+    elif not os.path.exists(mp3):
         rate, pitch = STYLE[voice]
         await edge_tts.Communicate(text, VOICE, rate=rate, pitch=pitch).save(mp3)
     # trim leading/trailing silence, 44.1k mono
