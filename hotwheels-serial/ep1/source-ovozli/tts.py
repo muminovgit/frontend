@@ -7,8 +7,8 @@ OUT = os.path.dirname(os.path.abspath(__file__))
 VOICE = "uz-UZ-SardorNeural"
 STYLE = {  # rate, pitch
     "N": ("-4%", "-6Hz"),
-    "OLD": ("-16%", "-20Hz"),
-    "STR": ("-8%", "-14Hz"),
+    "OLD": ("-8%", "-20Hz"),
+    "STR": ("+0%", "-14Hz"),
 }
 # scene id, pre-gap, [(line id, voice, text, subtitle, highlight word idx, quote)], post-gap, min duration
 SCENES = [
@@ -47,7 +47,8 @@ SCENES = [
 ]
 GAP = {"n2": 0.6, "s1": 1.6, "s2": 1.4, "s3": 1.6, "n23": 0.2, "n24": 0.2, "n25": 0.2, "n26": 0.5, "n12": 0.3, "n13": 0.3, "n14": 0.6, "n16": 0.2}
 
-NARRATOR = os.environ.get("NARRATOR", "edge")   # "silero" -> narrator lines from silero_<id>.wav
+NARRATOR = os.environ.get("NARRATOR", "edge")
+TIGHT = float(os.environ.get("TIGHT", "1.0"))   # "silero" -> narrator lines from silero_<id>.wav
 
 def phonetic(text):
     return text.replace("Hot Wheels", "Xot Vils").replace("Beach Bomb", "Bich Bomb")
@@ -61,7 +62,7 @@ async def synth(lid, voice, text):
         await edge_tts.Communicate(text, VOICE, rate=rate, pitch=pitch).save(mp3)
     # trim leading/trailing silence, 44.1k mono
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", mp3, "-af",
-        "silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse",
+        "silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse" + (",atempo=1.07" if (voice == "N" and NARRATOR == "silero") else ""),
         "-ar", "44100", "-ac", "1", wav], check=True)
     with wave.open(wav) as w:
         return w.getnframes() / w.getframerate()
@@ -69,13 +70,13 @@ async def synth(lid, voice, text):
 async def main():
     t = 0.0; scenes = {}; lines = []
     for sid, pre, ls, post, mind in SCENES:
-        s0 = t; t += pre
+        s0 = t; t += pre * TIGHT
         for i, (lid, voice, text, sub, hl, q) in enumerate(ls):
-            if i > 0: t += GAP.get(lid, 0.35)
+            if i > 0: t += GAP.get(lid, 0.35) * TIGHT
             d = await synth(lid, voice, text)
             lines.append(dict(id=lid, voice=voice, start=round(t, 3), end=round(t + d, 3), sub=sub, hl=hl, quote=q, scene=sid))
             t += d
-        t += post
+        t += post * TIGHT
         t = max(t, s0 + mind)
         scenes[sid] = [round(s0, 3), round(t, 3)]
     tl = dict(total=round(t, 3), scenes=scenes, lines=lines)

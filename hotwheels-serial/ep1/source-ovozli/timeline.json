@@ -1,81 +1,81 @@
 {
- "total": 118.089,
+ "total": 102.89,
  "scenes": {
   "S1": [
    0.0,
-   7.69
+   7.657
   ],
   "S2": [
-   7.69,
-   9.29
+   7.657,
+   9.257
   ],
   "S3": [
-   9.29,
-   16.961
+   9.257,
+   15.038
   ],
   "S4": [
-   16.961,
-   21.481
+   15.038,
+   18.967
   ],
   "S5": [
-   21.481,
-   28.074
+   18.967,
+   24.787
   ],
   "S6": [
-   28.074,
-   33.921
+   24.787,
+   29.258
   ],
   "S7": [
-   33.921,
-   40.225
+   29.258,
+   35.502
   ],
   "S8": [
-   40.225,
-   44.465
+   35.502,
+   38.637
   ],
   "S9": [
-   44.465,
-   63.229
+   38.637,
+   55.15
   ],
   "S10": [
-   63.229,
-   69.359
+   55.15,
+   60.716
   ],
   "S11": [
-   69.359,
-   72.768
+   60.716,
+   64.008
   ],
   "S12": [
-   72.768,
-   76.752
+   64.008,
+   67.068
   ],
   "S13": [
-   76.752,
-   79.404
+   67.068,
+   69.641
   ],
   "S14": [
-   79.404,
-   95.429
+   69.641,
+   83.596
   ],
   "S15": [
-   95.429,
-   98.778
+   83.596,
+   87.25
   ],
   "S16": [
-   98.778,
-   114.658
+   87.25,
+   100.119
   ],
   "S17": [
-   114.658,
-   118.089
+   100.119,
+   102.89
   ]
  },
  "lines": [
   {
    "id": "n1",
    "voice": "N",
-   "start": 0.4,
-   "end": 3.999,
+   "start": 0.28,
+   "end": 4.024,
    "sub": "Sen hozir qo'lingda 150 000 dollar ushlab turibsan.",
    "hl": [
     3,
@@ -87,8 +87,8 @@
   {
    "id": "n2",
    "voice": "N",
-   "start": 4.599,
-   "end": 7.19,
+   "start": 4.444,
+   "end": 7.307,
    "sub": "Va buni hali hech kim bilmaydi…",
    "hl": [],
    "quote": 0,
@@ -97,8 +97,8 @@
   {
    "id": "n3",
    "voice": "N",
-   "start": 9.59,
-   "end": 12.843,
+   "start": 9.467,
+   "end": 11.927,
    "sub": "Kecha. Yakshanba. Yangiobod bozori.",
    "hl": [
     3,
@@ -110,8 +110,8 @@
   {
    "id": "n4",
    "voice": "N",
-   "start": 13.193,
-   "end": 16.661,
+   "start": 12.172,
+   "end": 14.828,
    "sub": "Sen bu yerga eski radio izlab kelgan eding.",
    "hl": [],
    "quote": 0,
@@ -120,8 +120,8 @@
   {
    "id": "n5",
    "voice": "N",
-   "start": 17.161,
-   "end": 21.081,
+   "start": 15.178,
+   "end": 18.687,
    "sub": "Lekin bir cholning oldidagi bitta quti ko'zingga tushdi.",
    "hl": [
     5
@@ -132,8 +132,8 @@
   {
    "id": "o1",
    "voice": "OLD",
-   "start": 21.781,
-   "end": 27.474,
+   "start": 19.177,
+   "end": 24.367,
    "sub": "— Hammasi 50 ming. Nevaramniki edi. Endi kerakmas.",
    "hl": [
     2,
@@ -145,8 +145,8 @@
   {
    "id": "n6",
    "voice": "N",
-   "start": 28.274,
-   "end": 30.938,
+   "start": 24.927,
+   "end": 26.997,
    "sub": "Uyda qutini stolga ag'darding.",
    "hl": [],
    "quote": 0,
@@ -155,8 +155,8 @@
   {
    "id": "n7",
    "voice": "N",
-   "start": 31.288,
-   "end": 33.621,
+   "start": 27.242,
+   "end": 29.048,
    "sub": "Eski mashinalar. Bo'yog'i ko'chgan.",
    "hl": [],
    "quote": 0,
@@ -165,8 +165,8 @@
   {
    "id": "n8",
    "voice": "N",
-   "start": 34.121,
-   "end": 36.536,
+   "start": 29.398,
+   "end": 31.637,
    "sub": "Faqat bittasi boshqacha edi.",
    "hl": [
     3
@@ -177,8 +177,8 @@
   {
    "id": "n9",
    "voice": "N",
-   "start": 36.886,
-   "end": 39.725,
+   "start": 31.882,
+   "end": 35.152,
    "sub": "Pushti. Orqasida ikkita surf taxtasi.",
    "hl": [
     0
@@ -189,8 +189,8 @@
   {
    "id": "n10",
    "voice": "N",
-   "start": 40.425,
-   "end": 42.865,
+   "start": 35.642,
+   "end": 37.517,
    "sub": "Qiziqib, internetdan qidirding…",
    "hl": [],
    "quote": 0,
@@ -199,8 +199,8 @@
   {
    "id": "n11",
    "voice": "N",
-   "start": 44.965,
-   "end": 51.06,
+   "start": 38.987,
+   "end": 43.636,
    "sub": null,
    "hl": [],
    "quote": 0,
@@ -209,8 +209,8 @@
   {
    "id": "n12",
    "voice": "N",
-   "start": 51.36,
-   "end": 56.087,
+   "start": 43.846,
+   "end": 47.754,
    "sub": null,
    "hl": [],
    "quote": 0,
@@ -219,8 +219,8 @@
   {
    "id": "n13",
    "voice": "N",
-   "start": 56.387,
-   "end": 60.832,
+   "start": 47.964,
+   "end": 52.015,
    "sub": null,
    "hl": [],
    "quote": 0,
@@ -229,8 +229,8 @@
   {
    "id": "n14",
    "voice": "N",
-   "start": 61.432,
-   "end": 62.829,
+   "start": 52.435,
+   "end": 54.87,
    "sub": "Qo'llaring titray boshladi.",
    "hl": [],
    "quote": 0,
@@ -239,8 +239,8 @@
   {
    "id": "n15",
    "voice": "N",
-   "start": 63.729,
-   "end": 65.198,
+   "start": 55.5,
+   "end": 56.913,
    "sub": "Agar bu haqiqiy bo'lsa…",
    "hl": [],
    "quote": 0,
@@ -249,8 +249,8 @@
   {
    "id": "n16",
    "voice": "N",
-   "start": 65.398,
-   "end": 68.759,
+   "start": 57.053,
+   "end": 60.296,
    "sub": "Sen 50 ming so'mga deyarli 2 milliard topding.",
    "hl": [
     5,
@@ -262,8 +262,8 @@
   {
    "id": "n17",
    "voice": "N",
-   "start": 69.859,
-   "end": 72.068,
+   "start": 61.066,
+   "end": 63.518,
    "sub": null,
    "hl": [],
    "quote": 0,
@@ -272,8 +272,8 @@
   {
    "id": "n18",
    "voice": "N",
-   "start": 73.068,
-   "end": 76.452,
+   "start": 64.218,
+   "end": 66.858,
    "sub": "Pul to'layotganingda orqangda bir yigit turgan edi.",
    "hl": [],
    "quote": 0,
@@ -282,8 +282,8 @@
   {
    "id": "n19",
    "voice": "N",
-   "start": 76.952,
-   "end": 78.604,
+   "start": 67.208,
+   "end": 69.081,
    "sub": "U qutini suratga oldi.",
    "hl": [
     1,
@@ -295,8 +295,8 @@
   {
    "id": "n20",
    "voice": "N",
-   "start": 79.704,
-   "end": 82.65,
+   "start": 69.851,
+   "end": 73.028,
    "sub": "Soat tungi ikki. Telefoningga xabar keldi.",
    "hl": [],
    "quote": 0,
@@ -305,8 +305,8 @@
   {
    "id": "s1",
    "voice": "STR",
-   "start": 84.25,
-   "end": 88.159,
+   "start": 74.148,
+   "end": 77.748,
    "sub": null,
    "hl": [],
    "quote": 0,
@@ -315,8 +315,8 @@
   {
    "id": "s2",
    "voice": "STR",
-   "start": 89.559,
-   "end": 91.619,
+   "start": 78.728,
+   "end": 80.627,
    "sub": null,
    "hl": [],
    "quote": 0,
@@ -325,8 +325,8 @@
   {
    "id": "s3",
    "voice": "STR",
-   "start": 93.219,
-   "end": 94.629,
+   "start": 81.747,
+   "end": 83.036,
    "sub": null,
    "hl": [],
    "quote": 0,
@@ -335,8 +335,8 @@
   {
    "id": "n21",
    "voice": "N",
-   "start": 95.729,
-   "end": 97.878,
+   "start": 83.806,
+   "end": 86.62,
    "sub": "U raqamingni qayerdan oldi?…",
    "hl": [],
    "quote": 0,
@@ -345,8 +345,8 @@
   {
    "id": "n22",
    "voice": "N",
-   "start": 99.278,
-   "end": 100.046,
+   "start": 87.6,
+   "end": 88.19,
    "sub": null,
    "hl": [],
    "quote": 0,
@@ -355,8 +355,8 @@
   {
    "id": "n23",
    "voice": "N",
-   "start": 100.246,
-   "end": 101.346,
+   "start": 88.33,
+   "end": 89.175,
    "sub": null,
    "hl": [],
    "quote": 0,
@@ -365,8 +365,8 @@
   {
    "id": "n24",
    "voice": "N",
-   "start": 101.546,
-   "end": 102.467,
+   "start": 89.315,
+   "end": 90.036,
    "sub": null,
    "hl": [],
    "quote": 0,
@@ -375,8 +375,8 @@
   {
    "id": "n25",
    "voice": "N",
-   "start": 102.667,
-   "end": 106.581,
+   "start": 90.176,
+   "end": 93.864,
    "sub": null,
    "hl": [],
    "quote": 0,
@@ -385,8 +385,8 @@
   {
    "id": "n26",
    "voice": "N",
-   "start": 107.081,
-   "end": 113.658,
+   "start": 94.214,
+   "end": 99.419,
    "sub": null,
    "hl": [],
    "quote": 0,
@@ -395,8 +395,8 @@
   {
    "id": "n27",
    "voice": "N",
-   "start": 114.958,
-   "end": 116.889,
+   "start": 100.329,
+   "end": 102.05,
    "sub": null,
    "hl": [],
    "quote": 0,
