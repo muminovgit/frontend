@@ -1,0 +1,96 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:M;src:url(../assets/fonts/Montserrat-600.woff2);font-weight:600}
+@font-face{font-family:M;src:url(../assets/fonts/Montserrat-800.woff2);font-weight:800}
+@font-face{font-family:M;src:url(../assets/fonts/Montserrat-900.woff2);font-weight:900}
+:root{--y:#ffce68;--pk:#fb4669;--vi:#5e3a9a;--g:#01bdac;--cy:#5ecdf0;--ink:#1d1430;--mute:#5b5670}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:#fff;overflow:hidden}
+#ad{position:relative;overflow:hidden;font-family:M;color:var(--ink)}
+/* ---------- logo ---------- */
+.logo{display:flex;align-items:center;gap:.32em;font-weight:800;white-space:nowrap}
+.logo svg{flex:none}
+/* ---------- phone ---------- */
+.phone{position:absolute;background:#16131c;border-radius:16%/7.4%;padding:.32em;box-shadow:0 0 0 1px #3a3644 inset,0 .9em 2.2em rgba(20,40,60,.28)}
+.phone .scr{width:100%;height:100%;border-radius:13%/6%;overflow:hidden;position:relative;background:#cfefff}
+.phone .scr img{width:100%;display:block}
+.phone .isl{position:absolute;left:50%;top:2.6%;width:30%;height:2.6%;transform:translateX(-50%);background:#0b0a0f;border-radius:99px}
+/* ---------- format 1 ---------- */
+.f1{background:radial-gradient(120% 90% at 85% 40%,#d8f4fd 0%,#effaf9 45%,#fbfdfd 100%)}
+.f1 .blob{position:absolute;border-radius:50%;filter:blur(.5px)}
+.f1 h1{font-weight:900;line-height:1.08;letter-spacing:-.01em}
+.f1 p{font-weight:600;color:var(--mute);line-height:1.3}
+.f1 p b{color:var(--ink);font-weight:800}
+.cta{display:inline-flex;align-items:center;gap:.4em;background:var(--pk);color:#fff;font-weight:800;border-radius:99px;white-space:nowrap;box-shadow:0 .25em .7em rgba(251,70,105,.35)}
+.note{position:absolute;color:#8a8698;font-weight:600}
+.kit{position:absolute;filter:drop-shadow(0 .4em .5em rgba(20,60,90,.25))}
+/* ---------- format 2: studio ---------- */
+.f2{background:#e9f3f2}
+.f2 .wall{position:absolute;inset:0;background:linear-gradient(180deg,#e3f1f1 0%,#d7ebea 100%)}
+.f2 .light{position:absolute;inset:0;background:
+  linear-gradient(118deg,transparent 0 38%,rgba(255,255,255,.75) 38% 47%,transparent 47% 52%,rgba(255,255,255,.6) 52% 60%,transparent 60%);
+  filter:blur(14px);opacity:.9}
+.f2 .floor{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,#cfe4e2,#e4f0ef)}
+.f2 .pod-top{position:absolute;background:linear-gradient(180deg,#f6fbfa,#eaf4f3);border-radius:50%}
+.f2 .pod-side{position:absolute;background:linear-gradient(90deg,#d5e8e6,#eef7f6 45%,#d2e5e3)}
+.f2 .shadow{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(20,50,60,.35),transparent);filter:blur(6px)}
+.f2 .petal{position:absolute;border-radius:50%;box-shadow:0 .5em 1.2em rgba(20,50,60,.18)}
+</style></head>
+<body><div id="ad"></div>
+<script>
+const Q=new URLSearchParams(location.search),W=+Q.get('w'),H=+Q.get('h'),F=+(Q.get('f')||1),T=+(Q.get('t')||1),V=Q.get('v')||'a';
+const ad=document.getElementById('ad');ad.style.width=W+'px';ad.style.height=H+'px';document.body.style.width=W+'px';document.body.style.height=H+'px';
+const LOGO=(s)=>`<svg width="${s}" height="${s}" viewBox="-65.5 -65.5 131 131"><rect x="-65.5" y="-65.5" width="131" height="131" rx="31" fill="#fff"/>
+<circle cx="-20" cy="-20" r="28.5" fill="#ffce68"/><circle cx="20" cy="-20" r="28.5" fill="#fb4669"/><circle cx="-20" cy="20" r="28.5" fill="#5e3a9a"/><circle cx="20" cy="20" r="28.5" fill="#01bdac"/>
+<path d="M-10.5-29h21v18.5h18.5v21h-18.5v18.5h-21v-18.5h-18.5v-21h18.5z" fill="#fff"/></svg>`;
+// headline copy: full + short variant for tight sizes. "*" claims carry the footnote.
+const TX={1:{h:'Dorixona izlamang!',s:'Dorilarni <b>30 daqiqada*</b> yetkazamiz',hs:'Dorilar 30 daqiqada*',note:true},
+          2:{h:'Narxlarni solishtiring',s:'Dori narxlarini ilovada solishtirib buyurtma bering',hs:'Narxlarni solishtiring'},
+          3:{h:'Uydan chiqish shart emas!',s:'Dori kerak bo‘lganda — ilovada buyurtma bering',hs:'Uydan chiqmang!'},
+          4:{h:'Uydan chiqmay dori oling',s:'Litsenziyali, ishonchli, tezkor',hs:'Uydan chiqmay dori oling'},
+          5:{h:'Dorilarni uyingizga yetkazamiz',s:'Ilovani yuklab oling',hs:'Dorilar uyingizga'}}[T];
+const NOTE='*Yetkazish vaqti hududga qarab farq qilishi mumkin';
+const SCREEN='../figma/screens/Home.png';
+function phone(x,y,w,rot=0){const h=w*2.05;return `<div class="phone" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;transform:rotate(${rot}deg);font-size:${w/10}px"><div class="scr"><img src="${SCREEN}"></div><div class="isl"></div></div>`}
+function blobs(){return `<div class="blob" style="left:${W*.62}px;top:${-H*.25}px;width:${H*.9}px;height:${H*.9}px;background:radial-gradient(closest-side,rgba(94,205,240,.45),transparent)"></div>
+<div class="blob" style="left:${W*.78}px;top:${H*.55}px;width:${H*.7}px;height:${H*.7}px;background:radial-gradient(closest-side,rgba(255,206,104,.35),transparent)"></div>`}
+let html='';
+if(F===1){ad.className='f1';const r=W/H;
+  if(r>2.6){ // leaderboard / mobile banner strips
+    const u=H/90, sm=H<60;
+    html=blobs()+`<div class="logo" style="position:absolute;left:${16*u}px;top:50%;transform:translateY(-50%);font-size:${(sm?12:15)*u}px">${LOGO((sm?30:44)*u)}${W>500?'<span>Davo<br>Delivery</span>':''}</div>
+    <div style="position:absolute;left:${(W>500?150:56)*u}px;top:50%;transform:translateY(-50%);width:${W*.48}px">
+      <h1 style="font-size:${(sm?16:26)*u}px">${sm?TX.hs:TX.h}</h1>${sm?'':`<p style="font-size:${13*u}px;margin-top:${3*u}px">${TX.s}</p>`}</div>
+    ${phone(W-260*u,10*u,92*u,-10)}
+    <span class="cta" style="position:absolute;right:${(sm?10:24)*u}px;top:50%;transform:translateY(-50%);font-size:${(sm?11:14)*u}px;padding:${(sm?6:10)*u}px ${(sm?11:18)*u}px">Yuklab olish</span>
+    ${TX.note&&!sm?`<span class="note" style="left:${150*u}px;bottom:${5*u}px;font-size:${7.5*u}px">${NOTE}</span>`:''}`;
+  } else { // box / tall
+    const u=Math.min(W/300,H/250), tall=H/W>1.5;
+    html=blobs()+`<div class="logo" style="position:absolute;left:${16*u}px;top:${15*u}px;font-size:${11*u}px">${LOGO(24*u)}<span>Davo Delivery</span></div>
+    <div style="position:absolute;left:${16*u}px;top:${54*u}px;width:${W*.56}px">
+      <h1 style="font-size:${22*u}px">${TX.h}</h1>
+      <p style="font-size:${11.5*u}px;margin-top:${7*u}px">${TX.s}</p>
+      <span class="cta" style="margin-top:${13*u}px;font-size:${11.5*u}px;padding:${8*u}px ${15*u}px">Yuklab olish →</span></div>
+    ${phone(W-108*u,52*u,100*u,8)}
+    <img class="kit" src="../assets/aidkit.png" style="left:${W-150*u}px;top:${H-82*u}px;width:${78*u}px">
+    ${TX.note?`<span class="note" style="left:${16*u}px;bottom:${7*u}px;width:${W*.52}px;line-height:1.25;font-size:${7*u}px">${NOTE}</span>`:''}`;
+  }
+} else { // ---------- format 2: studio mockup, no text
+  ad.className='f2';const u=H/628, cx=W/2;
+  const pw=196*u, ph=pw*2.05, podW=430*u, podTop=H*.70, podH=H-podTop+40;
+  html=`<div class="wall"></div><div class="light"></div>
+  <div class="floor" style="height:${H*.22}px"></div>
+  <div class="petal" style="left:${cx+300*u}px;top:${110*u}px;width:${70*u}px;height:${70*u}px;background:radial-gradient(circle at 35% 30%,#fff3c9,#ffce68 45%,#d99a2b);font-size:${20*u}px"></div>
+  <div class="petal" style="left:${cx-380*u}px;top:${200*u}px;width:${46*u}px;height:${46*u}px;background:radial-gradient(circle at 35% 30%,#ffc0cc,#fb4669 45%,#c41e45);font-size:${20*u}px"></div>
+  <div class="petal" style="left:${cx+360*u}px;top:${330*u}px;width:${34*u}px;height:${34*u}px;background:radial-gradient(circle at 35% 30%,#b5fff6,#01bdac 45%,#007d72);font-size:${20*u}px"></div>
+  <div class="petal" style="left:${cx-300*u}px;top:${90*u}px;width:${26*u}px;height:${26*u}px;background:radial-gradient(circle at 35% 30%,#c9b3f0,#5e3a9a 45%,#341b5e);font-size:${20*u}px"></div>
+  <div class="pod-side" style="left:${cx-podW/2}px;top:${podTop}px;width:${podW}px;height:${podH}px"></div>
+  <div class="pod-top" style="left:${cx-podW/2}px;top:${podTop-42*u}px;width:${podW}px;height:${84*u}px"></div>
+  <div class="shadow" style="left:${cx-pw*.75}px;top:${podTop-26*u}px;width:${pw*1.6}px;height:${44*u}px"></div>
+  <div style="position:absolute;left:${cx-pw/2}px;top:${podTop-ph-6*u}px;width:${pw}px;height:${ph}px;perspective:${1400*u}px">
+    <div style="width:100%;height:100%;transform:rotateY(-14deg) rotateX(2deg);transform-origin:50% 100%;position:relative">${phone(0,0,pw,0)}</div></div>`;
+}
+ad.innerHTML=html;
+document.fonts.ready.then(()=>Promise.all([...document.images].map(i=>i.complete?1:new Promise(r=>i.onload=i.onerror=r)))).then(()=>window.READY=true);
+</script></body></html>
