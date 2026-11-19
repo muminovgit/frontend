@@ -92,11 +92,12 @@ if(F===1){ad.style.background=PAL.bg;const r=W/H;
   }
 } else if(F===3){ // ---------- logos for responsive display ads (1:1 and 4:1), on white
   ad.style.background='#fff';
-  html=W===H?`<div class="abs" style="inset:0;display:grid;place-items:center">${LOGO(W*.78)}</div>`
+  html=W===H?`<div class="abs" style="inset:0;display:grid;place-items:center">${LOGO(W*.7)}</div>`
    :`<div class="logo abs" style="inset:0;justify-content:center;font-size:${H*.36}px;gap:${H*.12}px;font-weight:900;color:#1d1430">${LOGO(H*.78)}<span style="white-space:nowrap">Davo Delivery</span></div>`;
 } else { // ---------- format 2: studio mockup, no text
   const cx=W/2, podTop=H*(W>H*1.5?.70:.72), ph=H*(W>H*1.5?.64:W>=H?.62:.55), pw=ph/2.05, podW=Math.min(pw*2.2,W*.9), u=pw/196, sh=PAL.sh;
   const balls=[['#fff3c9,#ffce68 45%,#d99a2b',.79,.26,70],['#ffc0cc,#fb4669 45%,#c41e45',.19,.40,46],['#b5fff6,#01bdac 45%,#007d72',.82,.57,34],['#c9b3f0,#5e3a9a 45%,#341b5e',.26,.17,26]];
+  if(W<H)balls.forEach((q,i)=>{q[1]=[.86,.13,.88,.16][i];q[2]=[.14,.30,.44,.12][i]});
   html=`<div class="abs" style="inset:0;background:${PAL.wall}"></div>
   <div class="abs" style="inset:0;background:linear-gradient(118deg,transparent 0 38%,rgba(255,255,255,.75) 38% 47%,transparent 47% 52%,rgba(255,255,255,.6) 52% 60%,transparent 60%);filter:blur(${14*u}px)"></div>
   <div class="abs" style="left:0;right:0;bottom:0;height:${H*.22}px;background:${PAL.floor}"></div>
