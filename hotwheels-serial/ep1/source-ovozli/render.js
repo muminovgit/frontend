@@ -10,7 +10,7 @@ const fs = require('fs');
   await p.goto('file://' + path.join(dir, 'index.html'));
   await p.evaluate(() => document.fonts.ready);
   await p.waitForTimeout(300);
-  const FPS = 30, TOTAL = 106.491;
+  const FPS = 30, TOTAL = 102.89;
   const times = only || [...Array(Math.ceil(FPS * TOTAL)).keys()].map(i => i / FPS);
   for (let i = 0; i < times.length; i++) {
     await p.evaluate(t => render(t), times[i]);
