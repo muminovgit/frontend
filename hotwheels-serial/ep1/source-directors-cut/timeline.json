@@ -1,0 +1,406 @@
+{
+ "total": 102.89,
+ "scenes": {
+  "S1": [
+   0.0,
+   7.657
+  ],
+  "S2": [
+   7.657,
+   9.257
+  ],
+  "S3": [
+   9.257,
+   15.038
+  ],
+  "S4": [
+   15.038,
+   18.967
+  ],
+  "S5": [
+   18.967,
+   24.787
+  ],
+  "S6": [
+   24.787,
+   29.258
+  ],
+  "S7": [
+   29.258,
+   35.502
+  ],
+  "S8": [
+   35.502,
+   38.637
+  ],
+  "S9": [
+   38.637,
+   55.15
+  ],
+  "S10": [
+   55.15,
+   60.716
+  ],
+  "S11": [
+   60.716,
+   64.008
+  ],
+  "S12": [
+   64.008,
+   67.068
+  ],
+  "S13": [
+   67.068,
+   69.641
+  ],
+  "S14": [
+   69.641,
+   83.596
+  ],
+  "S15": [
+   83.596,
+   87.25
+  ],
+  "S16": [
+   87.25,
+   100.119
+  ],
+  "S17": [
+   100.119,
+   102.89
+  ]
+ },
+ "lines": [
+  {
+   "id": "n1",
+   "voice": "N",
+   "start": 0.28,
+   "end": 4.024,
+   "sub": "Sen hozir qo'lingda 150 000 dollar ushlab turibsan.",
+   "hl": [
+    3,
+    4
+   ],
+   "quote": 0,
+   "scene": "S1"
+  },
+  {
+   "id": "n2",
+   "voice": "N",
+   "start": 4.444,
+   "end": 7.307,
+   "sub": "Va buni hali hech kim bilmaydi…",
+   "hl": [],
+   "quote": 0,
+   "scene": "S1"
+  },
+  {
+   "id": "n3",
+   "voice": "N",
+   "start": 9.467,
+   "end": 11.927,
+   "sub": "Kecha. Yakshanba. Yangiobod bozori.",
+   "hl": [
+    3,
+    4
+   ],
+   "quote": 0,
+   "scene": "S3"
+  },
+  {
+   "id": "n4",
+   "voice": "N",
+   "start": 12.172,
+   "end": 14.828,
+   "sub": "Sen bu yerga eski radio izlab kelgan eding.",
+   "hl": [],
+   "quote": 0,
+   "scene": "S3"
+  },
+  {
+   "id": "n5",
+   "voice": "N",
+   "start": 15.178,
+   "end": 18.687,
+   "sub": "Lekin bir cholning oldidagi bitta quti ko'zingga tushdi.",
+   "hl": [
+    5
+   ],
+   "quote": 0,
+   "scene": "S4"
+  },
+  {
+   "id": "o1",
+   "voice": "OLD",
+   "start": 19.177,
+   "end": 24.367,
+   "sub": "— Hammasi 50 ming. Nevaramniki edi. Endi kerakmas.",
+   "hl": [
+    2,
+    3
+   ],
+   "quote": 1,
+   "scene": "S5"
+  },
+  {
+   "id": "n6",
+   "voice": "N",
+   "start": 24.927,
+   "end": 26.997,
+   "sub": "Uyda qutini stolga ag'darding.",
+   "hl": [],
+   "quote": 0,
+   "scene": "S6"
+  },
+  {
+   "id": "n7",
+   "voice": "N",
+   "start": 27.242,
+   "end": 29.048,
+   "sub": "Eski mashinalar. Bo'yog'i ko'chgan.",
+   "hl": [],
+   "quote": 0,
+   "scene": "S6"
+  },
+  {
+   "id": "n8",
+   "voice": "N",
+   "start": 29.398,
+   "end": 31.637,
+   "sub": "Faqat bittasi boshqacha edi.",
+   "hl": [
+    3
+   ],
+   "quote": 0,
+   "scene": "S7"
+  },
+  {
+   "id": "n9",
+   "voice": "N",
+   "start": 31.882,
+   "end": 35.152,
+   "sub": "Pushti. Orqasida ikkita surf taxtasi.",
+   "hl": [
+    0
+   ],
+   "quote": 0,
+   "scene": "S7"
+  },
+  {
+   "id": "n10",
+   "voice": "N",
+   "start": 35.642,
+   "end": 37.517,
+   "sub": "Qiziqib, internetdan qidirding…",
+   "hl": [],
+   "quote": 0,
+   "scene": "S8"
+  },
+  {
+   "id": "n11",
+   "voice": "N",
+   "start": 38.987,
+   "end": 43.636,
+   "sub": null,
+   "hl": [],
+   "quote": 0,
+   "scene": "S9"
+  },
+  {
+   "id": "n12",
+   "voice": "N",
+   "start": 43.846,
+   "end": 47.754,
+   "sub": null,
+   "hl": [],
+   "quote": 0,
+   "scene": "S9"
+  },
+  {
+   "id": "n13",
+   "voice": "N",
+   "start": 47.964,
+   "end": 52.015,
+   "sub": null,
+   "hl": [],
+   "quote": 0,
+   "scene": "S9"
+  },
+  {
+   "id": "n14",
+   "voice": "N",
+   "start": 52.435,
+   "end": 54.87,
+   "sub": "Qo'llaring titray boshladi.",
+   "hl": [],
+   "quote": 0,
+   "scene": "S9"
+  },
+  {
+   "id": "n15",
+   "voice": "N",
+   "start": 55.5,
+   "end": 56.913,
+   "sub": "Agar bu haqiqiy bo'lsa…",
+   "hl": [],
+   "quote": 0,
+   "scene": "S10"
+  },
+  {
+   "id": "n16",
+   "voice": "N",
+   "start": 57.053,
+   "end": 60.296,
+   "sub": "Sen 50 ming so'mga deyarli 2 milliard topding.",
+   "hl": [
+    5,
+    6
+   ],
+   "quote": 0,
+   "scene": "S10"
+  },
+  {
+   "id": "n17",
+   "voice": "N",
+   "start": 61.066,
+   "end": 63.518,
+   "sub": null,
+   "hl": [],
+   "quote": 0,
+   "scene": "S11"
+  },
+  {
+   "id": "n18",
+   "voice": "N",
+   "start": 64.218,
+   "end": 66.858,
+   "sub": "Pul to'layotganingda orqangda bir yigit turgan edi.",
+   "hl": [],
+   "quote": 0,
+   "scene": "S12"
+  },
+  {
+   "id": "n19",
+   "voice": "N",
+   "start": 67.208,
+   "end": 69.081,
+   "sub": "U qutini suratga oldi.",
+   "hl": [
+    1,
+    2
+   ],
+   "quote": 0,
+   "scene": "S13"
+  },
+  {
+   "id": "n20",
+   "voice": "N",
+   "start": 69.851,
+   "end": 73.028,
+   "sub": "Soat tungi ikki. Telefoningga xabar keldi.",
+   "hl": [],
+   "quote": 0,
+   "scene": "S14"
+  },
+  {
+   "id": "s1",
+   "voice": "STR",
+   "start": 74.148,
+   "end": 77.748,
+   "sub": null,
+   "hl": [],
+   "quote": 0,
+   "scene": "S14"
+  },
+  {
+   "id": "s2",
+   "voice": "STR",
+   "start": 78.728,
+   "end": 80.627,
+   "sub": null,
+   "hl": [],
+   "quote": 0,
+   "scene": "S14"
+  },
+  {
+   "id": "s3",
+   "voice": "STR",
+   "start": 81.747,
+   "end": 83.036,
+   "sub": null,
+   "hl": [],
+   "quote": 0,
+   "scene": "S14"
+  },
+  {
+   "id": "n21",
+   "voice": "N",
+   "start": 83.806,
+   "end": 86.62,
+   "sub": "U raqamingni qayerdan oldi?…",
+   "hl": [],
+   "quote": 0,
+   "scene": "S15"
+  },
+  {
+   "id": "n22",
+   "voice": "N",
+   "start": 87.6,
+   "end": 88.19,
+   "sub": null,
+   "hl": [],
+   "quote": 0,
+   "scene": "S16"
+  },
+  {
+   "id": "n23",
+   "voice": "N",
+   "start": 88.33,
+   "end": 89.175,
+   "sub": null,
+   "hl": [],
+   "quote": 0,
+   "scene": "S16"
+  },
+  {
+   "id": "n24",
+   "voice": "N",
+   "start": 89.315,
+   "end": 90.036,
+   "sub": null,
+   "hl": [],
+   "quote": 0,
+   "scene": "S16"
+  },
+  {
+   "id": "n25",
+   "voice": "N",
+   "start": 90.176,
+   "end": 93.864,
+   "sub": null,
+   "hl": [],
+   "quote": 0,
+   "scene": "S16"
+  },
+  {
+   "id": "n26",
+   "voice": "N",
+   "start": 94.214,
+   "end": 99.419,
+   "sub": null,
+   "hl": [],
+   "quote": 0,
+   "scene": "S16"
+  },
+  {
+   "id": "n27",
+   "voice": "N",
+   "start": 100.329,
+   "end": 102.05,
+   "sub": null,
+   "hl": [],
+   "quote": 0,
+   "scene": "S17"
+  }
+ ]
+}
