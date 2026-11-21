@@ -1,0 +1,8 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#fff;overflow:hidden}
+#s{position:absolute;left:50%;top:44%;width:86vw;height:86vw;transform:translate(-50%,-50%)}</style></head>
+<body><div id="s"></div><script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script><script>
+// preview / QA page: ?bg=%23ffffff  — exposes window.seek(frame)
+const bg=new URLSearchParams(location.search).get('bg');if(bg)document.body.style.background=bg;
+fetch('davo-splash.json').then(r=>r.json()).then(d=>{const a=lottie.loadAnimation({container:document.getElementById('s'),renderer:'svg',loop:false,autoplay:false,animationData:d});
+ a.addEventListener('DOMLoaded',()=>{window.seek=f=>{a.goToAndStop(f,true);return new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))};window.READY=true})});
+</script></body></html>
