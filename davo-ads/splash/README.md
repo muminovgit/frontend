@@ -23,3 +23,18 @@ Kutubxonalar:
 - **iOS (native):** `lottie-ios` — `LottieAnimationView(name: "davo-splash")`, `loopMode = .playOnce`
 
 Shrift kerak emas: yozuv harflari vektor shaklga aylantirilgan.
+
+---
+
+# 2-variant: "Dive" — to'liq ekranli yorqin splash (`davo-splash-dive.json`)
+
+Dcard splash uslubida, Davo brendida. 1080×2340 (telefon ekrani), 2.6 soniya, 60 fps.
+
+1. Logo va "Davo Delivery" bir qatorda turadi → harflar oxiridan boshlab logoga "so'riladi".
+2. Logo markazga suzib kelib kattalashadi, bir lahza "cho'kadi" (sakrashga tayyorlanadi).
+3. Kamera yashil gulbargning ichiga sho'ng'iydi: sariq, pushti, binafsha gulbarglar va oq xoch butun ekranni kesib o'tadi.
+4. Ekran yashil; markazdan oq "+" xochlar va sariq nuqtalar to'lqin bo'lib portlab chiqadi.
+5. Hammasi oqarib ketadi → ilovaning birinchi ekrani ochiladi (crossfade).
+
+Ilovaga qo'yish: to'liq ekran, `scaleType="centerCrop"` (Android) / `contentMode = .scaleAspectFill` (iOS) / `fit: BoxFit.cover` (Flutter) / `resizeMode="cover"` (React Native). Bir marta o'ynatiladi, oxirida ekran oq bo'ladi — shu payt asosiy ekranga o'ting.
+Hajmi ~390 KB. Ko'rish uchun: `davo-splash-dive-preview.mp4`. Qayta yasash: `python3 build_splash_dive.py`.
