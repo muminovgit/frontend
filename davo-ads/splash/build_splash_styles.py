@@ -24,12 +24,22 @@ def cross_wipe(c, rig, t, col='#ffffff'):
     c.add('cross-h', [group([rect(2 * b, 2 * a), fill(col)])], st([0, 0, 0]), sc=anim([(t, [0, 100, 100]), (t + 12, [100, 100, 100])], 'back'), parent=rig)
 
 # ======================================================================= 1. DROP
-def drop():
-    c = Comp(W, H, 150); bg(c, '#ffffff')
+def drop(name='drop', back='#ffffff', ink=COL['ink'], ring=COL['y'], rain=False):
+    c = Comp(W, H, 150); bg(c, back)
     rig = c.add('rig', null=True, p=st([CX, CY, 0]))
     T_HIT = 30
+    if rain:   # all four drops fall into their own seats, one after another, each with its own splash ring
+        for n, (k, sx, sy) in enumerate(PET):
+            t = 4 + n * 7; th = t + 22; X, Y = sx * OFF, sy * OFF
+            c.add('ring-' + k, [group([ell(anim([(th, [30, 30]), (th + 22, [420, 420])], 'out')), stroke(COL[k], anim([(th, 16), (th + 22, 2)], 'out'))])],
+                  st([CX + X, CY + Y, 0]), o=anim([(th, 90), (th + 22, 0)], 'out'), ip=th)
+            c.add('drop-' + k, [group([ell(D), fill(COL[k])])], anim([(t, [X, -1300, 0], 'in'), (th, [X, Y, 0])], 'out'),
+                  sc=anim([(t, [34, 50, 100], 'in'), (th - 1, [30, 56, 100], 'out'), (th + 1, [125, 70, 100], 'back'), (th + 16, [100, 100, 100])], 'out'), parent=rig, ip=t)
+        cross_wipe(c, rig, 56)
+        wordmark(c, TEXT, TS, CX, TB, ink, 82, stagger=2, dur=22, dy=70)
+        save(c, name); return
     # shock ring on the impact frame
-    c.add('ring', [group([ell(anim([(T_HIT, [40, 40]), (T_HIT + 26, [760, 760])], 'out')), stroke(COL['y'], anim([(T_HIT, 22), (T_HIT + 26, 2)], 'out'))])],
+    c.add('ring', [group([ell(anim([(T_HIT, [40, 40]), (T_HIT + 26, [760, 760])], 'out')), stroke(ring, anim([(T_HIT, 22), (T_HIT + 26, 2)], 'out'))])],
           st([CX, CY, 0]), o=anim([(T_HIT, 90), (T_HIT + 26, 0)], 'out'), ip=T_HIT)
     # three sibling droplets spawn from the splash and fly to their petal seats
     for n, (k, sx, sy) in enumerate(PET[1:]):
@@ -44,27 +54,29 @@ def drop():
           parent=rig)
     cross_wipe(c, rig, 52)
     # stillness 66-76, then the name rises in a waterfall
-    wordmark(c, TEXT, TS, CX, TB, COL['ink'], 78, stagger=2, dur=22, dy=70)
-    save(c, 'drop')
+    wordmark(c, TEXT, TS, CX, TB, ink, 78, stagger=2, dur=22, dy=70)
+    save(c, name)
 
 # ======================================================================= 2. ROUTE
-def route():
-    c = Comp(W, H, 156); bg(c, '#dff6fd')
+def route(name='route', back='#dff6fd', street='#c4ebf6', line=COL['g'], dash='#ffffff', courier=COL['pk'], ink=COL['ink'], flip='', pin=False):
+    c = Comp(W, H, 156); bg(c, back)
     # faint city grid (static map texture: streets)
     streets = []
     for i in range(-2, 14): streets.append(path([[i * 120 - 300, -200], [i * 120 + 500, 2600]], closed=False))
     for j in range(-2, 24): streets.append(path([[-200, j * 120], [1300, j * 120 - 180]], closed=False))
-    c.add('streets', [group(streets + [stroke('#c4ebf6', 6)])], st([0, 0, 0]))
+    c.add('streets', [group(streets + [stroke(street, 6)])], st([0, 0, 0]))
     segs = [((-80, 2180), (260, 2140), (180, 1780), (520, 1720)), ((520, 1720), (900, 1650), (980, 1380), (700, 1300)),
             ((700, 1300), (380, 1210), (180, 1000), (420, 880)), ((420, 880), (600, 790), (640, 930), (CX, CY))]
+    fx = lambda q: (W - q[0] if 'x' in flip else q[0], 2 * CY - q[1] if 'y' in flip else q[1])
+    segs = [tuple(fx(q) for q in sg) for sg in segs]
     pts, L = sample_cubics(segs, 200)
     T0, T1 = 2, 56                                    # courier travel
     ease = lambda x: cubic_bez(.45, 0, .2, 1, x)      # accelerate out of the corner, brake into the destination
     # route line: drawn by the courier (trim end), then snapped in behind it (trim start)
     v = [[round(x, 1), round(y, 1)] for x, y in pts[::3]] + [[CX, CY]]
     ekeys = [(t, 100 * ease((t - T0) / (T1 - T0)), 'lin') for t in range(T0, T1 + 1, 2)]
-    c.add('route', [group([path(v, closed=False), stroke(COL['g'], 18), trim(s=anim([(T1 - 2, 0), (T1 + 14, 100)], 'out'), e=anim(ekeys))])], st([0, 0, 0]), op=T1 + 16)
-    c.add('route-dash', [group([path(v, closed=False), {'ty': 'st', 'c': st(rgb('#ffffff')), 'o': st(100), 'w': st(5), 'lc': 2, 'lj': 2,
+    c.add('route', [group([path(v, closed=False), stroke(line, 18), trim(s=anim([(T1 - 2, 0), (T1 + 14, 100)], 'out'), e=anim(ekeys))])], st([0, 0, 0]), op=T1 + 16)
+    c.add('route-dash', [group([path(v, closed=False), {'ty': 'st', 'c': st(rgb(dash)), 'o': st(100), 'w': st(5), 'lc': 2, 'lj': 2,
           'd': [{'n': 'd', 'nm': 'dash', 'v': st(14)}, {'n': 'g', 'nm': 'gap', 'v': st(22)}, {'n': 'o', 'nm': 'offset', 'v': st(0)}]},
           trim(s=anim([(T1 - 2, 0), (T1 + 14, 100)], 'out'), e=anim(ekeys))])], st([0, 0, 0]), op=T1 + 16)
     # logo bursts out of the arrival point (scale-burst), staggered clockwise; confetti flies outward on the same frame
@@ -84,29 +96,33 @@ def route():
     pkeys, rkeys = [], []
     for t in range(T0, T1 + 1, 2):
         p, ang = at_len(pts, L, ease((t - T0) / (T1 - T0))); pkeys.append((t, [p[0], p[1], 0], 'lin'))
-    c.add('courier', [group([ell(64), fill(COL['pk'])]), group([ell(26), fill('#ffffff')])], anim(pkeys),
+    body = ([group([path([[0, 6], [-30, -40], [30, -40]]), fill(courier)]), group([ell(78, (0, -62)), fill(courier)]), group([ell(30, (0, -62)), fill('#ffffff')])]
+            if pin else [group([ell(64), fill(courier)]), group([ell(26), fill('#ffffff')])])
+    c.add('courier', body, anim(pkeys),
           sc=anim([(T1 - 1, [100, 100, 100]), (T1 + 2, [135, 70, 100], 'in'), (T1 + 8, [0, 0, 100])], 'out'), op=T1 + 9)
-    wordmark(c, TEXT, TS, CX, TB, COL['ink'], T1 + 36, stagger=2, dur=22, dx=110, dy=0)   # enters on the current (moving LEFT)
-    save(c, 'route')
+    wordmark(c, TEXT, TS, CX, TB, ink, T1 + 36, stagger=2, dur=22, dx=110, dy=0)   # enters on the current (moving LEFT)
+    save(c, name)
 
 # ======================================================================= 3. CAPSULE
-def capsule():
-    c = Comp(W, H, 160); bg(c, '#2a1748')
-    c.add('glow', [group([ell(1500), {'ty': 'gf', 'o': st(100), 'r': 1, 't': 2, 's': st([0, 0]), 'e': st([750, 0]), 'g': {'p': 2, 'k': st([0, .37, .23, .6, 1, .16, .09, .28])}}])],
+def capsule(name='capsule', back='#2a1748', glow=('#5e3b99', '#291746'), ink='#ffffff', spark='#ffffff', halves=(COL['pk'], COL['g']), horizontal=False):
+    c = Comp(W, H, 160); bg(c, back)
+    g0, g1 = rgb(glow[0])[:3], rgb(back)[:3]          # fade to the page colour: no visible disc edge
+    c.add('glow', [group([ell(3400), {'ty': 'gf', 'o': st(100), 'r': 1, 't': 2, 's': st([0, 0]), 'e': st([1100, 0]), 'g': {'p': 2, 'k': st([0] + g0 + [1] + g1)}}])],
           st([CX, CY, 0]), o=anim([(0, 60), (70, 60, 'out'), (90, 100)]))
     CW, CH = 170, 380; T_LAND, T_OPEN = 32, 62                   # land, hold ~0.45 s (stillness before climax), crack open
-    cap = c.add('capsule', null=True, p=anim([(0, [CX, -300, 0], 'in'), (T_LAND, [CX, CY, 0])]),
-                r=anim([(0, -200, 'out'), (T_LAND, -12, 'out'), (T_LAND + 10, 0)]),
+    R0 = 90 if horizontal else 0      # horizontal: the capsule rolls in from the left and splits left / right
+    cap = c.add('capsule', null=True, p=anim([(0, [-300, CY, 0] if horizontal else [CX, -300, 0], 'out' if horizontal else 'in'), (T_LAND, [CX, CY, 0])]),
+                r=anim([(0, R0 - (540 if horizontal else 200), 'out'), (T_LAND, R0 - 12, 'out'), (T_LAND + 10, R0)]),
                 sc=anim([(T_LAND, [100, 100, 100], 'out'), (T_LAND + 3, [112, 86, 100], 'out'), (T_LAND + 14, [100, 100, 100])]))
     half = lambda col, sgn: [group([ell(CW, (0, sgn * (CH / 2 - CW / 2))), fill(col)]), group([rect(CW, CH / 2 - CW / 2 + 2, 0, (0, sgn * (CH / 2 - CW / 2) / 2)), fill(col)]),
                              group([rect(CW * .16, CH * .3, CW * .08, (-CW * .22, sgn * CH * .2)), fill('#ffffff', 28)])]
     # halves fly apart along their own axis the instant it cracks; fade as they leave
-    c.add('top', half(COL['pk'], -1), anim([(T_OPEN, [0, 0, 0]), (T_OPEN + 26, [0, -900, 0])], 'out'),
+    c.add('top', half(halves[0], -1), anim([(T_OPEN, [0, 0, 0]), (T_OPEN + 26, [0, -900, 0])], 'out'),
           r=anim([(T_OPEN, 0), (T_OPEN + 26, -35)], 'out'), o=anim([(T_OPEN + 8, 100), (T_OPEN + 24, 0)], 'out'), parent=cap, op=T_OPEN + 27)
-    c.add('bottom', half(COL['g'], 1), anim([(T_OPEN, [0, 0, 0]), (T_OPEN + 26, [0, 900, 0])], 'out'),
+    c.add('bottom', half(halves[1], 1), anim([(T_OPEN, [0, 0, 0]), (T_OPEN + 26, [0, 900, 0])], 'out'),
           r=anim([(T_OPEN, 0), (T_OPEN + 26, 35)], 'out'), o=anim([(T_OPEN + 8, 100), (T_OPEN + 24, 0)], 'out'), parent=cap, op=T_OPEN + 27)
     # tension: a hairline of light opens along the seam just before the crack
-    c.add('seam', [group([rect(CW + 30, 6, 3), fill('#ffffff')])], st([CX, CY, 0]),
+    c.add('seam', [group([rect(CW + 30, 6, 3), fill('#ffffff')])], st([CX, CY, 0]), r=st(R0),
           sc=anim([(T_OPEN - 10, [0, 100, 100], 'in'), (T_OPEN, [100, 100, 100], 'out'), (T_OPEN + 6, [300, 0, 100])]), ip=T_OPEN - 10, op=T_OPEN + 7)
     rig = c.add('rig', null=True, p=st([CX, CY, 0]))
     for n, (k, sx, sy) in enumerate(PET):
@@ -117,10 +133,20 @@ def capsule():
           sc=anim([(T_OPEN + 10, [0, 0, 100]), (T_OPEN + 28, [100, 100, 100])], 'back'), r=anim([(T_OPEN + 10, 90), (T_OPEN + 28, 0)], 'back'))
     for i in range(10):   # little white crosses spray out of the capsule
         a = i / 10 * 2 * math.pi + .3; dist = 520 + (i % 2) * 120; s = 30 + (i % 3) * 10
-        c.add(f'spark{i}', [group([path(cross_pts(s / 58)), fill('#ffffff')])],
+        c.add(f'spark{i}', [group([path(cross_pts(s / 58)), fill(spark)])],
               anim([(T_OPEN, [CX, CY, 0]), (T_OPEN + 34, [CX + math.cos(a) * dist, CY + math.sin(a) * dist, 0])], 'out'),
               r=anim([(T_OPEN, 0), (T_OPEN + 34, 140)], 'out'), o=anim([(T_OPEN + 16, 100), (T_OPEN + 34, 0)], 'out'), ip=T_OPEN, op=T_OPEN + 35)
-    wordmark(c, TEXT, TS, CX, TB, '#ffffff', T_OPEN + 34, stagger=2, dur=22, dy=70)
-    save(c, 'capsule')
+    wordmark(c, TEXT, TS, CX, TB, ink, T_OPEN + 34, stagger=2, dur=22, dy=70)
+    save(c, name)
 
 drop(); route(); capsule()
+# ---- variants
+drop('drop-rain', rain=True)                                                      # all four drops fall, one by one
+drop('drop-night', back='#1d1430', ink='#ffffff', ring='#ffffff')                 # dark
+drop('drop-sky', back='#5ecdf0', ink=COL['ink'], ring='#ffffff')                  # app cyan
+route('route-night', back='#1d1430', street='#2b2247', line=COL['y'], dash='#1d1430', ink='#ffffff')      # 24/7 night delivery
+route('route-pin', back='#ffffff', street='#eef0f5', line=COL['vi'], dash='#ffffff', courier=COL['pk'], flip='x', pin=True)
+route('route-cream', back='#fff4e2', street='#f6e6cc', line=COL['pk'], dash='#ffffff', courier=COL['g'], flip='y')
+capsule('capsule-light', back='#f4f0ff', glow=('#ffffff', '#e9e1ff'), ink=COL['ink'], spark=COL['vi'])
+capsule('capsule-roll', back='#08332f', glow=('#0f6b63', '#062824'), halves=(COL['y'], COL['pk']), horizontal=True)
+capsule('capsule-sky', back='#5ecdf0', glow=('#b5ecfb', '#4cbfe4'), ink=COL['ink'], spark='#ffffff', halves=(COL['pk'], COL['y']))
