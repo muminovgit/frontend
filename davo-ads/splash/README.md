@@ -53,3 +53,19 @@ Hammasi 1080×2340, 60 fps, to'liq ekran (cover / centerCrop), oxirida logo + yo
 
 Ko'rish: `davo-splash-3-styles.mp4` (uchalasi yonma-yon) yoki har birining `-preview.mp4` fayli.
 Qayta yasash: `python3 build_splash_styles.py` (umumiy yordamchilar — `splash_lib.py`).
+
+## Variantlar (har bir uslubdan 3 tadan)
+
+`davo-splash-variants-grid.mp4` — 12 tasi bir ekranda (qator: Tomchi / Yetkazish yo'li / Kapsula; 1-ustun — asl variant).
+
+| Fayl | Nima o'zgargan |
+|---|---|
+| `drop-rain` | 4 ta tomchi birma-bir o'z joyiga tushadi, har birining rangli to'lqini bor (oq fon) |
+| `drop-night` | Tomchi, to'q fon, oq halqa va oq yozuv |
+| `drop-sky` | Tomchi, ilovaning havorang foni, oq halqa |
+| `route-night` | "24/7" tungi yetkazish: to'q xarita, sariq yo'l, oq yozuv |
+| `route-pin` | Oq xarita, binafsha yo'l, kurer — xarita pini, yo'l o'ngdan keladi |
+| `route-cream` | Iliq krem xarita, pushti yo'l, yashil kurer, yo'l tepadan keladi |
+| `capsule-light` | Kapsula, och lavanda fon, to'q yozuv, binafsha uchqunlar |
+| `capsule-roll` | Kapsula chapdan dumalab keladi, yotgan holda chap-o'ngga ochiladi; to'q yashil fon; sariq-pushti kapsula |
+| `capsule-sky` | Kapsula, havorang fon, pushti-sariq kapsula |
