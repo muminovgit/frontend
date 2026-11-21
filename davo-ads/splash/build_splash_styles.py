@@ -58,7 +58,7 @@ def drop(name='drop', back='#ffffff', ink=COL['ink'], ring=COL['y'], rain=False)
     save(c, name)
 
 # ======================================================================= 2. ROUTE
-def route(name='route', back='#dff6fd', street='#c4ebf6', line=COL['g'], dash='#ffffff', courier=COL['pk'], ink=COL['ink'], flip='', pin=False):
+def route(name='route', back='#dff6fd', street='#c4ebf6', line=COL['g'], dash='#ffffff', courier=COL['pk'], ink=COL['ink'], flip='', pin=False, text=True, cy=None):
     c = Comp(W, H, 156); bg(c, back)
     # faint city grid (static map texture: streets)
     streets = []
@@ -100,11 +100,11 @@ def route(name='route', back='#dff6fd', street='#c4ebf6', line=COL['g'], dash='#
             if pin else [group([ell(64), fill(courier)]), group([ell(26), fill('#ffffff')])])
     c.add('courier', body, anim(pkeys),
           sc=anim([(T1 - 1, [100, 100, 100]), (T1 + 2, [135, 70, 100], 'in'), (T1 + 8, [0, 0, 100])], 'out'), op=T1 + 9)
-    wordmark(c, TEXT, TS, CX, TB, ink, T1 + 36, stagger=2, dur=22, dx=110, dy=0)   # enters on the current (moving LEFT)
+    if text: wordmark(c, TEXT, TS, CX, TB, ink, T1 + 36, stagger=2, dur=22, dx=110, dy=0)   # enters on the current (moving LEFT)
     save(c, name)
 
 # ======================================================================= 3. CAPSULE
-def capsule(name='capsule', back='#2a1748', glow=('#5e3b99', '#291746'), ink='#ffffff', spark='#ffffff', halves=(COL['pk'], COL['g']), horizontal=False):
+def capsule(name='capsule', back='#2a1748', glow=('#5e3b99', '#291746'), ink='#ffffff', spark='#ffffff', halves=(COL['pk'], COL['g']), horizontal=False, text=True):
     c = Comp(W, H, 160); bg(c, back)
     g0, g1 = rgb(glow[0])[:3], rgb(back)[:3]          # fade to the page colour: no visible disc edge
     c.add('glow', [group([ell(3400), {'ty': 'gf', 'o': st(100), 'r': 1, 't': 2, 's': st([0, 0]), 'e': st([1100, 0]), 'g': {'p': 2, 'k': st([0] + g0 + [1] + g1)}}])],
@@ -136,17 +136,18 @@ def capsule(name='capsule', back='#2a1748', glow=('#5e3b99', '#291746'), ink='#f
         c.add(f'spark{i}', [group([path(cross_pts(s / 58)), fill(spark)])],
               anim([(T_OPEN, [CX, CY, 0]), (T_OPEN + 34, [CX + math.cos(a) * dist, CY + math.sin(a) * dist, 0])], 'out'),
               r=anim([(T_OPEN, 0), (T_OPEN + 34, 140)], 'out'), o=anim([(T_OPEN + 16, 100), (T_OPEN + 34, 0)], 'out'), ip=T_OPEN, op=T_OPEN + 35)
-    wordmark(c, TEXT, TS, CX, TB, ink, T_OPEN + 34, stagger=2, dur=22, dy=70)
+    if text: wordmark(c, TEXT, TS, CX, TB, ink, T_OPEN + 34, stagger=2, dur=22, dy=70)
     save(c, name)
 
-drop(); route(); capsule()
-# ---- variants
-drop('drop-rain', rain=True)                                                      # all four drops fall, one by one
-drop('drop-night', back='#1d1430', ink='#ffffff', ring='#ffffff')                 # dark
-drop('drop-sky', back='#5ecdf0', ink=COL['ink'], ring='#ffffff')                  # app cyan
-route('route-night', back='#1d1430', street='#2b2247', line=COL['y'], dash='#1d1430', ink='#ffffff')      # 24/7 night delivery
-route('route-pin', back='#ffffff', street='#eef0f5', line=COL['vi'], dash='#ffffff', courier=COL['pk'], flip='x', pin=True)
-route('route-cream', back='#fff4e2', street='#f6e6cc', line=COL['pk'], dash='#ffffff', courier=COL['g'], flip='y')
-capsule('capsule-light', back='#f4f0ff', glow=('#ffffff', '#e9e1ff'), ink=COL['ink'], spark=COL['vi'])
-capsule('capsule-roll', back='#08332f', glow=('#0f6b63', '#062824'), halves=(COL['y'], COL['pk']), horizontal=True)
-capsule('capsule-sky', back='#5ecdf0', glow=('#b5ecfb', '#4cbfe4'), ink=COL['ink'], spark='#ffffff', halves=(COL['pk'], COL['y']))
+if __name__ == '__main__':
+  drop(); route(); capsule()
+  # ---- variants
+  drop('drop-rain', rain=True)                                                      # all four drops fall, one by one
+  drop('drop-night', back='#1d1430', ink='#ffffff', ring='#ffffff')                 # dark
+  drop('drop-sky', back='#5ecdf0', ink=COL['ink'], ring='#ffffff')                  # app cyan
+  route('route-night', back='#1d1430', street='#2b2247', line=COL['y'], dash='#1d1430', ink='#ffffff')      # 24/7 night delivery
+  route('route-pin', back='#ffffff', street='#eef0f5', line=COL['vi'], dash='#ffffff', courier=COL['pk'], flip='x', pin=True)
+  route('route-cream', back='#fff4e2', street='#f6e6cc', line=COL['pk'], dash='#ffffff', courier=COL['g'], flip='y')
+  capsule('capsule-light', back='#f4f0ff', glow=('#ffffff', '#e9e1ff'), ink=COL['ink'], spark=COL['vi'])
+  capsule('capsule-roll', back='#08332f', glow=('#0f6b63', '#062824'), halves=(COL['y'], COL['pk']), horizontal=True)
+  capsule('capsule-sky', back='#5ecdf0', glow=('#b5ecfb', '#4cbfe4'), ink=COL['ink'], spark='#ffffff', halves=(COL['pk'], COL['y']))

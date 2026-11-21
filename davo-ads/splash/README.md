@@ -88,3 +88,23 @@ Hammasini bir ekranda ko'rish: `davo-splash-nine-grid.mp4`.
 | `n7-liquid` | Bo'sh doiralar to'lqinli suyuqlik bilan birma-bir to'ladi |
 | `n8-notification` | "Davo Delivery — Buyurtmangiz yetib keldi!" bildirishnomasi tushadi, keyin ilova ikonkasiga aylanadi |
 | `n9-particles` | Ekran bo'ylab sochilgan rangli nuqtalar oqib kelib logoni yig'adi |
+
+---
+
+# Dasturchi taklifi bo'yicha prototiplar (`build_splash_proposal.py`)
+
+Faqat logotip elementlari (4 doira + oq xoch), oq fon, logo markazda, yozuvsiz. Hammasini bir ekranda: `davo-splash-proposal-grid.mp4`.
+
+| Fayl | G'oya | Davomiyligi |
+|---|---|---|
+| `p1-bloom` ⭐ | **Gul ochilishi.** Kirish: ekranda faqat xoch (brend `#09BBD4` rangida, oq fonda ko'rinishi uchun), orqasidan 4 doira 60 ms oraliq bilan ochiladi (sariq → pushti → yashil → binafsha), ozgina sakrab o'tiradi, xoch oqaradi. Kutish: doiralar xoch atrofida sekin aylanadi (3 s/aylanish, uzluksiz). Chiqish: xoch kattalashib butun ekranni oq qiladi | kirish 0.7 s · kutish ∞ · chiqish 0.35 s |
+| `p2-pulse` | **Puls.** Xoch bir lahza qisiladi, so'ng yurakdek "uriladi" (125%), shu kadrda 4 doira o'z rangidagi to'lqin bilan otilib chiqadi | 1.0 s |
+| `p3-route` | **Yetkazish yo'li.** `#09BBD4` chiziq ekran bo'ylab chiziladi, oxiridagi nuqta logotipga aylanib ochiladi | 1.6 s |
+| `p4-capsule` | **Kapsula.** Kapsula tushadi, chok bo'ylab nur, ochiladi — ichidan 4 doira | 1.8 s |
+| `p5-minimal` | **Minimal.** Yumshoq paydo bo'lish + 0.95 → 1 masshtab | 0.6 s |
+
+**p1 Lottie markerlari:** `intro` (0–42), `loop` (42–222), `outro` (222–243). Ilova: `intro`ni o'ynat → tayyor bo'lmasa `loop`ni takrorla → tayyor bo'lganda `outro`ni o'ynat va bosh sahifaga o't. Flutter'da: `lottie` paketi + `controller.animateTo` / segmentlar; yoki xuddi shu vaqtlar bilan `AnimationController + CustomPainter`.
+
+**Native splash:** oq fonda faqat `#09BBD4` xoch (p1 va p2 ning birinchi kadri aynan shu) — animatsiya shu kadrdan sakrashsiz boshlanadi.
+Eslatma: taklifda "oq fondagi oq xoch" deyilgan — oq fonda oq xoch ko'rinmaydi, shuning uchun xoch boshida brend rangida, doiralar orqasidan chiqqanda oqaradi.
+Haptic: p1 da doiralar o'tirgan payt ≈ 0.55 s (33-kadr); p2 da zarb ≈ 0.33 s (20-kadr).
