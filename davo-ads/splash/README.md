@@ -38,3 +38,18 @@ Dcard splash uslubida, Davo brendida. 1080×2340 (telefon ekrani), 2.6 soniya, 6
 
 Ilovaga qo'yish: to'liq ekran, `scaleType="centerCrop"` (Android) / `contentMode = .scaleAspectFill` (iOS) / `fit: BoxFit.cover` (Flutter) / `resizeMode="cover"` (React Native). Bir marta o'ynatiladi, oxirida ekran oq bo'ladi — shu payt asosiy ekranga o'ting.
 Hajmi ~390 KB. Ko'rish uchun: `davo-splash-dive-preview.mp4`. Qayta yasash: `python3 build_splash_dive.py`.
+
+---
+
+# 3 ta qo'shimcha uslub (`build_splash_styles.py`)
+
+Hammasi 1080×2340, 60 fps, to'liq ekran (cover / centerCrop), oxirida logo + yozuv qotib turadi.
+
+| Fayl | Uslub | Fon | Davomiyligi | Hajmi |
+|---|---|---|---|---|
+| `davo-splash-drop.json` | **Tomchi**: sariq tomchi tushadi → yerga urilib siqiladi, to'lqin halqa → 3 ta tomchi sachrab gulbarglarga aylanadi → oq xoch kesib o'tadi → yozuv pastdan ko'tariladi | oq | 2.5 s | 24 KB |
+| `davo-splash-route.json` | **Yetkazish yo'li**: shahar xaritasi ustida kurer nuqtasi egri yo'l bo'ylab tezlashib kelib markazda tormozlaydi → yo'l orqasidan yig'iladi → logo portlab ochiladi, konfetti → yozuv o'ngdan suriladi | och havorang | 2.6 s | 60 KB |
+| `davo-splash-capsule.json` | **Kapsula**: ikki rangli kapsula aylanib tushadi, qo'nadi, 0.45 s jimlik → chok bo'ylab nur → ochilib ketadi, ichidan logo va oq xochchalar otilib chiqadi → yozuv | to'q binafsha | 2.7 s | 41 KB |
+
+Ko'rish: `davo-splash-3-styles.mp4` (uchalasi yonma-yon) yoki har birining `-preview.mp4` fayli.
+Qayta yasash: `python3 build_splash_styles.py` (umumiy yordamchilar — `splash_lib.py`).
