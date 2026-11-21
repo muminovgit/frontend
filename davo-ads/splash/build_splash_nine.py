@@ -69,12 +69,13 @@ def n2():
     rig = c.add('rig', null=True, p=st([CX, CY, 0]), sc=anim([(TBt, [0, 0, 100], 'back'), (TBt + 10, [86, 86, 100], 'io'), (TBt + 16, [76, 76, 100], 'back'),
                                                               (TBt + 26, [104, 104, 100], 'io'), (TBt + 36, [100, 100, 100]), (98, [100, 100, 100], 'io'),
                                                               (106, [105, 105, 100], 'io'), (118, [100, 100, 100])]))
-    # fix 3: rings thicker and darker so they read on a phone
-    for tb in (TBt, TBt + 16):
-        c.add(f'pulse{tb}', [group([ell(anim([(tb, [260, 260]), (tb + 30, [900, 900])], 'out')), stroke(COL['pk'], anim([(tb, 12), (tb + 30, 7)], 'out'))])],
-              st([CX, CY, 0]), o=anim([(tb, 95), (tb + 30, 0)], 'out'), ip=tb, op=tb + 31)
-    for k, sx, sy in PET:
-        c.add('petal-' + k, [group([ell(D), fill(COL[k])])], st([sx * OFF, sy * OFF, 0]), parent=rig)
+    # no generic expanding rings: the impact is carried by the trace's own momentum — the line arrives moving RIGHT,
+    # so the newborn logo recoils right (squash along the travel axis) and springs back; the circles fly out of the
+    # centre rather than just scaling up.
+    c.layers[rig - 1]['ks']['p'] = anim([(TBt, [CX - 6, CY, 0], 'out'), (TBt + 6, [CX + 26, CY, 0], 'io'), (TBt + 20, [CX, CY, 0])])
+    for n, (k, sx, sy) in enumerate(PET):
+        t = TBt + (0 if sx < 0 else 2)                # the left pair (hit first) leaves one frame earlier
+        c.add('petal-' + k, [group([ell(D), fill(COL[k])])], anim([(t, [0, 0, 0]), (t + 14, [sx * OFF, sy * OFF, 0])], 'back'), parent=rig)
     # fix 2: the cross pops (0 -> 1) together with the circles, no cross-less frame
     c.add('cross', [group([path(cross_pts(K)), fill('#ffffff')])], st([0, 0, 0]), parent=rig,
           sc=anim([(TBt + 2, [0, 0, 100]), (TBt + 12, [100, 100, 100])], 'out'), ip=TBt + 2)
