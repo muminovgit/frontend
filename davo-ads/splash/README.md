@@ -69,3 +69,22 @@ Qayta yasash: `python3 build_splash_styles.py` (umumiy yordamchilar — `splash_
 | `capsule-light` | Kapsula, och lavanda fon, to'q yozuv, binafsha uchqunlar |
 | `capsule-roll` | Kapsula chapdan dumalab keladi, yotgan holda chap-o'ngga ochiladi; to'q yashil fon; sariq-pushti kapsula |
 | `capsule-sky` | Kapsula, havorang fon, pushti-sariq kapsula |
+
+---
+
+# 9 ta har xil animatsiya g'oyasi (`build_splash_nine.py`)
+
+Ranglar ataylab bir xil — farq faqat harakat g'oyasida. Tanlangandan keyin ranglar moslanadi.
+Hammasini bir ekranda ko'rish: `davo-splash-nine-grid.mp4`.
+
+| Fayl | G'oya |
+|---|---|
+| `n1-orbit` | Gulbarglar katta spiral bo'ylab ikki aylanib keladi, ortidan "iz" qoladi, joyiga tushganda logo siqilib "zarb" beradi, xoch aylanib kiradi |
+| `n2-heartbeat` | EKG chizig'i ekranni kesib o'tadi; puls cho'qqisida logo "tuk-tuk" ikki marta uradi, har zarbda to'lqin |
+| `n3-tiles` | 4 ta kvadrat to'rt tomondan uchib kelib to'qnashadi, keyin burchaklari yumaloqlanib doiraga aylanadi |
+| `n4-draw` | Logo avval chiziq bo'lib chiziladi, keyin har doira rang bilan to'ladi |
+| `n5-flip` | Ilova ikonkasi tushadi va tobora tezroq aylanadi: sariq → pushti → yashil → binafsha → logo |
+| `n6-type` | "Davo Delivery" yozuv mashinkasidek teriladi; "o" harfi kattalashib logoga aylanadi, yozuv pastga tushadi |
+| `n7-liquid` | Bo'sh doiralar to'lqinli suyuqlik bilan birma-bir to'ladi |
+| `n8-notification` | "Davo Delivery — Buyurtmangiz yetib keldi!" bildirishnomasi tushadi, keyin ilova ikonkasiga aylanadi |
+| `n9-particles` | Ekran bo'ylab sochilgan rangli nuqtalar oqib kelib logoni yig'adi |
