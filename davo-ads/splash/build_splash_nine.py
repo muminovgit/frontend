@@ -57,27 +57,18 @@ def n1():
 
 # ------------------------------------------------------------------ 2. HEARTBEAT — an ECG trace; the logo is the beat
 def n2():
-    c = Comp(W, H, 140); bg(c); y = CY
-    pts = [[-60, y], [300, y], [340, y - 40], [380, y], [440, y], [470, y + 60], [CX, y - 520], [610, y + 240], [650, y], [720, y], [760, y - 50], [800, y], [1140, y]]
-    T0, T1 = 2, 54; ez = lambda x: cubic_bez(.3, .1, .3, 1, x)
-    TBt = 24                                          # the spike passes the centre: the logo is born on this beat
-    # head = trim end; tail chases it so a glowing segment travels across
-    E_ = c.add('ecg', [group([path(pts, closed=False), stroke(COL['pk'], 16), trim(s=anim(sampled(lambda u: max(0, 138 * ez(u) - 38), T0 + 8, T1 + 16)),
-                                                                                    e=anim(sampled(lambda u: 100 * ez(u), T0, T1)))])], st([0, 0, 0]), op=T1 + 17)
-    # fix 1: the trace never crosses the logo — a hole (subtract mask) opens around the logo on the beat
-    R0, R1 = 4, LOGO * .62
-    def oval(rx, ry):   # the hole is a tall oval so the whole spike (up to -520 / +240) disappears with it
-        o = circ(1, CX, CY)
-        o['v'] = [[CX, CY - ry], [CX + rx, CY], [CX, CY + ry], [CX - rx, CY]]
-        o['i'] = [[-rx * KAP, 0], [0, -ry * KAP], [rx * KAP, 0], [0, ry * KAP]]; o['o'] = [[rx * KAP, 0], [0, ry * KAP], [-rx * KAP, 0], [0, -ry * KAP]]
-        return o
-    hole = {'a': 1, 'k': [{'t': TBt - 6, 's': [oval(R0, R0)], 'o': {'x': [.22], 'y': [1]}, 'i': {'x': [.36], 'y': [1]}}, {'t': TBt + 4, 's': [oval(R1, 600)]}]}
-    lay = c.layers[E_ - 1]; lay['hasMask'] = True
-    lay['masksProperties'] = [{'inv': False, 'mode': 's', 'pt': hole, 'o': st(100), 'x': st(0), 'nm': 'logo-hole'}]
+    c = Comp(W, H, 130); bg(c); y = CY
+    # the beat happens LEFT of the logo, in clear space: small P-wave, then one tall QRS spike, then the trace runs into
+    # the logo centre and is swallowed by it — the circles burst out on that very frame. Nothing crosses the logo.
+    pts = [[-60, y], [90, y], [120, y - 34], [150, y], [190, y], [210, y + 54], [245, y - 560], [282, y + 210], [312, y], [CX, y]]
+    T0, T1 = 2, 40; ez = lambda x: cubic_bez(.35, .15, .55, 1, x)
+    TBt = T1                                          # the trace reaches the centre: the logo is born on this beat
+    c.add('ecg', [group([path(pts, closed=False), stroke(COL['pk'], 16), trim(s=anim([(T1 - 8, 0, 'in'), (T1 + 10, 100)]),
+                                                                            e=anim(sampled(lambda u: 100 * ez(u), T0, T1)))])], st([0, 0, 0]), op=T1 + 11)
     # logo thumps twice (lub-dub); fix 5: one gentle beat (1.0 -> 1.05 -> 1.0) near the end so the hold keeps living
     rig = c.add('rig', null=True, p=st([CX, CY, 0]), sc=anim([(TBt, [0, 0, 100], 'back'), (TBt + 10, [86, 86, 100], 'io'), (TBt + 16, [76, 76, 100], 'back'),
-                                                              (TBt + 26, [104, 104, 100], 'io'), (TBt + 36, [100, 100, 100]), (104, [100, 100, 100], 'io'),
-                                                              (112, [105, 105, 100], 'io'), (124, [100, 100, 100])]))
+                                                              (TBt + 26, [104, 104, 100], 'io'), (TBt + 36, [100, 100, 100]), (98, [100, 100, 100], 'io'),
+                                                              (106, [105, 105, 100], 'io'), (118, [100, 100, 100])]))
     # fix 3: rings thicker and darker so they read on a phone
     for tb in (TBt, TBt + 16):
         c.add(f'pulse{tb}', [group([ell(anim([(tb, [260, 260]), (tb + 30, [900, 900])], 'out')), stroke(COL['pk'], anim([(tb, 12), (tb + 30, 7)], 'out'))])],
@@ -88,7 +79,7 @@ def n2():
     c.add('cross', [group([path(cross_pts(K)), fill('#ffffff')])], st([0, 0, 0]), parent=rig,
           sc=anim([(TBt + 2, [0, 0, 100]), (TBt + 12, [100, 100, 100])], 'out'), ip=TBt + 2)
     # fix 4: the name simply fades in while rising ~10 pt, as one calm piece (no per-letter drop)
-    word(c, TBt + 46, stagger=0, dur=26, dy=32)
+    word(c, TBt + 40, stagger=0, dur=26, dy=32)
     save(c, 'n2-heartbeat')
 
 # ------------------------------------------------------------------ 3. TILES — four squares slam in from four edges, then round off
