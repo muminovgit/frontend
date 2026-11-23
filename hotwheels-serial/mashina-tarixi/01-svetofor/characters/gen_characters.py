@@ -89,19 +89,20 @@ def leg(cid, side, hipx, c, pose):
     ft = G(f"{cid}_foot_{side}", 0, sh, foot(side, c["boot"], c.get("shoe", "boot")), pose.get(f"foot_{side}", 0))
     shin = G(f"{cid}_shin_{side}", 0, th, shin_body + ft, pose.get(f"shin_{side}", 0))
     crease = L(f"M {(-1 if side=='R' else 1)*6},20 Q {(-1 if side=='R' else 1)*2},{th*0.5} {(-1 if side=='R' else 1)*5},{th-20}", 2, mul(pants, 0.62))
-    return G(f"{cid}_thigh_{side}", hipx, 0, P(limb(th, tw0, tw1), pants) + crease + shin, pose.get(f"thigh_{side}", 0))
+    return G(f"{cid}_thigh_{side}", hipx, 0, shin + P(limb(th, tw0, tw1), pants) + crease, pose.get(f"thigh_{side}", 0))
 
 def arm(cid, side, shx, shy, c, pose):
     ua, fa = c.get("upper", 150), c.get("fore", 135)
     sleeve = c["sleeve"]
     cuff = c.get("cuff")
-    fore_body = P(limb(fa, 15, 12), sleeve)
-    if cuff: fore_body += P(f"M -14,{fa-14} L 14,{fa-14} L 13,{fa+2} L -13,{fa+2} Z", cuff, 3)
+    aw = c.get("aw", 1.0)
+    fore_body = P(limb(fa, 15 * aw, 12 * aw), sleeve)
+    if cuff: fore_body += P(f"M {-14*aw:.1f},{fa-14} L {14*aw:.1f},{fa-14} L {13*aw:.1f},{fa+2} L {-13*aw:.1f},{fa+2} Z", cuff, 3)
     for b in c.get("cuffButtons", []): fore_body += C(b, fa - 6, 2.6, "#c99a3e", 1.2)
     hd = G(f"{cid}_hand_{side}", 0, fa + (2 if cuff else 0), hand(cid, side, c["skin"], c.get("glove")), pose.get(f"hand_{side}", 0))
     fore = G(f"{cid}_forearm_{side}", 0, ua, fore_body + hd, pose.get(f"forearm_{side}", 0))
     wrinkle = L(f"M -8,{ua-12} Q 0,{ua-6} 8,{ua-12}", 2, mul(sleeve, 0.6))
-    return G(f"{cid}_upper_arm_{side}", shx, shy, P(limb(ua, 19, 16), sleeve) + wrinkle + fore, pose.get(f"upper_arm_{side}", 0))
+    return G(f"{cid}_upper_arm_{side}", shx, shy, fore + P(limb(ua, 19 * aw, 16 * aw), sleeve) + wrinkle, pose.get(f"upper_arm_{side}", 0))
 
 # ---------------------------------------------------------------- heads / faces / hats
 HEAD = "M 0,-64 C 36,-64 54,-40 54,-6 C 54,28 38,60 0,62 C -38,60 -54,28 -54,-6 C -54,-40 -36,-64 0,-64 Z"
@@ -252,7 +253,9 @@ def torso_tunic(cid, c):
 def torso_frock(cid, c):
     """Victorian frock coat to the knee, waistcoat, white collar, dark cravat"""
     j, v = c["jacket"], c["vest"]
-    tails = P("M -80,-60 L -88,150 Q -50,160 -8,150 L -4,40 Z", mul(j, 0.92)) + P("M 80,-60 L 88,150 Q 50,160 8,150 L 4,40 Z", j)
+    trousers = P("M -46,-24 Q 0,-16 46,-24 L 44,164 L -44,164 Z", c["pants"], 3) + L("M 0,40 L 0,164", 2.5, mul(c["pants"], 0.6)) + \
+               PF("M -44,-20 Q 0,-12 44,-20 L 44,30 Q 0,44 -44,30 Z", mul(c["pants"], 0.75), ' opacity="0.7"')
+    tails = trousers + P("M -80,-60 L -88,150 Q -50,160 -10,150 L -6,-6 Z", mul(j, 0.92)) + P("M 80,-60 L 88,150 Q 50,160 10,150 L 6,-6 Z", j)
     vest = P("M -34,-226 L 34,-226 L 38,-10 Q 0,0 -38,-10 Z", v, 3)
     vest_btn = "".join(C(0, y, 3.5, "#cfa042", 1.5) for y in range(-170, -20, 26))
     shirt = P("M -18,-240 L 18,-240 L 0,-196 Z", "#f5f5f2", 3)
@@ -283,8 +286,8 @@ def torso_shirt(cid, c):
     j = c["jacket"]
     body = P("M -22,-238 Q -60,-236 -80,-222 Q -88,-150 -74,-60 L -70,24 Q 0,34 70,24 L 74,-60 Q 88,-150 80,-222 Q 60,-236 22,-238 Z", j)
     tee = P("M -16,-236 Q 0,-224 16,-236 L 12,-208 L -12,-208 Z", "#e9ecef", 2.5)
-    collar = P("M -24,-244 L -2,-228 L -18,-206 L -30,-232 Z", mul(j, 0.88), 2.5) + P("M 24,-244 L 2,-228 L 18,-206 L 30,-232 Z", mul(j, 1.05), 2.5)
-    placket = L("M 4,-222 L 4,22", 2.5, mul(j, 0.6)) + "".join(C(10, y, 3, "#e8eef6", 1.2) for y in range(-200, 20, 36))
+    collar = P("M -24,-244 L -2,-228 L -18,-206 L -30,-232 Z", mul(j, 0.88), 2.5) + P("M 24,-244 L 2,-228 L 18,-206 L 30,-232 Z", mul(j, 0.88), 2.5)
+    placket = L("M -6,-222 L -6,22 M 10,-222 L 10,22", 2, mul(j, 0.62)) + "".join(C(2, y, 3.4, "#e8eef6", 1.4) for y in range(-196, 20, 36))
     pockets = P("M -56,-190 L -24,-190 L -24,-158 Q -40,-152 -56,-158 Z", mul(j, 0.92), 2.5) + P("M 30,-190 L 62,-190 L 62,-158 Q 46,-152 30,-158 Z", j, 2.5)
     folds = L("M -40,-60 Q -30,-40 -36,0 M 46,-70 Q 40,-40 48,-6", 2, mul(j, 0.7))
     return body + tee + collar + placket + pockets + folds
@@ -316,13 +319,13 @@ def person(cid, cfg, pose):
     hx = cfg.get("hipx", 36)
     leg_c = dict(pants=cfg["pants"], boot=cfg["boot"], shoe=cfg.get("shoe", "boot"), bootTop=cfg.get("bootTop"), tw=cfg.get("tw", 25), tw1=cfg.get("tw1", 18), sw1=cfg.get("sw1", 14))
     legs = leg(cid, "R", -hx, leg_c, pose) + leg(cid, "L", hx, leg_c, pose)
-    arm_c = dict(sleeve=cfg["sleeve"], skin=skin, cuff=cfg.get("cuff"), cuffButtons=cfg.get("cuffButtons", []), glove=cfg.get("glove"))
-    shx = cfg.get("shx", 80)
+    arm_c = dict(aw=cfg.get("aw", 1.0), sleeve=cfg["sleeve"], skin=skin, cuff=cfg.get("cuff"), cuffButtons=cfg.get("cuffButtons", []), glove=cfg.get("glove"))
+    shx = cfg.get("shx", 74)
     nh = neck_head(cid, skin, cfg["expr"], cfg["hat"], cfg["hatCol"], cfg.get("hatExtra"), cfg.get("moustache"), cfg.get("sideburns"),
                    cfg.get("cheeks"), cfg.get("noseCol"), cfg.get("soot", False), cfg.get("sweat", False), cfg.get("smoke", False), pose.get("head", 0))
     neck = G(f"{cid}_neck", 0, -236, nh, pose.get("neck", 0))
-    arms_back = "".join(arm(cid, s, x, -222, arm_c, pose) for s, x in (("R", -shx), ("L", shx)) if pose.get(f"arm_{s}_behind"))
-    arms_front = "".join(arm(cid, s, x, -222, arm_c, pose) for s, x in (("R", -shx), ("L", shx)) if not pose.get(f"arm_{s}_behind"))
+    arms_back = "".join(arm(cid, s, x, -214, arm_c, pose) for s, x in (("R", -shx), ("L", shx)) if pose.get(f"arm_{s}_behind"))
+    arms_front = "".join(arm(cid, s, x, -214, arm_c, pose) for s, x in (("R", -shx), ("L", shx)) if not pose.get(f"arm_{s}_behind"))
     torso_body = torso_fn(cid, cfg)
     if cfg["torso"] == "lady":  # skirt hangs from the waist over the legs
         legs_and_skirt = legs + skirt(cid, cfg)
@@ -345,17 +348,17 @@ def horse(cid):
         side = "fore_" + side
         hoof_g = G(f"{cid}_hoof_{side}", 0, 0, P("M -14,0 L 16,0 L 22,24 L -16,24 Z", hoof, 3.5) + L("M -14,4 L 16,4", 2, "#4a4440"))
         past = G(f"{cid}_fetlock_{side}", 0, 66, P("M -12,-6 Q 14,-8 16,4 L 18,14 Q 0,18 -12,12 Z", fill, 3) + G(f"{cid}_pastern_{side}", 2, 12, hoof_g), rot[2])
-        cannon = G(f"{cid}_cannon_{side}", 0, 86, P(limb(66, 12, 11, 1.02), fill) + E(0, 4, 11, 9, fill, 2.5) + past, rot[1])
-        forearm = P("M -26,-14 Q 30,-20 26,10 Q 18,50 14,86 L -12,86 Q -20,40 -26,-14 Z", fill)
-        return G(f"{cid}_foreleg_{side[5:]}", x, y, forearm + cannon, rot[0])
+        cannon = G(f"{cid}_cannon_{side}", 0, 82, P(limb(70, 13, 11, 1.02), fill) + past, rot[1])
+        forearm = P("M -28,-40 Q 32,-46 28,6 Q 22,48 16,80 Q 18,94 2,96 Q -16,94 -14,80 Q -20,40 -28,-40 Z", fill)
+        return G(f"{cid}_foreleg_{side[5:]}", x, y, cannon + forearm, rot[0])
 
     def hindleg(side, x, y, fill, rot=(14, -24, 8)):
         side = "hind_" + side
         hoof_g = G(f"{cid}_hoof_{side}", 0, 0, P("M -14,0 L 16,0 L 22,24 L -16,24 Z", hoof, 3.5) + L("M -14,4 L 16,4", 2, "#4a4440"))
         past = G(f"{cid}_fetlock_{side}", 0, 70, P("M -12,-6 Q 14,-8 16,4 L 18,14 Q 0,18 -12,12 Z", fill, 3) + G(f"{cid}_pastern_{side}", 2, 12, hoof_g), 0)
-        cannon = G(f"{cid}_cannon_{side}", 0, 92, P(limb(70, 13, 11, 1.02), fill) + E(-3, 4, 12, 9, fill, 2.5) + past, rot[1])
-        gaskin = P("M -30,-20 Q 28,-28 24,20 Q 18,60 14,92 L -14,92 Q -26,40 -30,-20 Z", fill)
-        return G(f"{cid}_hindleg_{side[5:]}", x, y, gaskin + cannon, rot[0])
+        cannon = G(f"{cid}_cannon_{side}", 0, 88, P(limb(74, 13, 11, 1.02), fill) + past, rot[1])
+        gaskin = P("M -34,-46 Q 32,-52 26,14 Q 20,56 18,86 Q 16,102 -2,102 Q -18,98 -16,86 Q -28,40 -34,-46 Z", fill)
+        return G(f"{cid}_hindleg_{side[5:]}", x, y, cannon + gaskin, rot[0])
 
     # far legs (behind the body, darker)
     far = foreleg("R", 118, -205, far_fill, (6, -4, 0)) + hindleg("R", -150, -200, far_fill, (10, -20, 6))
@@ -363,19 +366,23 @@ def horse(cid):
              L("M -30,30 Q -48,90 -38,160 M -18,40 Q -30,100 -26,150", 2, "#5a4636"), 0)
     body = P("M 168,-292 C 120,-276 60,-270 0,-272 C -60,-274 -122,-296 -168,-294 C -212,-292 -236,-262 -234,-222 C -232,-186 -212,-160 -180,-150 "
              "C -120,-136 60,-134 132,-148 C 180,-158 210,-192 210,-232 C 210,-266 194,-288 168,-292 Z", body_fill)
-    muscles = L("M -150,-280 Q -120,-200 -170,-160 M 150,-262 Q 120,-210 150,-160 M -40,-150 Q 20,-168 90,-152", 2.5, dark) + \
+    muscles = L("M -140,-282 Q -112,-214 -150,-160", 2.5, dark) + L("M 150,-268 Q 128,-220 146,-170", 2.5, dark) + L("M -60,-152 Q 0,-162 50,-152", 2, dark) + \
               L("M -200,-270 Q -170,-292 -120,-290", 3, hi)
     near = hindleg("L", -168, -196, body_fill, (16, -26, 10)) + foreleg("L", 146, -200, body_fill, (-4, 6, 0))
     # harness: collar + hames at the neck base, saddle pad + girth, breeching, traces
-    harness = P("M -40,-300 Q 0,-312 40,-300 L 46,-262 Q 0,-252 -46,-262 Z", strap, 3) + C(-30, -282, 6, brass, 2) + C(30, -282, 6, brass, 2) + \
-              P("M -18,-262 L 18,-262 L 22,-142 L -22,-142 Z", strap, 3) + C(0, -228, 7, brass, 2) + \
-              P("M -170,-246 Q -60,-232 60,-238 L 60,-224 Q -60,-218 -168,-232 Z", strap, 2.5) + C(60, -231, 6, brass, 2) + \
-              P("M 150,-206 Q 60,-190 -20,-198 L -20,-186 Q 60,-178 152,-192 Z", strap, 2.5)
+    crupper = L("M 48,-282 Q -60,-290 -196,-284", 7, strap) + L("M 48,-282 Q -60,-290 -196,-284", 2, mul(strap, 1.8))
+    breeching = P("M -148,-282 Q -204,-262 -220,-190 L -204,-186 Q -192,-250 -140,-268 Z", strap, 3) + C(-208, -214, 7, brass, 2.5)
+    traces = P("M 206,-206 Q 10,-186 -204,-200 L -204,-186 Q 10,-172 206,-192 Z", strap, 3)
+    girth = P("M 70,-270 L 98,-270 L 102,-140 Q 86,-134 72,-140 Z", strap, 3) + P("M 74,-206 L 98,-206 L 98,-188 L 74,-188 Z", brass, 2) + \
+            P("M 80,-201 L 92,-201 L 92,-193 L 80,-193 Z", strap, 1.5)
+    pad = P("M 36,-288 Q 84,-300 132,-288 L 128,-262 Q 84,-272 40,-262 Z", strap, 3) + C(84, -280, 6, brass, 2) + L("M 46,-270 Q 84,-280 122,-270", 1.5, mul(strap, 2))
+    collar = P("M 142,-306 Q 200,-302 226,-246 Q 236,-206 214,-168 L 190,-178 Q 208,-212 200,-240 Q 184,-278 136,-284 Z", "#3a2e28", 3.5) + \
+             L("M 150,-300 Q 200,-292 220,-240 Q 226,-210 212,-180", 4, brass) + C(154, -312, 7, brass, 2.5) + C(222, -176, 7, brass, 2.5) + C(213, -232, 6, brass, 2)
+    harness = crupper + breeching + girth + traces + pad + collar
     neck = G(f"{cid}_neck", 160, -270,
              P("M -40,0 C -24,-70 10,-132 60,-168 C 76,-176 96,-168 104,-152 C 84,-100 62,-40 56,24 Q 10,30 -40,0 Z", body_fill) +
              L("M 10,-20 Q 30,-80 70,-130", 2.5, dark) +
              P("M -36,-6 C -20,-74 14,-136 62,-170 Q 52,-150 40,-150 Q 30,-120 14,-110 Q 10,-84 -4,-76 Q -6,-50 -22,-40 Q -24,-20 -36,-6 Z", mane, 3) +
-             P("M 20,-38 Q 60,-20 80,10 L 56,24 Q 34,0 6,-18 Z", strap, 3) + C(56, -2, 8, brass, 2.5) + C(56, -2, 4, mul(brass, 0.7)) +
              G(f"{cid}_head", 76, -160,
                P("M -6,-10 C 26,-22 54,0 80,46 C 94,70 104,92 94,108 C 84,122 60,122 46,110 C 28,90 8,60 -14,30 C -28,12 -24,-4 -6,-10 Z", body_fill) +
                P("M 52,112 Q 76,126 94,108 Q 90,124 70,128 Q 56,126 52,112 Z", mul(coat, 0.8), 2.5) +
@@ -387,7 +394,7 @@ def horse(cid):
                # bridle: crown piece, browband, noseband, cheek strap, brass rings, rein
                L("M 4,-8 Q 2,30 32,74", 6, strap) + L("M 10,-12 L 30,-4", 5, strap) + L("M 44,70 Q 70,58 92,78", 6, strap) +
                L("M 30,74 Q 44,90 58,104", 5, strap) + C(32, 74, 6, brass, 2) + C(60, 104, 6, brass, 2) + L("M 60,104 Q 20,150 -60,120", 3.5, strap)))
-    cid_g = far + tail + body + muscles + harness + neck + near
+    cid_g = far + tail + neck + near + body + muscles + harness
     shadow = f'<ellipse id="{cid}_contact_shadow" cx="0" cy="22" rx="250" ry="18" fill="#3a2a20" opacity="0.18"/>'
     return shadow + cid_g
 
@@ -407,7 +414,7 @@ CABBIE = dict(torso="coach", skin="#d9a582", expr="shock", hat="flatcap", hatCol
               bootTop=56, shx=90, hipx=40, tw=28, tw1=20, sw1=15, shadowW=118)
 LADY = dict(torso="lady", skin="#f5d5be", expr="nervous", hat="bonnet", hatCol="#e8d49c", hatExtra={"hair": "#dec078", "ribbon": "#b85c74"},
             cheeks="#e68a8a", sweat=True, dress="#a84e6b", shawl="#6e2c42", sleeve="#6e2c42", cuff="#f6efe6", pants="#a84e6b", boot="#2a2026",
-            shoe="heel", shx=66, hipx=22, tw=18, tw1=13, sw1=10, shadowW=135)
+            shoe="heel", aw=0.8, shx=60, hipx=22, tw=18, tw1=13, sw1=10, shadowW=135)
 DRIVER = dict(torso="shirt", skin="#c9936b", expr="bored", hat="modernhair", hatCol="#241e1c", jacket="#2f629e", sleeve="#2f629e",
               cuff=mul("#2f629e", 0.9), pants="#232b38", boot="#f4f5f7", shoe="sneaker", sw1=14)
 
@@ -415,8 +422,8 @@ POSES = {
     "politsiyachi": dict(upper_arm_L=-16, forearm_L=68, hand_L=24, upper_arm_R=8, forearm_R=4, thigh_L=-3, thigh_R=3, foot_L=0),  # hand on belt
     "portlashdan_keyin": dict(upper_arm_L=-28, forearm_L=-20, hand_L=-10, upper_arm_R=30, forearm_R=24, thigh_L=-6, shin_L=4, thigh_R=4, head=-8, torso=3),
     "jon_nayt": dict(upper_arm_L=-30, forearm_L=-105, hand_L=-30, upper_arm_R=8, forearm_R=6, thigh_L=-2, thigh_R=2, head=4),  # presenting gesture
-    "aravakash": dict(upper_arm_L=-150, forearm_L=16, hand_L=-6, upper_arm_R=150, forearm_R=-16, hand_R=6, thigh_L=-5, thigh_R=5, head=-3),  # hands up
-    "piyoda_xonim": dict(upper_arm_L=14, forearm_L=104, hand_L=14, upper_arm_R=-14, forearm_R=-104, hand_R=-14, head=-4),  # hands clasped
+    "aravakash": dict(upper_arm_L=-145, forearm_L=12, hand_L=-4, upper_arm_R=145, forearm_R=-12, hand_R=4, thigh_L=-4, thigh_R=4, head=-3),  # hands up
+    "piyoda_xonim": dict(upper_arm_L=4, forearm_L=19, hand_L=8, upper_arm_R=-4, forearm_R=-19, hand_R=-8, head=-4),  # hands clasped at the waist
     "bugungi_haydovchi": dict(upper_arm_L=-4, forearm_L=-14, upper_arm_R=6, forearm_R=10, thigh_L=-3, thigh_R=5, foot_R=-6, head=6, neck=-2),
 }
 
