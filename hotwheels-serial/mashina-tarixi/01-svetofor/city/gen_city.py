@@ -266,7 +266,7 @@ def scene(mode, cast=False):
         # horse + hansom cab on the road (cab behind the horse), cabbie up on the seat
         hs = 0.42
         hg = gen.horse("ot")
-        cg, _ = gen.person("aravakash", gen.CABBIE, dict(gen.POSES["aravakash"], upper_arm_L=16, forearm_L=78, hand_L=10, upper_arm_R=-16, forearm_R=-78, hand_R=-10))
+        cg, _ = gen.person("aravakash", gen.CABBIE, dict(gen.POSES["aravakash"], arm_L=16, forearm_L=78, hand_L=10, arm_R=-16, forearm_R=-78, hand_R=-10))
         people += f'<g id="stage_cab" transform="translate(470,1630) scale({hs})">' + \
                   f'<g transform="translate(-110,-445) scale(0.62)">{cg}</g>' + cab() + \
                   f'<g transform="translate(700,0)">{hg}</g></g>'

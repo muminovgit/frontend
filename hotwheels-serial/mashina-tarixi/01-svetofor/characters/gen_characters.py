@@ -47,6 +47,11 @@ def G(gid, x, y, body, rot=0, extra=""):
     r = f" rotate({rot})" if rot else ""
     return f'<g id="{gid}" data-pivot="{x:.1f},{y:.1f}" transform="translate({x:.1f},{y:.1f}){r}"{extra}>{body}</g>'
 
+def rim(Lh, w0, w1, col, k=0.42):
+    """thin light stroke just inside the right edge of a limb (key light from the right)"""
+    m = max(w0, w1) * 1.02
+    return L(f"M {w0-5:.1f},{6} Q {m-5:.1f},{Lh*k:.1f} {w1-5:.1f},{Lh-4}", 2.2, mix(col, "#fff6e6", 0.45), ' opacity="0.7"')
+
 def limb(Lh, w0, w1, bulge=1.08, k=0.42):
     """capsule-like limb along +y from (0,0) to (0,Lh), half widths w0 (top) and w1 (bottom)"""
     m = max(w0, w1) * bulge
@@ -80,7 +85,7 @@ def leg(cid, side, hipx, c, pose):
     th, sh = c.get("thigh", 185), c.get("shin", 190)
     tw0, tw1, sw1 = c.get("tw", 25), c.get("tw1", 18), c.get("sw1", 14)
     pants = c["pants"]
-    shin_body = P(limb(sh, tw1, sw1), pants)
+    shin_body = P(limb(sh, tw1, sw1), pants) + rim(sh, tw1, sw1, pants)
     if c.get("bootTop"):  # tall boot over the lower shin
         bt = c["bootTop"]
         shin_body += P(f"M {-sw1-3},{sh-bt} L {sw1+3},{sh-bt} L {sw1+2},{sh} L {-sw1-2},{sh} Z", c["boot"], 3.5)
@@ -89,20 +94,20 @@ def leg(cid, side, hipx, c, pose):
     ft = G(f"{cid}_foot_{side}", 0, sh, foot(side, c["boot"], c.get("shoe", "boot")), pose.get(f"foot_{side}", 0))
     shin = G(f"{cid}_shin_{side}", 0, th, shin_body + ft, pose.get(f"shin_{side}", 0))
     crease = L(f"M {(-1 if side=='R' else 1)*6},20 Q {(-1 if side=='R' else 1)*2},{th*0.5} {(-1 if side=='R' else 1)*5},{th-20}", 2, mul(pants, 0.62))
-    return G(f"{cid}_thigh_{side}", hipx, 0, shin + P(limb(th, tw0, tw1), pants) + crease, pose.get(f"thigh_{side}", 0))
+    return G(f"{cid}_leg_{side}", hipx, 0, shin + P(limb(th, tw0, tw1), pants) + rim(th, tw0, tw1, pants) + crease, pose.get(f"leg_{side}", 0))
 
 def arm(cid, side, shx, shy, c, pose):
     ua, fa = c.get("upper", 150), c.get("fore", 135)
     sleeve = c["sleeve"]
     cuff = c.get("cuff")
     aw = c.get("aw", 1.0)
-    fore_body = P(limb(fa, 15 * aw, 12 * aw), sleeve)
+    fore_body = P(limb(fa, 15 * aw, 12 * aw), sleeve) + rim(fa, 15 * aw, 12 * aw, sleeve)
     if cuff: fore_body += P(f"M {-14*aw:.1f},{fa-14} L {14*aw:.1f},{fa-14} L {13*aw:.1f},{fa+2} L {-13*aw:.1f},{fa+2} Z", cuff, 3)
     for b in c.get("cuffButtons", []): fore_body += C(b, fa - 6, 2.6, "#c99a3e", 1.2)
     hd = G(f"{cid}_hand_{side}", 0, fa + (2 if cuff else 0), hand(cid, side, c["skin"], c.get("glove")), pose.get(f"hand_{side}", 0))
     fore = G(f"{cid}_forearm_{side}", 0, ua, fore_body + hd, pose.get(f"forearm_{side}", 0))
     wrinkle = L(f"M -8,{ua-12} Q 0,{ua-6} 8,{ua-12}", 2, mul(sleeve, 0.6))
-    return G(f"{cid}_upper_arm_{side}", shx, shy, fore + P(limb(ua, 19 * aw, 16 * aw), sleeve) + wrinkle, pose.get(f"upper_arm_{side}", 0))
+    return G(f"{cid}_arm_{side}", shx, shy, fore + P(limb(ua, 19 * aw, 16 * aw), sleeve) + rim(ua, 19 * aw, 16 * aw, sleeve) + wrinkle, pose.get(f"arm_{side}", 0))
 
 # ---------------------------------------------------------------- heads / faces / hats
 HEAD = "M 0,-64 C 36,-64 54,-40 54,-6 C 54,28 38,60 0,62 C -38,60 -54,28 -54,-6 C -54,-40 -36,-64 0,-64 Z"
@@ -419,12 +424,12 @@ DRIVER = dict(torso="shirt", skin="#c9936b", expr="bored", hat="modernhair", hat
               cuff=mul("#2f629e", 0.9), pants="#232b38", boot="#f4f5f7", shoe="sneaker", sw1=14)
 
 POSES = {
-    "politsiyachi": dict(upper_arm_L=-16, forearm_L=68, hand_L=24, upper_arm_R=8, forearm_R=4, thigh_L=-3, thigh_R=3, foot_L=0),  # hand on belt
-    "portlashdan_keyin": dict(upper_arm_L=-28, forearm_L=-20, hand_L=-10, upper_arm_R=30, forearm_R=24, thigh_L=-6, shin_L=4, thigh_R=4, head=-8, torso=3),
-    "jon_nayt": dict(upper_arm_L=-30, forearm_L=-105, hand_L=-30, upper_arm_R=8, forearm_R=6, thigh_L=-2, thigh_R=2, head=4),  # presenting gesture
-    "aravakash": dict(upper_arm_L=-145, forearm_L=12, hand_L=-4, upper_arm_R=145, forearm_R=-12, hand_R=4, thigh_L=-4, thigh_R=4, head=-3),  # hands up
-    "piyoda_xonim": dict(upper_arm_L=4, forearm_L=19, hand_L=8, upper_arm_R=-4, forearm_R=-19, hand_R=-8, head=-4),  # hands clasped at the waist
-    "bugungi_haydovchi": dict(upper_arm_L=-4, forearm_L=-14, upper_arm_R=6, forearm_R=10, thigh_L=-3, thigh_R=5, foot_R=-6, head=6, neck=-2),
+    "politsiyachi": dict(arm_L=-16, forearm_L=68, hand_L=24, arm_R=8, forearm_R=4, leg_L=-3, leg_R=3, foot_L=0),  # hand on belt
+    "portlashdan_keyin": dict(arm_L=-28, forearm_L=-20, hand_L=-10, arm_R=30, forearm_R=24, leg_L=-6, shin_L=4, leg_R=4, head=-8, torso=3),
+    "jon_nayt": dict(arm_L=-30, forearm_L=-105, hand_L=-30, arm_R=8, forearm_R=6, leg_L=-2, leg_R=2, head=4),  # presenting gesture
+    "aravakash": dict(arm_L=-145, forearm_L=12, hand_L=-4, arm_R=145, forearm_R=-12, hand_R=4, leg_L=-4, leg_R=4, head=-3),  # hands up
+    "piyoda_xonim": dict(arm_L=4, forearm_L=19, hand_L=8, arm_R=-4, forearm_R=-19, hand_R=-8, head=-4),  # hands clasped at the waist
+    "bugungi_haydovchi": dict(arm_L=-4, forearm_L=-14, arm_R=6, forearm_R=10, leg_L=-3, leg_R=5, foot_R=-6, head=6, neck=-2),
 }
 
 CAST = [
@@ -446,7 +451,7 @@ def defs():
     return "<defs>" + soot + "".join(DEFS.values()) + "</defs>"
 
 def build():
-    W, H = 1920, 3420
+    W, H = 1920, 3300
     cols = [330, 960, 1590]
     rows = [120 + 880, 120 + 880 * 2 + 40]  # pelvis y gets computed from ground line
     chars, singles = [], {}
@@ -461,7 +466,7 @@ def build():
         chars.append(grp + label(x, gy + 70, title, sub))
         singles[cid] = (g, ground, scale, title, sub)
     hg = horse("ot")
-    hy = 3180
+    hy = 3060
     chars.append(f'<g id="ot" data-label="Ot" transform="translate(960,{hy})">{hg}</g>' + label(960, hy + 100, "Ot", "aravani tortadi"))
     sheet = (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}">'
              f'<title>Portlagan svetofor: rigged character sheet</title>{defs()}'

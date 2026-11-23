@@ -10,16 +10,20 @@ Every joint is its own `<g>`, already translated to its pivot (also stored in `d
 People (prefix = character id, e.g. `politsiyachi_`):
 ```
 <id>_pelvis
- ├ <id>_thigh_L/R → <id>_shin_L/R → <id>_foot_L/R
+ ├ <id>_leg_L/R (thigh) → <id>_shin_L/R → <id>_foot_L/R
  ├ <id>_skirt                      (lady only, hangs from the waist)
  └ <id>_torso
     ├ <id>_neck → <id>_head → <id>_hat, <id>_eye_L/R, <id>_brow_L/R, <id>_nose, <id>_mouth, <id>_moustache, <id>_ear_L/R
     │                         (+ <id>_sweat, <id>_smoke_0..3 where used)
-    └ <id>_upper_arm_L/R → <id>_forearm_L/R → <id>_hand_L/R
+    └ <id>_arm_L/R (upper arm) → <id>_forearm_L/R → <id>_hand_L/R
 <id>_contact_shadow
 ```
 L/R means the character's own left and right, so L is on the viewer's right.
 
 Horse (`ot_`): `ot_neck → ot_head → ot_ear, ot_eye, ot_nostril, ot_mouth`; `ot_tail`; legs: `ot_foreleg_L → ot_cannon_fore_L → ot_fetlock_fore_L → ot_pastern_fore_L → ot_hoof_fore_L` (same chain for `foreleg_R`, `hindleg_L/R` with `hind_`). Here L is the near side and R is the far side.
+
+Pose keys in `POSES` use the same names (`arm_L`, `forearm_L`, `leg_L`, `shin_L`, `foot_L`, `head`, `neck`, `torso`).
+
+Shading: each segment has a soft gradient (shadow on the left/underside, base colour, light on the right), plus a thin highlight just inside its right edge.
 
 All shapes are vector: paths and gradients only, with no raster images.
