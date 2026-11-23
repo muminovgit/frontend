@@ -5,7 +5,7 @@ data-pivot). L/R = the character's own left/right (L is on the viewer's right fo
 usage: python3 gen.py <out_dir>"""
 import os, sys, math
 
-OUT = sys.argv[1] if len(sys.argv) > 1 else "."
+OUT = sys.argv[1] if (len(sys.argv) > 1 and __name__ == "__main__") else "."
 INK = "#221d1a"
 BG = "#f3ead8"
 SW = 4  # outline width
@@ -470,5 +470,6 @@ def build():
            f'<rect x="-420" y="-620" width="900" height="760" fill="{BG}"/><g id="ot">{hg}</g>' + label(30, 100, "Ot", "aravani tortadi") + "</svg>")
     open(os.path.join(OUT, "ot.svg"), "w").write(svg)
 
-build()
-print("ok", OUT)
+if __name__ == "__main__":
+    build()
+    print("ok", OUT)
