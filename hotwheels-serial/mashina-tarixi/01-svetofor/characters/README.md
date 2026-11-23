@@ -20,6 +20,6 @@ People (prefix = character id, e.g. `politsiyachi_`):
 ```
 L/R means the character's own left and right, so L is on the viewer's right.
 
-Horse (`ot_`): `ot_neck → ot_head → ot_ear, ot_eye, ot_nostril, ot_mouth`; `ot_tail`; and for each of the four legs (`foreleg_L/R`, `hindleg_L/R`): `→ ot_cannon_* → ot_fetlock_* → ot_pastern_* → ot_hoof_*`. Here L is the near side and R is the far side.
+Horse (`ot_`): `ot_neck → ot_head → ot_ear, ot_eye, ot_nostril, ot_mouth`; `ot_tail`; legs: `ot_foreleg_L → ot_cannon_fore_L → ot_fetlock_fore_L → ot_pastern_fore_L → ot_hoof_fore_L` (same chain for `foreleg_R`, `hindleg_L/R` with `hind_`). Here L is the near side and R is the far side.
 
 All shapes are vector: paths and gradients only, with no raster images.

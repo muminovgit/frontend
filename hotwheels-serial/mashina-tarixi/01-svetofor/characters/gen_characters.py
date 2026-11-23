@@ -342,18 +342,20 @@ def horse(cid):
     body_fill, far_fill = "url(#horseBody)", "url(#horseFar)"
 
     def foreleg(side, x, y, fill, rot=(0, 0, 0)):
+        side = "fore_" + side
         hoof_g = G(f"{cid}_hoof_{side}", 0, 0, P("M -14,0 L 16,0 L 22,24 L -16,24 Z", hoof, 3.5) + L("M -14,4 L 16,4", 2, "#4a4440"))
         past = G(f"{cid}_fetlock_{side}", 0, 66, P("M -12,-6 Q 14,-8 16,4 L 18,14 Q 0,18 -12,12 Z", fill, 3) + G(f"{cid}_pastern_{side}", 2, 12, hoof_g), rot[2])
         cannon = G(f"{cid}_cannon_{side}", 0, 86, P(limb(66, 12, 11, 1.02), fill) + E(0, 4, 11, 9, fill, 2.5) + past, rot[1])
         forearm = P("M -26,-14 Q 30,-20 26,10 Q 18,50 14,86 L -12,86 Q -20,40 -26,-14 Z", fill)
-        return G(f"{cid}_foreleg_{side}", x, y, forearm + cannon, rot[0])
+        return G(f"{cid}_foreleg_{side[5:]}", x, y, forearm + cannon, rot[0])
 
     def hindleg(side, x, y, fill, rot=(14, -24, 8)):
+        side = "hind_" + side
         hoof_g = G(f"{cid}_hoof_{side}", 0, 0, P("M -14,0 L 16,0 L 22,24 L -16,24 Z", hoof, 3.5) + L("M -14,4 L 16,4", 2, "#4a4440"))
         past = G(f"{cid}_fetlock_{side}", 0, 70, P("M -12,-6 Q 14,-8 16,4 L 18,14 Q 0,18 -12,12 Z", fill, 3) + G(f"{cid}_pastern_{side}", 2, 12, hoof_g), 0)
         cannon = G(f"{cid}_cannon_{side}", 0, 92, P(limb(70, 13, 11, 1.02), fill) + E(-3, 4, 12, 9, fill, 2.5) + past, rot[1])
         gaskin = P("M -30,-20 Q 28,-28 24,20 Q 18,60 14,92 L -14,92 Q -26,40 -30,-20 Z", fill)
-        return G(f"{cid}_hindleg_{side}", x, y, gaskin + cannon, rot[0])
+        return G(f"{cid}_hindleg_{side[5:]}", x, y, gaskin + cannon, rot[0])
 
     # far legs (behind the body, darker)
     far = foreleg("R", 118, -205, far_fill, (6, -4, 0)) + hindleg("R", -150, -200, far_fill, (10, -20, 6))
