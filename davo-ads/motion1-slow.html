@@ -19,8 +19,10 @@ function spring(t,f=2.4,z=.5){if(t<=0)return 0;const w=2*Math.PI*f,wd=w*Math.sqr
 function rnd(i){const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)}
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 const F=(w,s,f='Montserrat')=>`${w} ${s}px "${f}"`;
-function txt(s,x,y,size,o={}){ctx.save();ctx.globalAlpha*=o.a??1;ctx.font=F(o.w??900,size,o.f);ctx.textAlign=o.al??'center';ctx.textBaseline='middle';ctx.fillStyle=o.c??INK;ctx.fillText(s,x,y);ctx.restore()}
-function tw(s,size,w=900,f='Montserrat'){ctx.save();ctx.font=F(w,size,f);const v=ctx.measureText(s).width;ctx.restore();return v}
+// i18n: window.TR exact-string translations, window.TRS [[from,to],...] substring swaps
+const TR=window.TR||{},TRS=window.TRS||[];function L(s){s=String(s);if(TR[s]!=null)return TR[s];for(const [a,b] of TRS)s=s.split(a).join(b);return s}
+function txt(s,x,y,size,o={}){s=L(s);ctx.save();ctx.globalAlpha*=o.a??1;ctx.font=F(o.w??900,size,o.f);ctx.textAlign=o.al??'center';ctx.textBaseline='middle';ctx.fillStyle=o.c??INK;ctx.fillText(s,x,y);ctx.restore()}
+function tw(s,size,w=900,f='Montserrat'){s=L(s);ctx.save();ctx.font=F(w,size,f);const v=ctx.measureText(s).width;ctx.restore();return v}
 function fit(s,maxW,start,w=900){let z=start;while(tw(s,z,w)>maxW&&z>20)z-=4;return z}
 function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
 function flash(a,c='#fff'){if(a<=0)return;ctx.save();ctx.globalAlpha=clamp(a);ctx.fillStyle=c;ctx.fillRect(-80,-80,W+160,H+160);ctx.restore()}
@@ -138,7 +140,7 @@ function draw(t){ctx.setTransform(1,0,0,1,0,0);ctx.fillStyle=PAPER;ctx.fillRect(
   // S1 -> S2: the white line slams into paper
   if(t>=T.a1&&t<T.a1+.12)flash(1-P(t,T.a1,.12));
   ctx.setTransform(1,0,0,1,0,0);flash(E.in(P(t,DUR-.3,.3)),PAPER)}
-window.ready=(async()=>{await Promise.all(['900 90px Montserrat','800 90px Montserrat','600 90px Montserrat','500 30px Inter','600 30px Inter','700 30px Inter','48px "Noto Color Emoji"'].map(f=>document.fonts.load(f,"Oʻ‘’'✓⬇№…🛵")));draw(0);return true})();
+window.ready=(async()=>{await Promise.all(['900 90px Montserrat','800 90px Montserrat','600 90px Montserrat','500 30px Inter','600 30px Inter','700 30px Inter','48px "Noto Color Emoji"'].map(f=>document.fonts.load(f,"Oʻ‘’'✓⬇№…🛵ЖжЁё")));draw(0);return true})();
 // playback speed: 0.8x (client asked for a slower cut). Output length = DUR/SPEED.
 const SPEED=0.8;window.seek=t=>draw(Math.min(Math.max(t*SPEED,0),DUR-1e-4));window.DUR=DUR/SPEED;
 </script></body></html>
