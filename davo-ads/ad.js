@@ -11,9 +11,12 @@ const cv=document.getElementById('c'),ctx=cv.getContext('2d');const IM={};
 
 // ---------------------------------------------------------------- helpers
 const F=(w,s,f='Montserrat')=>`${w} ${s}px "${f}"`;
-function txt(s,x,y,size,o={}){ctx.save();ctx.globalAlpha*=o.a??1;ctx.font=F(o.w??800,size,o.f);ctx.textAlign=o.al??'center';ctx.textBaseline=o.base??'middle';ctx.fillStyle=o.c??WH;
+// i18n: VARIANT.tr = exact-string translations, VARIANT.trSub = [[from,to],...] substring swaps (e.g. currency)
+const TR=(window.VARIANT||{}).tr||{},TRS=(window.VARIANT||{}).trSub||[];
+function L(s){s=String(s);if(TR[s]!=null)return TR[s];for(const [a,b] of TRS)s=s.split(a).join(b);return s}
+function txt(s,x,y,size,o={}){s=L(s);ctx.save();ctx.globalAlpha*=o.a??1;ctx.font=F(o.w??800,size,o.f);ctx.textAlign=o.al??'center';ctx.textBaseline=o.base??'middle';ctx.fillStyle=o.c??WH;
   if(o.ls)ctx.letterSpacing=o.ls+'px';if(o.glow){ctx.shadowColor=o.glow;ctx.shadowBlur=o.gb??24}ctx.fillText(s,x,y);ctx.restore()}
-function tw(s,size,w=800,f='Montserrat'){ctx.save();ctx.font=F(w,size,f);const v=ctx.measureText(s).width;ctx.restore();return v}
+function tw(s,size,w=800,f='Montserrat'){s=L(s);ctx.save();ctx.font=F(w,size,f);const v=ctx.measureText(s).width;ctx.restore();return v}
 function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
 function glass(x,y,w,h,r,a=1){ctx.save();ctx.globalAlpha*=a;rr(x,y,w,h,r);ctx.fillStyle='rgba(255,255,255,.10)';ctx.fill();ctx.strokeStyle='rgba(255,255,255,.22)';ctx.lineWidth=2;ctx.stroke();
   const g=ctx.createLinearGradient(x,y,x,y+h);g.addColorStop(0,'rgba(255,255,255,.10)');g.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=g;rr(x,y,w,h/2,r);ctx.fill();ctx.restore()}
@@ -140,6 +143,6 @@ function draw(t){ctx.setTransform(1,0,0,1,0,0);bg(t);const[sx,sy]=shake(t);ctx.t
   hook(t);headline(t);DEMOS[VA.demo.kind](t);bullets(t);cta(t);foot(t);
   ctx.setTransform(1,0,0,1,0,0);flash(E.in(P(t,DUR-.35,.35)),'#110820');flash((1-P(t,0,.12))*.0)}
 function loadImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.src=src})}
-window.ready=(async()=>{await Promise.all(['900 90px Montserrat','800 90px Montserrat','600 90px Montserrat','500 30px Inter','600 30px Inter','700 30px Inter','300px "Noto Color Emoji"'].map(f=>document.fonts.load(f,"Oʻ‘’'✓⬇⏱🛵🤧")));
+window.ready=(async()=>{await Promise.all(['900 90px Montserrat','800 90px Montserrat','600 90px Montserrat','500 30px Inter','600 30px Inter','700 30px Inter','300px "Noto Color Emoji"'].map(f=>document.fonts.load(f,"Oʻ‘’'✓⬇⏱🛵🤧ЖжЁё")));
   for(const n of['aidkit','vitamins'])IM[n]=await loadImg('assets/'+n+'.png');IM.app=await loadImg('assets/app-page.png');layoutHeadline();draw(0);return true})();
 window.seek=t=>draw(Math.min(Math.max(t,0),DUR-1e-4));window.DUR=DUR;
