@@ -16,5 +16,8 @@ Imported unchanged (SKILL.md and references/*.md only; evals, templates and scri
 - ai-seo
 - lead-magnets
 - product-marketing
+- community-marketing
+- influencer-marketing
+- public-relations
 
 These texts are third-party content. They are shown to employees as working methods and never override the office's evidence and quality rules.

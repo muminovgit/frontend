@@ -149,3 +149,18 @@ Skill'lari: sotuv hunisi, narx va paketlar, muzokara, e'tirozlar bilan ishlash. 
 ## Toshkent kechasi (standart ko'rinish)
 Bino kechki Toshkent osmono'par uslubiga o'tkazildi: qora osmon, oy va yulduzlar, panjarali oynali zinapoyali toj (yonib turgan oynalar), binoning chetlari va qavatlar chegarasida ko'k neon chiziqlar,
 o'ng tomonda bayroq ranglaridagi (ko'k, oq, yashil, qizil chiziqlar, yarim oy va yulduzlar) LED ekran. Xodimlar ichkarida ishlaydi. Tepadagi **Rang** menyusidan avvalgi sxemalarga (Iliq, Shisha, Kechki shahar) qaytish mumkin.
+
+## Social Media qavati (4-qavat) va Jamshid
+Kontent studiyadan keyingi yangi qavat: kontentni ijtimoiy tarmoqlarda tarqatish, hamjamiyatni boshqarish va obro'ni kuzatish.
+| Xodim | Shakl | Vazifa |
+|---|---|---|
+| **Jamshid** | katta, qalin gavdali (1.3x) | Media rahbari, qavat boshlig'i (tinch, "katta aka") |
+| Ozodbek | beshburchak | Social tahlilchi (ko'rsatkichlar, tinglash) |
+| Shahlo (SM) | olti uchli yulduz | Reels/TikTok kreatori (Kontent studiyadagi dizayner Shahlo bilan adashtirmang) |
+| Munisa | yonca | Community manager (izohlar, shikoyatlar) |
+| Lola | loviya | SMM kopirayter, bloger aloqalari |
+| Sahar | barg | Moderator va trend kuzatuvchi. **Ertalab birinchi ish choy**, kun bo'yi choy ichadi (qo'lida piyola) |
+
+Skill'lar: 6 ta yangi ichki (ijtimoiy strategiya, hamjamiyat boshqaruvi, inqiroz aloqasi, tinglash, analitika, UGC/bloger) va GitHub'dan (MIT) `public-relations`, `community-marketing`, `influencer-marketing`, `social`.
+Loyiha jarayoni endi 7 bosqichli: Tadqiqot → Marketing → Kontent studiya → **Social Media** → Sotuv → Risk → Nazorat. Bosqichni olib tashlash uchun `ai-agents.js` dagi `PIPELINE` ro'yxatidan `'social'` ni o'chiring.
+Qavatlar raqami siljidi: Sotuv 5, Risk 6, Nazorat (penthouse) 7. Katta gavda uchun `roster.json` da `look.scale`, choy uchun `drink: "tea"` ishlatiladi; ixcham 6 stolli qavat uchun `tight: true`.
