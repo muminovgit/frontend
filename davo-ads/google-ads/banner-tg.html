@@ -1,0 +1,98 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Davo — Telegram bot banner</title>
+<!-- Davo Delivery — "Narxlarni Telegram botda solishtiring", 16:9, no CTA button.
+     ?w=1920&h=1080 (any 16:9 size scales from the 1920x1080 design). Chat UI is an illustration; prices are samples. -->
+<style>
+@font-face{font-family:M;src:url(../assets/fonts/Montserrat-600.woff2);font-weight:600}
+@font-face{font-family:M;src:url(../assets/fonts/Montserrat-800.woff2);font-weight:800}
+@font-face{font-family:M;src:url(../assets/fonts/Montserrat-900.woff2);font-weight:900}
+@font-face{font-family:I;src:url(../assets/fonts/Inter-500.woff2);font-weight:500}
+@font-face{font-family:I;src:url(../assets/fonts/Inter-600.woff2);font-weight:600}
+@font-face{font-family:I;src:url(../assets/fonts/Inter-700.woff2);font-weight:700}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{overflow:hidden;background:#fff}
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;font-family:M;color:#1d1430;
+  background:radial-gradient(90% 120% at 78% 45%,#d4f2fc 0%,#ecf9f8 45%,#fbfdfd 100%)}
+.abs{position:absolute}
+.blob{position:absolute;border-radius:50%}
+.logo{display:flex;align-items:center;gap:22px;font-weight:800;font-size:46px}
+h1{font-weight:900;font-size:128px;line-height:1.04;letter-spacing:-.015em}
+h1 .tg{color:#229ed9}
+p.s{font-weight:600;font-size:46px;line-height:1.3;color:#5b5670}
+.note{font-weight:600;font-size:22px;color:#8a8698}
+/* phone */
+.phone{position:absolute;width:470px;height:964px;background:#16131c;border-radius:76px;padding:15px;box-shadow:0 0 0 3px #3a3644 inset,0 40px 90px rgba(20,40,60,.3)}
+.scr{width:100%;height:100%;border-radius:62px;overflow:hidden;position:relative;background:#cfe6df;font-family:I}
+.isl{position:absolute;left:50%;top:26px;width:130px;height:34px;transform:translateX(-50%);background:#0b0a0f;border-radius:99px;z-index:5}
+.status{height:62px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 36px 6px;font-weight:700;font-size:18px;background:#fff}
+.head{display:flex;align-items:center;gap:14px;padding:12px 20px 14px;background:#fff;border-bottom:1px solid #e6e9ee}
+.head .back{font-size:30px;color:#229ed9;line-height:1}
+.head .nm{font-weight:700;font-size:20px}
+.head .sub{font-weight:500;font-size:15px;color:#8a919c;margin-top:2px}
+.chat{position:absolute;left:0;right:0;top:142px;bottom:76px;padding:18px 16px;display:flex;flex-direction:column;gap:12px;
+  background:linear-gradient(160deg,#d6ece4,#cde6e8)}
+.b{max-width:84%;padding:13px 17px 10px;border-radius:20px;font-size:19px;line-height:1.35;box-shadow:0 1px 1px rgba(0,0,0,.08);position:relative}
+.out{align-self:flex-end;background:#e3fbd0;border-bottom-right-radius:6px;font-weight:600}
+.in{align-self:flex-start;background:#fff;border-bottom-left-radius:6px;width:84%}
+.t{font-size:13px;color:#7ca06a;text-align:right;margin-top:2px}
+.in .t{color:#9aa1ab}
+.row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px solid #eef0f3;font-size:17px}
+.row:first-of-type{border-top:0}
+.row .ph{font-weight:600}
+.row .km{font-size:13px;color:#9aa1ab;font-weight:500;margin-left:6px}
+.row .pr{font-weight:700;font-family:M;font-size:18px}
+.best{background:#e6f8f5;margin:4px -10px 0;padding:9px 10px;border-radius:12px;border-top:0}
+.best .pr{color:#01a596}
+.tag{display:inline-block;background:#01bdac;color:#fff;font-weight:700;font-size:12px;padding:3px 8px;border-radius:99px;margin-left:8px;vertical-align:2px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:84%;align-self:flex-start;margin-top:-6px}
+.btns div{background:rgba(255,255,255,.55);border-radius:12px;text-align:center;font-weight:600;font-size:15px;padding:10px 4px;color:#1d5f7a}
+.input{position:absolute;left:0;right:0;bottom:0;height:76px;background:#fff;display:flex;align-items:center;gap:12px;padding:0 18px 8px;color:#a2a8b2;font-size:18px}
+.input .f{flex:1;background:#f1f3f5;border-radius:99px;padding:12px 18px}
+.input .send{width:46px;height:46px;border-radius:50%;background:#229ed9;display:grid;place-items:center}
+/* floating chip */
+.chip{position:absolute;background:#fff;border-radius:28px;box-shadow:0 18px 40px rgba(20,50,70,.18);padding:22px 28px;font-weight:800}
+</style></head>
+<body><div id="stage">
+  <div class="blob" style="left:1180px;top:-260px;width:900px;height:900px;background:radial-gradient(closest-side,rgba(94,205,240,.45),transparent)"></div>
+  <div class="blob" style="left:1450px;top:560px;width:700px;height:700px;background:radial-gradient(closest-side,rgba(255,206,104,.33),transparent)"></div>
+
+  <div class="abs logo" style="left:120px;top:110px"><span id="lg"></span><span>Davo Delivery</span></div>
+  <div class="abs" style="left:120px;top:262px;width:1120px">
+    <h1 style="font-size:116px">Narxlarni<br><span class="tg">Telegram botda</span><br>solishtiring</h1>
+    <p class="s" style="margin-top:44px">Dori narxlarini solishtirib<br>buyurtma bering</p></div>
+  <div class="abs note" style="left:120px;bottom:64px">Narxlar namuna sifatida</div>
+
+  <!-- phone with a Telegram-style chat with the Davo bot -->
+  <div class="phone" style="left:1290px;top:118px;transform:rotate(6deg)">
+    <div class="scr">
+      <div class="isl"></div>
+      <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="head"><span class="back">‹</span><span id="av"></span><div><div class="nm">Davo Delivery</div><div class="sub">bot</div></div></div>
+      <div class="chat">
+        <div class="b out">Vitamin C 1000 mg<div class="t">9:41 ✓✓</div></div>
+        <div class="b in">
+          <div style="font-weight:700;margin-bottom:6px">3 ta dorixonada topildi:</div>
+          <div class="row"><span><span class="ph">1-dorixona</span><span class="km">1.2 km</span></span><span class="pr">42 000 so'm</span></div>
+          <div class="row"><span><span class="ph">2-dorixona</span><span class="km">0.8 km</span></span><span class="pr">38 500 so'm</span></div>
+          <div class="row best"><span><span class="ph">3-dorixona</span><span class="tag">eng arzon</span></span><span class="pr">34 900 so'm</span></div>
+          <div class="t">9:41</div>
+        </div>
+        <div class="btns"><div>🛒 Buyurtma berish</div><div>📍 Xaritada</div></div>
+        <div class="b out">Eng arzonini buyurtma qilaman<div class="t">9:42 ✓✓</div></div>
+        <div class="b in" style="width:auto">✅ Buyurtma qabul qilindi!<br><span style="color:#5b5670">Kuryer yo'lga chiqdi 🛵</span><div class="t">9:42</div></div>
+      </div>
+      <div class="input"><span class="f">Xabar...</span><span class="send"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M3 11.5 21 3l-6.5 18-3-7.5z" fill="#fff"/></svg></span></div>
+    </div>
+  </div>
+  <div class="chip" style="left:1110px;top:760px;transform:rotate(-4deg);font-size:30px"><span style="color:#8a8698;font-size:22px;font-weight:600;display:block">Tejash</span><span style="color:#01a596">−7 100 so'm</span></div>
+</div>
+<script>
+const Q=new URLSearchParams(location.search),W=+(Q.get('w')||1920),H=+(Q.get('h')||1080);
+document.body.style.width=W+'px';document.body.style.height=H+'px';
+document.getElementById('stage').style.transform=`scale(${W/1920},${H/1080})`;
+const LOGO=s=>`<svg width="${s}" height="${s}" viewBox="-65.5 -65.5 131 131" style="display:block;filter:drop-shadow(0 4px 8px rgba(60,30,60,.15))"><rect x="-65.5" y="-65.5" width="131" height="131" rx="31" fill="#fff"/>
+<circle cx="-20" cy="-20" r="28.5" fill="#ffce68"/><circle cx="20" cy="-20" r="28.5" fill="#fb4669"/><circle cx="-20" cy="20" r="28.5" fill="#5e3a9a"/><circle cx="20" cy="20" r="28.5" fill="#01bdac"/>
+<path d="M-10.5-29h21v18.5h18.5v21h-18.5v18.5h-21v-18.5h-18.5v-21h18.5z" fill="#fff"/></svg>`;
+document.getElementById('lg').innerHTML=LOGO(88);document.getElementById('av').innerHTML=LOGO(48);
+document.fonts.ready.then(()=>window.READY=true);
+</script></body></html>
