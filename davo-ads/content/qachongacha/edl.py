@@ -16,7 +16,7 @@ EDL = [   # in/out points sit inside real pauses (found from the energy envelope
  ('IMG_3260', 4.18, 7.70, 'plus1', "Uyingizgacha yetkazib berish — bu birinchi plus bo'lsa, ikkinchi plus:"),
  ('IMG_3260', 13.86, 20.70, 'plus2', "bu ilova orqali dorini qaysi mahal va necha mahal ichish kerakligini ushbu ilova sizga xabar berib turadi."),
 ]
-TAIL = 4.1      # end card: the presenter's separately recorded 'Davo Delivery, dorixona uyingizda' (2.7 s) + hold
+TAIL = 2.2      # end card hold (no voice; the recorded tagline was dropped at the client's request)
 TAG_GAP = .2    # tagline starts this long after the last video word
 os.makedirs(os.path.join(FR, 'v'), exist_ok=True)
 tr = {t: json.load(open(os.path.join(HERE, f'{t}_tr.json'))) for t in ('IMG_3259', 'IMG_3260')}
@@ -46,6 +46,6 @@ DUR = t_out + TAIL
 with open(os.path.join(FR, 'alist.txt'), 'w') as f:
     for w in wavs: f.write(f"file '{w}'\n")
 subprocess.run(['ffmpeg', '-nostdin', '-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', os.path.join(FR, 'alist.txt'), '-af', f'apad=pad_dur={TAIL}', '-ar', '48000', os.path.join(HERE, 'voice_raw.wav')], check=True)
-open(os.path.join(HERE, 'timeline.js'), 'w').write('window.TL=' + json.dumps({'segs': segs, 'words': words, 'dur': round(DUR, 3), 'nframes': nframe, 'tag': round(t_out + TAG_GAP, 3)}, ensure_ascii=False) + ';')
+open(os.path.join(HERE, 'timeline.js'), 'w').write('window.TL=' + json.dumps({'segs': segs, 'words': words, 'dur': round(DUR, 3), 'nframes': nframe, 'tag': None}, ensure_ascii=False) + ';')
 for s in segs: print(s)
 print('total', round(DUR, 2), 's', nframe, 'frames')

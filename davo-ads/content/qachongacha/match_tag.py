@@ -42,11 +42,11 @@ vs, vt = vrms(street, voiced_s), vrms(y, voiced_t); y *= vs / max(vt, 1e-9)
 fade = np.minimum(1, np.minimum(np.arange(len(y)) / (.03 * SR), (len(y) - np.arange(len(y))) / (.06 * SR)))
 y = y * fade + noise
 # insert into voice_raw at TL.tag (+ a little street noise bridging the gap before it)
-raw = load(os.path.join(HERE, 'voice_raw.wav')); i0 = int(TL['tag'] * SR)
+raw = load(os.path.join(HERE, 'voice_raw.wav')); i0 = int((TL.get('tag') or 0) * SR)
 # continuous street room tone under the whole voice track: the noise floor no longer jumps at cuts / between takes
 bed = istft(np.stack([nmag * np.exp(2j * np.pi * rng.random(len(f))) for _ in range(len(raw) // HOP + 8)]), len(raw))[:len(raw)]
 raw += bed * .7
-raw[i0:i0 + len(y)] += y[:len(raw) - i0]
+if TL.get('tag') is not None: raw[i0:i0 + len(y)] += y[:len(raw) - i0]
 with wave.open(os.path.join(HERE, 'voice_raw_tag.wav'), 'wb') as w:
     w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((np.clip(raw, -1, 1) * 32767).astype('<i2').tobytes())
 print('eq range dB', round(20 * np.log10(corr.min()), 1), round(20 * np.log10(corr.max()), 1), 'level x', round(vs / max(vt, 1e-9), 2))
