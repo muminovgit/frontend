@@ -1,0 +1,118 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Davo — "Qachongacha?" reel</title><style>
+@font-face{font-family:"Montserrat";src:url(../../assets/fonts/Montserrat-800.woff2);font-weight:800}
+@font-face{font-family:"Montserrat";src:url(../../assets/fonts/Montserrat-900.woff2);font-weight:900}
+@font-face{font-family:"Inter";src:url(../../assets/fonts/Inter-600.woff2);font-weight:600}
+@font-face{font-family:"Inter";src:url(../../assets/fonts/Inter-700.woff2);font-weight:700}
+html,body{margin:0;background:#000}canvas{display:block}</style></head><body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="timeline.js"></script>
+<script>
+// "Qachongacha?" — talking-head reel. Hook first (the strongest line, moved from the end), then brand, product, app
+// demo in a split screen, payoff map, 200+ counter, two "plus" cards, end card. seek(t) is a pure function of t.
+const W=1080,H=1920,FPS=30,TL=window.TL,SEG=TL.segs,WORDS=TL.words,DUR=TL.dur;
+const Y='#ffce68',PK='#fb4669',VI='#5e3a9a',G='#01bdac',WH='#ffffff',INK='#1d1430',BLUE='#2f6bff',RED='#ff4b4b';
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),lerp=(a,b,k)=>a+(b-a)*k,P=(t,t0,d)=>clamp((t-t0)/d);
+const E={out:k=>1-Math.pow(1-k,4),in:k=>k*k*k*k,io:k=>k<.5?8*k*k*k*k:1-Math.pow(-2*k+2,4)/2};
+function spring(t,f=2.4,z=.5){if(t<=0)return 0;const w=2*Math.PI*f,wd=w*Math.sqrt(1-z*z);return 1-Math.exp(-z*w*t)*(Math.cos(wd*t)+z*w/wd*Math.sin(wd*t))}
+const F=(w,s,f='Montserrat')=>`${w} ${s}px "${f}", "Noto Color Emoji"`;
+function txt(s,x,y,size,o={}){ctx.save();ctx.globalAlpha*=o.a??1;ctx.font=F(o.w??900,size,o.f);ctx.textAlign=o.al??'center';ctx.textBaseline='middle';
+  if(o.stroke){ctx.lineJoin='round';ctx.lineWidth=o.stroke;ctx.strokeStyle=o.sc??'rgba(0,0,0,.85)';ctx.strokeText(s,x,y)}ctx.fillStyle=o.c??WH;ctx.fillText(s,x,y);ctx.restore()}
+function tw(s,size,w=900,f='Montserrat'){ctx.save();ctx.font=F(w,size,f);const v=ctx.measureText(s).width;ctx.restore();return v}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function logo(x,y,s,a=1,bloom=1){ctx.save();ctx.globalAlpha*=a;ctx.translate(x,y);ctx.fillStyle=WH;rr(-s/2,-s/2,s,s,s*.24);ctx.fill();const u=s/131;
+  [[Y,-1,-1],[PK,1,-1],[G,1,1],[VI,-1,1]].forEach(([c,sx,sy],i)=>{const k=clamp(bloom*1.6-i*.15);if(k<=0)return;ctx.fillStyle=c;ctx.beginPath();ctx.arc(sx*20*u*E.out(k),sy*20*u*E.out(k),28.5*u*E.out(k),0,7);ctx.fill()});
+  const c=clamp(bloom*1.4-.4);if(c>0){ctx.fillStyle=WH;ctx.save();ctx.scale(c,c);const a2=10.5*u,b=29*u;ctx.fillRect(-a2,-b,2*a2,2*b);ctx.fillRect(-b,-a2,2*b,2*a2);ctx.restore()}ctx.restore()}
+const segAt=t=>SEG.find(s=>t>=s.t0&&t<s.t1)||SEG[SEG.length-1];
+const W_=k=>WORDS.find(w=>w.w.replace(/[^\p{L}\d]/gu,'').toLowerCase().startsWith(k));      // first word starting with k
+const wt=(k,seg)=>{const w=WORDS.find(w=>w.seg===seg&&w.w.replace(/[^\p{L}\d]/gu,'').toLowerCase().startsWith(k));return w?w.s:0};
+// ---------------------------------------------------------------- image cache
+const cache=new Map();function img(src){if(cache.has(src))return cache.get(src);const im=new Image();const p=new Promise(r=>{im.onload=()=>r(im);im.onerror=()=>r(null)});im.src=src;const v={im,p};cache.set(src,v);if(cache.size>40)cache.delete(cache.keys().next().value);return v}
+const pad=n=>String(n).padStart(5,'0');
+const vFrame=t=>`fr/v/${pad(clamp(Math.floor(t*FPS)+1,1,TL.nframes))}.jpg`;
+const S3=t=>`rec/${pad(clamp(Math.floor(t/1.0246*FPS)+1,1,366))}.jpg`;           // screen recording, rec-time t (s)
+const FIG=['Dori eslatmalari - Start page.png','Home v1 - pill widget - ichish vaqti.png','Mening dorilarim - dori eslatma.png'].map(f=>'../../figma/screens/'+encodeURIComponent(f));
+// ---------------------------------------------------------------- the speaker
+// per-segment punch (jump-cut energy) — hook punches in on each phrase
+function zoomAt(t){const s=segAt(t);if(s.kind==='hook'){const a=wt('sarson',0),b=wt('qachongacha',0);return 1+.07*spring(t-a,3,.6)+.12*spring(t-b,3.2,.5)}
+  return {brand:1.06,hands:1,app:1,nohassle:1.1,count:1,plus1:1.08,plus2:1,cta:1.05}[s.kind]??1}
+function speaker(im,t,box=[0,0,W,H],fy=.43,extraZ=1){if(!im)return;const [bx,by,bw,bh]=box,z=zoomAt(t)*extraZ;
+  const sc=Math.max(bw/im.width,bh/im.height)*z,dw=im.width*sc,dh=im.height*sc;let dx=bx+bw/2-dw/2,dy=by+bh*.5-dh*fy;dy=Math.min(by,Math.max(by+bh-dh,dy));
+  ctx.save();ctx.beginPath();ctx.rect(bx,by,bw,bh);ctx.clip();ctx.drawImage(im,dx,dy,dw,dh);ctx.restore()}
+// ---------------------------------------------------------------- pieces
+function chip(x,y,label,bg,fg,k,rot=0,size=46){if(k<=0)return;const w=tw(label,size)+64,h=size*1.9;ctx.save();ctx.translate(x,y);ctx.rotate(rot);const s=lerp(.4,1,Math.min(1.1,k));ctx.scale(s,s);ctx.globalAlpha=clamp(k*2);
+  ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=30;ctx.shadowOffsetY=10;ctx.fillStyle=bg;rr(-w/2,-h/2,w,h,h/2);ctx.fill();ctx.shadowColor='transparent';txt(label,0,4,size,{c:fg});ctx.restore()}
+function inOut(t,a,b,f=2.4,z=.55){if(t<a||t>b+.3)return 0;return spring(t-a,f,z)*(1-E.in(P(t,b,.25)))}
+// map card: pharmacies, a lost dot (hook) / a scooter going straight home (payoff) / 200+ pins (count)
+const PH=[[250,300],[560,210],[840,330]],HOME=[540,520],RNG=i=>{const x=Math.sin(i*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+function mapCard(t,k,mode){if(k<=0)return;const x0=60,y0=90,w=960,h=540;ctx.save();ctx.globalAlpha=clamp(k*1.5);ctx.translate(0,(1-k)*-80);
+  ctx.shadowColor='rgba(0,0,0,.5)';ctx.shadowBlur=40;ctx.fillStyle='rgba(16,12,28,.94)';rr(x0,y0,w,h,44);ctx.fill();ctx.shadowColor='transparent';
+  ctx.save();rr(x0,y0,w,h,44);ctx.clip();ctx.strokeStyle='rgba(255,255,255,.08)';ctx.lineWidth=14;for(let i=0;i<8;i++){ctx.beginPath();ctx.moveTo(x0+i*150-60,y0);ctx.lineTo(x0+i*150+60,y0+h);ctx.stroke()}
+  for(let j=0;j<4;j++){ctx.beginPath();ctx.moveTo(x0,y0+60+j*140);ctx.lineTo(x0+w,y0+30+j*140);ctx.stroke()}
+  const pin=(x,y,c,s=1,lab)=>{ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.fillStyle=c;ctx.beginPath();ctx.arc(0,-34,26,0,7);ctx.fill();ctx.beginPath();ctx.moveTo(-18,-20);ctx.lineTo(0,0);ctx.lineTo(18,-20);ctx.fill();ctx.fillStyle=WH;ctx.beginPath();ctx.arc(0,-34,10,0,7);ctx.fill();ctx.restore();if(lab)txt(lab,x,y+24,22,{f:'Inter',w:700,c:'rgba(255,255,255,.7)'})};
+  if(mode==='hook'){const t0=SEG[0].t0,ts=[wt('dorixonama',0),wt('sarson',0),wt("bo",0),wt('qachongacha',0)];
+    PH.forEach((p,i)=>pin(p[0],p[1],BLUE,1,'Dorixona'));
+    // the dot runs pharmacy to pharmacy; each visit gets a red "yo'q"
+    const legs=[[ [140,560],PH[0] ],[PH[0],PH[1]],[PH[1],PH[2]]];ctx.strokeStyle='rgba(255,206,104,.7)';ctx.setLineDash([14,14]);ctx.lineWidth=6;
+    let cur=[140,560];legs.forEach(([a,b],i)=>{const k2=E.io(P(t,ts[i]-.1,.5));if(k2<=0)return;const p=[lerp(a[0],b[0],k2),lerp(a[1],b[1],k2)];ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.lineTo(p[0],p[1]);ctx.stroke();cur=p;
+      if(k2>=1){const sk=spring(t-ts[i]-.4,3,.5);ctx.save();ctx.setLineDash([]);ctx.translate(b[0]+46,b[1]-70);ctx.rotate(-.15);ctx.scale(sk,sk);ctx.fillStyle=RED;rr(-62,-26,124,52,26);ctx.fill();txt("yo'q",0,3,30,{c:WH});ctx.restore()}});
+    ctx.setLineDash([]);ctx.fillStyle=Y;ctx.beginPath();ctx.arc(cur[0],cur[1],18,0,7);ctx.fill();
+    const q=ts[3];if(t>q){const sh=Math.max(0,1-(t-q)*5)*10;ctx.fillStyle=Y;ctx.beginPath();ctx.arc(cur[0]+Math.sin(t*90)*sh,cur[1],26,0,7);ctx.fill()}}
+  if(mode==='pay'){const a=SEG[4].t0+.3;PH.forEach((p,i)=>pin(p[0],p[1],i===1?G:'rgba(120,120,140,.6)',1,i===1?'Eng yaqin':''));pin(HOME[0]+300,HOME[1],PK,1.1,'Uyingiz');
+    const k2=E.io(P(t,a+.4,1.6)),A=PH[1],B=[HOME[0]+300,HOME[1]-30];ctx.strokeStyle=G;ctx.lineWidth=8;ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.lineTo(lerp(A[0],B[0],k2),lerp(A[1],B[1],k2));ctx.stroke();
+    ctx.font='64px "Noto Color Emoji"';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('🛵',lerp(A[0],B[0],k2),lerp(A[1],B[1],k2)-10);
+    const dk=spring(t-a-2.1,2.6,.5);if(t>a+2.1){ctx.save();ctx.translate(B[0]-60,B[1]-120);ctx.scale(dk,dk);ctx.fillStyle=G;rr(-150,-32,300,64,32);ctx.fill();txt('✓ Eshigingizgacha',0,3,30,{c:'#06231f'});ctx.restore()}}
+  if(mode==='count'){const a=SEG[5].t0,n200=wt('200',5);for(let i=0;i<200;i++){const tt=a+.1+i*.012;if(t<tt)continue;const s=spring(t-tt,3,.5);ctx.fillStyle=[BLUE,G,PK,Y,VI][i%5];ctx.beginPath();ctx.arc(x0+30+RNG(i)*(w-60),y0+30+RNG(i+999)*(h-60),9*s,0,7);ctx.fill()}
+    const kk=E.out(P(t,a+.1,n200-a+.2)),v=Math.round(200*kk);const ck=spring(t-a,2,.6);ctx.save();ctx.translate(540,y0+h/2);ctx.scale(ck,ck);ctx.fillStyle='rgba(16,12,28,.8)';rr(-260,-120,520,240,40);ctx.fill();
+    txt(v+(v>=200?'+':''),0,-20,150,{c:Y});txt('dorixona · Toshkent',0,82,38,{w:800});ctx.restore()}
+  ctx.restore();ctx.restore()}
+function plusCard(t,a,b,n,l1,l2,col,emoji,dxIn=0){const k=inOut(t,a,b,2,.6);if(k<=0)return;const out=E.in(P(t,b,.3));ctx.save();ctx.translate(540+(1-Math.min(1,k))*500-out*900,360);ctx.globalAlpha=clamp(k*2);
+  ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=40;ctx.shadowOffsetY=14;ctx.fillStyle=WH;rr(-460,-150,920,300,56);ctx.fill();ctx.shadowColor='transparent';
+  ctx.fillStyle=col;rr(-430,-120,190,240,40);ctx.fill();txt(`+${n}`,-335,-30,110,{c:WH});txt('PLUS',-335,70,38,{c:WH,w:800});
+  txt(emoji,330,0,110);txt(l1,-200,-38,48,{al:'left',c:INK});txt(l2,-200,32,48,{al:'left',c:col});ctx.restore()}
+function phonePanel(t,k,draw){ // lower half: dark brand panel + phone, rises with the split
+  const y0=lerp(H,960,k);ctx.save();ctx.fillStyle='#120c1f';ctx.fillRect(0,y0,W,H-y0+10);
+  [[Y,150,y0+250,260],[PK,950,y0+500,300],[G,900,y0+900,260]].forEach(([c,x,y,r])=>{const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c+'40');g.addColorStop(1,c+'00');ctx.fillStyle=g;ctx.fillRect(x-r,y-r,2*r,2*r)});
+  const pw=560,ph=1215,px=540-pw/2,py=y0+110;ctx.fillStyle='#0d0b12';rr(px-14,py-14,pw+28,ph+28,84);ctx.fill();ctx.save();rr(px,py,pw,ph,70);ctx.clip();draw(px,py,pw,ph);ctx.restore();ctx.restore()}
+// captions: <=3 words, active word on a yellow box
+function captions(t,y){const ws=WORDS.filter(w=>/[\p{L}\d]/u.test(w.w));let i=ws.findIndex(w=>t>=w.s-.03&&t<w.e+.25);if(i<0)return;
+  const seg=ws[i].seg,first=ws.findIndex(w=>w.seg===seg);const g=Math.floor((i-first)/3),grp=ws.filter(w=>w.seg===seg).slice(g*3,g*3+3);let size=70,gap=20;
+  let tot=grp.reduce((a,w)=>a+tw(w.w,size),0)+gap*(grp.length-1);if(tot>960){size=Math.floor(size*960/tot);gap=gap*960/tot;tot=grp.reduce((a,w)=>a+tw(w.w,size),0)+gap*(grp.length-1)}let x=540-tot/2;const k=spring(t-grp[0].s,3,.55),s=lerp(.85,1,Math.min(1.05,k));
+  ctx.save();ctx.translate(540,y);ctx.scale(s,s);ctx.translate(-540,-y);grp.forEach(w=>{const ww=tw(w.w,size),on=t>=w.s&&t<w.e+.02;if(on){ctx.fillStyle=Y;rr(x-14,y-size*.62,ww+28,size*1.22,18);ctx.fill()}
+    txt(w.w,x+ww/2,y+4,size,on?{c:INK}:{stroke:12});x+=ww+gap});ctx.restore()}
+// ---------------------------------------------------------------- frame
+function draw(t,v,R,F){ctx.clearRect(0,0,W,H);const s=segAt(t),S=k=>SEG.find(x=>x.kind===k);
+  const app=S('app'),p2=S('plus2'),cta=S('cta');
+  const split=t>=app.t0&&t<app.t1?E.out(P(t,app.t0,.45))*(1-E.in(P(t,app.t1-.3,.3))):t>=p2.t0&&t<p2.t1?E.out(P(t,p2.t0,.45))*(1-E.in(P(t,p2.t1-.3,.3))):0;
+  if(split>0){speaker(v,t,[0,0,W,lerp(H,960,split)],.40)}else speaker(v,t);
+  if(split>0){phonePanel(t,split,(x,y,w,h)=>{if(s.kind==='app'&&R){ctx.drawImage(R,x,y,w,h)}else if(F){ctx.drawImage(F,x,y,w,w*F.height/F.width)}})}
+  // hook
+  if(s.kind==='hook'){mapCard(t,E.out(P(t,0,.35)),'hook');const q=wt('qachongacha',0);const k=spring(t-q,3,.45);if(t>q){ctx.save();ctx.translate(540+Math.sin(t*80)*Math.max(0,1-(t-q)*6)*14,1180);ctx.rotate(-.06);ctx.scale(lerp(1.8,1,Math.min(1,k)),lerp(1.8,1,Math.min(1,k)));
+    {const z=Math.min(124,124*940/tw('QACHONGACHA?!',124));txt('QACHONGACHA?!',0,0,z,{c:Y,stroke:22,sc:INK})};ctx.restore()}}
+  // brand sting
+  if(s.kind==='brand'){const a=s.t0,k=spring(t-a,2,.6);ctx.save();ctx.translate(540,330);const sc=lerp(.5,1,Math.min(1.06,k));ctx.scale(sc,sc);ctx.globalAlpha=clamp(k*2)*(1-E.in(P(t,s.t1-.25,.25)));
+    ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=40;ctx.fillStyle=WH;rr(-400,-130,800,260,60);ctx.fill();ctx.shadowColor='transparent';logo(-250,0,170,1,E.out(P(t,a+.05,.7)));
+    txt('Davo Delivery',95,-30,60,{c:INK});ctx.save();ctx.fillStyle=PK;rr(-20,22,230,58,29);ctx.fill();ctx.restore();txt('YANGI ILOVA',95,53,32,{c:WH});ctx.restore()}
+  // product labels
+  if(s.kind==='hands'){chip(320,1180,'Sink',Y,INK,inOut(t,wt('sink',2),s.t1-.1),-.08,60);chip(770,1160,'Biotin',G,WH,inOut(t,wt('biotin',2),s.t1-.1),.07,60)}
+  // app split: steps over the phone + link chip
+  if(s.kind==='app'){chip(540,1030,'🔗 Havola profilda',BLUE,WH,inOut(t,wt('havola',3),wt('dostavka',3)+.6),-.03,44);chip(540,1030,'🛵 Uyingizgacha yetkaziladi',G,WH,inOut(t,wt('uyingizgacha',3),s.t1-.35),.03,44)}
+  if(s.kind==='nohassle'){mapCard(t,E.out(P(t,s.t0,.35))*(1-E.in(P(t,s.t1-.25,.25))),'pay')}
+  if(s.kind==='count'){mapCard(t,E.out(P(t,s.t0,.3))*(1-E.in(P(t,s.t1-.25,.25))),'count')}
+  if(s.kind==='plus1'){plusCard(t,wt('uyingizgacha',6)-.05,wt('ikkinchi',6)-.15,1,'Uyingizgacha','yetkazib berish',G,'🛵')}
+  if(s.kind==='plus1'||s.kind==='plus2'){const a=wt('ikkinchi',6);if(t>a)plusCard(t,a,p2.t1-.35,2,'Ichish vaqtini','eslatib turadi',VI,'⏰')}
+  // end card rises over everything (same upward vector as the splits)
+  if(t>=cta.t0){const k=E.out(P(t,cta.t0,.5));ctx.save();ctx.translate(0,(1-k)*H);ctx.fillStyle='#f6f4fb';ctx.fillRect(0,0,W,H);
+    [[Y,180,300,380],[PK,950,520,420],[G,900,1600,380],[VI,150,1500,420]].forEach(([c,x,y,r])=>{const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c+'40');g.addColorStop(1,c+'00');ctx.fillStyle=g;ctx.fillRect(x-r,y-r,2*r,2*r)});
+    logo(540,640,300,1,E.out(P(t,cta.t0+.15,.8)));const nk=E.out(P(t,cta.t0+.35,.5));txt('Davo Delivery',540,900+(1-nk)*40,104,{c:INK,a:nk});
+    txt('Dorixona — telefoningizda',540,1000,46,{c:VI,w:800,a:E.out(P(t,cta.t0+.5,.5))});
+    const bk=spring(t-cta.t0-.7,2,.55);ctx.save();ctx.translate(540,1180);ctx.scale(bk,bk);ctx.fillStyle=BLUE;rr(-400,-72,800,144,72);ctx.fill();txt('Ilovani yuklab oling',0,4,54,{c:WH});ctx.restore();
+    const sk=E.out(P(t,cta.t0+.9,.4));['App Store','Google Play'].forEach((n,i)=>{const x=i?700:380;ctx.save();ctx.globalAlpha=sk;ctx.fillStyle=INK;rr(x-150,1310,300,70,35);ctx.fill();txt(n,x,1346,30,{f:'Inter',w:700});ctx.restore()});
+    txt('🔗 Havola profilda',540,1480,40,{c:INK,w:800,a:sk});ctx.restore()}
+  if(t<cta.t0+.3&&!(s.kind==='hook'&&t>wt('qachongacha',0)))captions(t,split>.5?960:s.kind==='hook'?1560:1540);
+}
+window.ready=(async()=>{await Promise.all(['900 70px Montserrat','800 40px Montserrat','700 30px Inter','600 30px Inter','48px "Noto Color Emoji"'].map(f=>document.fonts.load(f,"Oʻ'🛵⏰🔗")))})();
+window.seek=async t=>{t=Math.min(Math.max(t,0),DUR-1e-3);const s=segAt(t);const vv=img(vFrame(Math.min(t,SEG[SEG.length-1].t1-.02)));
+  const rv=s.kind==='app'?img(S3(2.0+(t-s.t0)*.98)):null;const fi=s.kind==='plus2'?img(FIG[Math.min(2,Math.floor((t-s.t0)/2.3))]):null;
+  const [v,R,F]=await Promise.all([vv.p,rv?rv.p:null,fi?fi.p:null]);draw(t,v,R,F)};
+window.DUR=DUR;
+</script></body></html>
