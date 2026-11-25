@@ -16,7 +16,7 @@ def istft(S, L):
     for i, f in enumerate(S): y[i * HOP:i * HOP + N] += np.fft.irfft(f) * w; z[i * HOP:i * HOP + N] += w * w
     return (y / np.maximum(z, 1e-6))[:L]
 street = load(os.path.join(HERE, 'voice_raw.wav'), 0, TL['segs'][-1]['t1'])
-tag = load(os.path.join(HERE, 'tag_dorixona_uyingizda.ogg'), 1.38)
+tag = load(os.path.join(HERE, 'tag_dorixona_uyingizda.ogg'), 0.0)   # full line: 'Davo Delivery, dorixona uyingizda'
 Ss, St = stft(street), stft(tag)
 es, et = (np.abs(Ss) ** 2).sum(1), (np.abs(St) ** 2).sum(1)
 voiced_s, quiet_s, voiced_t = es > np.percentile(es, 55), es < np.percentile(es, 8), et > np.percentile(et, 40)
@@ -43,8 +43,9 @@ fade = np.minimum(1, np.minimum(np.arange(len(y)) / (.03 * SR), (len(y) - np.ara
 y = y * fade + noise
 # insert into voice_raw at TL.tag (+ a little street noise bridging the gap before it)
 raw = load(os.path.join(HERE, 'voice_raw.wav')); i0 = int(TL['tag'] * SR)
-bridge = istft(np.stack([nmag * np.exp(2j * np.pi * rng.random(len(f))) for _ in range(int(SR * 1.2 / HOP) + 8)]), int(SR * 1.2))
-b0 = int(TL['segs'][-1]['t1'] * SR); raw[b0:b0 + len(bridge)] += bridge[:len(raw) - b0] * np.minimum(1, np.arange(min(len(bridge), len(raw) - b0)) / (.05 * SR))
+# continuous street room tone under the whole voice track: the noise floor no longer jumps at cuts / between takes
+bed = istft(np.stack([nmag * np.exp(2j * np.pi * rng.random(len(f))) for _ in range(len(raw) // HOP + 8)]), len(raw))[:len(raw)]
+raw += bed * .7
 raw[i0:i0 + len(y)] += y[:len(raw) - i0]
 with wave.open(os.path.join(HERE, 'voice_raw_tag.wav'), 'wb') as w:
     w.setnchannels(1); w.setsampwidth(2); w.setframerate(SR); w.writeframes((np.clip(raw, -1, 1) * 32767).astype('<i2').tobytes())

@@ -57,7 +57,7 @@ pop(wt('havola', 3), .22); pop(wt('uyingizgacha', 3), .22, 1100)
 for i in range(30): tick(segs['count']['t0'] + .1 + i * .04)
 bell(wt('200', 5), 91, .1)
 pop(wt('uyingizgacha', 6), .28); pop(wt('ikkinchi', 6), .28, 1200)
-c = segs['cta']['t0']; whoosh(c, .5, .25)
+c = TL['segs'][-1]['t1']; whoosh(c, .5, .25)   # end card
 for i, m in enumerate((76, 79, 84, 88)): bell(c + .2 + i * .08, m, .08, pan=(i % 2 - .5) * .4)
 mix = np.stack([L, R], 1); fo = int(.6 * SR); mix[-fo:] *= np.linspace(1, 0, fo)[:, None]
 mix = mix / np.abs(mix).max() * .8

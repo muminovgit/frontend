@@ -81,7 +81,7 @@ function captions(t,y){const ws=WORDS.filter(w=>/[\p{L}\d]/u.test(w.w));let i=ws
     txt(w.w,x+ww/2,y+4,size,on?{c:INK}:{stroke:12});x+=ww+gap});ctx.restore()}
 // ---------------------------------------------------------------- frame
 function draw(t,v,R,F){ctx.clearRect(0,0,W,H);const s=segAt(t),S=k=>SEG.find(x=>x.kind===k);
-  const app=S('app'),p2=S('plus2'),cta=S('cta');
+  const app=S('app'),p2=S('plus2'),cta={t0:SEG[SEG.length-1].t1};   // end card follows the last video segment
   const split=t>=app.t0&&t<app.t1?E.out(P(t,app.t0,.45))*(1-E.in(P(t,app.t1-.3,.3))):t>=p2.t0&&t<p2.t1?E.out(P(t,p2.t0,.45))*(1-E.in(P(t,p2.t1-.3,.3))):0;
   if(split>0){speaker(v,t,[0,0,W,lerp(H,960,split)],.40)}else speaker(v,t);
   if(split>0){phonePanel(t,split,(x,y,w,h)=>{if(s.kind==='app'&&R){ctx.drawImage(R,x,y,w,h)}else if(F){ctx.drawImage(F,x,y,w,w*F.height/F.width)}})}
@@ -104,7 +104,7 @@ function draw(t,v,R,F){ctx.clearRect(0,0,W,H);const s=segAt(t),S=k=>SEG.find(x=>
   if(t>=cta.t0){const k=E.out(P(t,cta.t0,.5));ctx.save();ctx.translate(0,(1-k)*H);ctx.fillStyle='#f6f4fb';ctx.fillRect(0,0,W,H);
     [[Y,180,300,380],[PK,950,520,420],[G,900,1600,380],[VI,150,1500,420]].forEach(([c,x,y,r])=>{const g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,c+'40');g.addColorStop(1,c+'00');ctx.fillStyle=g;ctx.fillRect(x-r,y-r,2*r,2*r)});
     logo(540,640,300,1,E.out(P(t,cta.t0+.15,.8)));const nk=E.out(P(t,cta.t0+.35,.5));txt('Davo Delivery',540,900+(1-nk)*40,104,{c:INK,a:nk});
-    {const tk=spring(t-TL.tag,2.6,.5);if(t>TL.tag){ctx.save();ctx.translate(540,1010);ctx.rotate(-.02);ctx.scale(lerp(.5,1,Math.min(1.06,tk)),lerp(.5,1,Math.min(1.06,tk)));ctx.fillStyle=PK;rr(-330,-46,660,92,46);ctx.fill();txt('Dorixona — uyingizda!',0,4,46,{c:WH});ctx.restore()}}
+    {const tg=TL.tag+1.3,tk=spring(t-tg,2.6,.5);if(t>tg){ctx.save();ctx.translate(540,1010);ctx.rotate(-.02);ctx.scale(lerp(.5,1,Math.min(1.06,tk)),lerp(.5,1,Math.min(1.06,tk)));ctx.fillStyle=PK;rr(-330,-46,660,92,46);ctx.fill();txt('Dorixona — uyingizda!',0,4,46,{c:WH});ctx.restore()}}
     const bk=spring(t-cta.t0-.7,2,.55);ctx.save();ctx.translate(540,1180);ctx.scale(bk,bk);ctx.fillStyle=BLUE;rr(-400,-72,800,144,72);ctx.fill();txt('Ilovani yuklab oling',0,4,54,{c:WH});ctx.restore();
     const sk=E.out(P(t,cta.t0+.9,.4));['App Store','Google Play'].forEach((n,i)=>{const x=i?700:380;ctx.save();ctx.globalAlpha=sk;ctx.fillStyle=INK;rr(x-150,1310,300,70,35);ctx.fill();txt(n,x,1346,30,{f:'Inter',w:700});ctx.restore()});
     txt('🔗 Havola profilda',540,1480,40,{c:INK,w:800,a:sk});ctx.restore()}
