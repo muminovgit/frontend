@@ -8,7 +8,7 @@ seq = "seq"; shutil.rmtree(seq, ignore_errors=True); os.makedirs(seq)
 k = 0
 for b in timeline():
     for f in range(b["frames"]):
-        src = os.path.abspath(f"frames/{b['id']}_{f:04d}.png")
+        src = os.path.abspath(f"{os.environ.get('FRAMES', 'frames')}/{b['id']}_{f:04d}.png")
         if not os.path.exists(src): sys.exit(f"missing {src}")
         os.symlink(src, f"{seq}/{k:05d}.png"); k += 1
 subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-framerate", "30", "-i", f"{seq}/%05d.png", "-i", audio,

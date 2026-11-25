@@ -12,6 +12,8 @@ from beats import timeline
 
 TL = timeline()
 SUBS = {b["id"]: b["subs"] for b in TL}
+SCALE = {b["id"]: round(b["anim"] / b["dur"], 5) for b in TL}
+DURS = {b["id"]: b["dur"] for b in TL}
 OUT = os.path.join(HERE, "pages"); os.makedirs(OUT, exist_ok=True)
 W, H = 1080, 1920
 FONT = "DejaVu Sans, Arial, sans-serif"
@@ -26,7 +28,10 @@ def text(x, y, s, size, fill="#ffffff", weight=800, anchor="middle", stroke=10, 
 
 SUB_LAYER = ('<g id="subs"><rect id="subbg1" rx="18" fill="#221d1a" opacity="0"/><rect id="subbg2" rx="18" fill="#221d1a" opacity="0"/>'
              + text(540, 430, "", 54, stroke=0, extra=' id="sub1"') + text(540, 504, "", 54, stroke=0, extra=' id="sub2"') + '</g>'
-             '<rect id="flash" width="1080" height="1920" fill="#fff8e6" opacity="0"/>')
+             '<rect id="flash" width="1080" height="1920" fill="#fff8e6" opacity="0"/>'
+             '<g id="brand" opacity="0.92">' + rect(40, 250, 400, 64, "#221d1a", 0, 32) + text(240, 293, "MASHINA TARIXI · #1", 28, fill="#ffd34a", stroke=0, weight=900) + '</g>'
+             '<g id="hook1" opacity="0">' + text(540, 560, "DUNYODAGI BIRINCHI", 74, fill="#ffffff", stroke=14) + text(540, 660, "SVETOFOR…", 96, fill="#ffffff", stroke=16) + '</g>'
+             '<g id="hook2" opacity="0">' + text(540, 640, "PORTLAB KETGAN!", 92, fill="#ffd34a", stroke=16, weight=900) + '</g>')
 
 JS_LIB = r"""
 const $ = (id) => document.getElementById(id);
@@ -72,12 +77,32 @@ function trot(p, ph, k) {  // horse trot cycle for prefix p (ot / ot2)
 }
 """
 
+WARP = r"""
+const __sf = window.setFrame;
+window.setFrame = (f, beat) => {
+  const tr = f / 30, D = DURS[beat]; let ta = tr * SCALE[beat];
+  if (beat === 'b1') { const hit = D - 1.45; ta = tr < hit ? 1.25 * tr / hit : 1.25 + (tr - hit); }          // boom on "portlab ketgan"
+  if (beat === 'b8') { const hit = D - 1.0; ta = tr < hit ? -0.737 + 0.842 * tr / hit : 0.105 + (tr - hit) * 0.95; }  // boom on "portladi"
+  __sf(ta * 30, beat);
+  subs(beat, tr);
+  if (beat === 'b1') {   // big hook text instead of the subtitle
+    const hit = D - 1.45;
+    for (const n of ['sub1', 'sub2']) $(n).textContent = '';
+    for (const n of ['subbg1', 'subbg2']) $(n).setAttribute('opacity', 0);
+    op('hook1', tr < hit ? seg(tr, 0, 0.15) : 0); tr_('hook1', `translate(540,600) scale(${0.85 + 0.15 * back(seg(tr, 0, 0.3)) + 0.03 * tr}) translate(-540,-600)`);
+    op('hook2', tr >= hit ? 1 : 0); tr_('hook2', `translate(540,620) scale(${0.5 + 0.5 * back(seg(tr - hit, 0, 0.25))}) rotate(${-4 * seg(tr - hit, 0, 0.25)}) translate(-540,-620)`);
+  } else { op('hook1', 0); op('hook2', 0); }
+  op('brand', beat === 'b13' ? 0 : 0.92);
+};
+function tr_(id, t) { const e = $(id); if (e) e.setAttribute('transform', t); }
+"""
+
 def page(name, svg_body, js, defs_extra="", bg="#f3ead8", overlay=""):
     """svg_body is placed inside <g id="cam">; subtitles + flash overlay on top"""
     html = (f"<!doctype html><html><head><meta charset='utf-8'><style>html,body{{margin:0;background:{bg}}}svg{{display:block}}</style></head><body>"
             f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}">'
             f'<defs>{gen.defs()[6:-7]}{defs_extra}</defs><g id="cam">{svg_body}</g>{overlay}{SUB_LAYER}</svg>'
-            f"<script>const SUBS = {json.dumps(SUBS, ensure_ascii=False)};{JS_LIB}{js}</script></body></html>")
+            f"<script>const SUBS = {json.dumps(SUBS, ensure_ascii=False)}; const SCALE = {json.dumps(SCALE)}; const DURS = {json.dumps(DURS)};{JS_LIB}{js}{WARP}</script></body></html>")
     open(os.path.join(OUT, name + ".html"), "w").write(html)
     print("page", name, len(html) // 1024, "KB")
 

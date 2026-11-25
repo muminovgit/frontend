@@ -73,43 +73,53 @@ def engine(at, dur, rev_at=None, g=0.12):
 def murmur(at, dur, g=0.05): put(sfx, lp(noise(dur), 0.03) * (1 + 0.4 * np.sin(np.arange(int(dur * SR)) / SR * 3)), at, g)
 
 S = START
+def A(bid, x):
+    b = BEAT[bid]; D, an = b["dur"], b["anim"]
+    if bid == "b1":
+        hit = D - 1.45; real = x / 1.25 * hit if x <= 1.25 else hit + (x - 1.25)
+    elif bid == "b8":
+        hit = D - 1.0; real = hit * (x + 0.737) / 0.842 if x < 0.105 else hit + (x - 0.105) / 0.95
+    else:
+        real = x * D / an
+    return b["start"] + real
+def Dm(bid, x): b = BEAT[bid]; return x * b["dur"] / b["anim"]
 # b1 hook: flicker hiss, BOOM, glass, dizzy tweet
-hiss(S["b1"], 1.25, 0.06, 0.22); boom(S["b1"] + 1.25); glass(S["b1"] + 1.45); tweet(S["b1"] + 2.4)
+hiss(A("b1", 0), A("b1", 1.25) - A("b1", 0), 0.06, 0.22); boom(A("b1", 1.25)); glass(A("b1", 1.45)); tweet(A("b1", 2.4))
 # b2 busy street
-murmur(S["b2"], 5.2); hooves(S["b2"], 5.2, 0.24, 0.45); hooves(S["b2"] + 0.1, 5.0, 0.3, 0.18); whoosh(S["b2"] + 2.05, 0.6, 0.3)
+murmur(A("b2", 0), Dm("b2", 5.2)); hooves(A("b2", 0), Dm("b2", 5.2), 0.24, 0.45); hooves(A("b2", 0.1), Dm("b2", 5.0), 0.3, 0.18); whoosh(A("b2", 2.05), 0.6, 0.3)
 # b3 Knight + blueprint
-whoosh(S["b3"] + 0.1, 0.4, 0.25); whoosh(S["b3"] + 1.05, 0.35, 0.3); ding(S["b3"] + 1.35, 1568, 0.12)
+whoosh(A("b3", 0.1), 0.4, 0.25); whoosh(A("b3", 1.05), 0.35, 0.3); ding(A("b3", 1.35), 1568, 0.12)
 # b4 train + semaphore
-for i in range(10): chuff(S["b4"] + i * 0.24, 0.32 - 0.02 * i)
-whistle(S["b4"] + 0.3); clunk(S["b4"] + 1.6, 220, 0.3); clunk(S["b4"] + 1.75, 260, 0.3); whoosh(S["b4"] + 3.3, 0.6, 0.25)
-put(sfx, lp(noise(0.5), 0.2) * env(int(0.5 * SR), 0.02, 0.15), S["b4"] + 3.6, 0.35)
+for i in range(10): chuff(A("b4", i * 0.24), 0.32 - 0.02 * i)
+whistle(A("b4", 0.3)); clunk(A("b4", 1.6), 220, 0.3); clunk(A("b4", 1.75), 260, 0.3); whoosh(A("b4", 3.3), 0.6, 0.25)
+put(sfx, lp(noise(0.5), 0.2) * env(int(0.5 * SR), 0.02, 0.15), A("b4", 3.6), 0.35)
 # b5 lever, stop, badges
-hooves(S["b5"], 2.4, 0.22, 0.45, slow=True); murmur(S["b5"], 5.2, 0.04)
-clunk(S["b5"] + 0.4, 160, 0.5); clunk(S["b5"] + 0.9, 240, 0.35); clunk(S["b5"] + 1.02, 280, 0.3); ding(S["b5"] + 1.05, 1320, 0.14)
-pop(S["b5"] + 2.36); pop(S["b5"] + 3.46)
+hooves(A("b5", 0), Dm("b5", 2.4), 0.22, 0.45, slow=True); murmur(A("b5", 0), Dm("b5", 5.2), 0.04)
+clunk(A("b5", 0.4), 160, 0.5); clunk(A("b5", 0.9), 240, 0.35); clunk(A("b5", 1.02), 280, 0.3); ding(A("b5", 1.05), 1320, 0.14)
+pop(A("b5", 2.36)); pop(A("b5", 3.46))
 # b6 lady crosses + newspaper
-murmur(S["b6"], 4.2, 0.04); steps(S["b6"] + 0.3, 2.3); whoosh(S["b6"] + 2.0, 0.45, 0.35); flips(S["b6"] + 2.2, 0.25, 4, 0.25)
+murmur(A("b6", 0), Dm("b6", 4.2), 0.04); steps(A("b6", 0.3), Dm("b6", 2.3)); whoosh(A("b6", 2.0), 0.45, 0.35); flips(A("b6", 2.2), 0.25, 4, 0.25)
 # b7 winter night, gas leak builds
-put(sfx, lp(noise(4.2), 0.015) * 0.12, S["b7"]); hiss(S["b7"] + 1.6, 2.6, 0.02, 0.25)
+put(sfx, lp(noise(Dm("b7", 4.2)), 0.015) * 0.12, A("b7", 0)); hiss(A("b7", 1.6), Dm("b7", 2.6), 0.02, 0.25)
 # b8 explosion
-boom(S["b8"] + 0.1); glass(S["b8"] + 0.3)
+boom(A("b8", 0.1)); glass(A("b8", 0.3))
 # b9 sooty policeman + retired stamp
-tweet(S["b9"] + 0.1, 1.6); wahwah(S["b9"] + 0.3); clunk(S["b9"] + 2.32, 90, 0.7)
+tweet(A("b9", 0.1), 1.6); wahwah(A("b9", 0.3)); clunk(A("b9", 2.32), 90, 0.7)
 # b10 stove analogy + lantern diagram
-clunk(S["b10"] + 0.3, 600, 0.2); hiss(S["b10"] + 0.6, 2.15, 0.05, 0.15)
-put(sfx, hp(noise(0.15), 0.4) * env(int(0.15 * SR), 0.001, 0.05), S["b10"] + 2.35, 0.5)  # match strike
-boom(S["b10"] + 2.75, 0.45); whoosh(S["b10"] + 3.5, 0.5, 0.3); hiss(S["b10"] + 3.9, 1.7, 0.03, 0.16)
-for i in range(6): pop(S["b10"] + 5.7 + i * 0.05, 0.12)
-boom(S["b10"] + 6.05, 0.9)
+clunk(A("b10", 0.3), 600, 0.2); hiss(A("b10", 0.6), Dm("b10", 2.15), 0.05, 0.15)
+put(sfx, hp(noise(0.15), 0.4) * env(int(0.15 * SR), 0.001, 0.05), A("b10", 2.35), 0.5)  # match strike
+boom(A("b10", 2.75), 0.45); whoosh(A("b10", 3.5), 0.5, 0.3); hiss(A("b10", 3.9), Dm("b10", 1.7), 0.03, 0.16)
+for i in range(6): pop(A("b10", 5.7 + i * 0.05), 0.12)
+boom(A("b10", 6.05), 0.9)
 # b11 calendar flips, electric light
-flips(S["b11"] + 0.2, 2.3, 26); whoosh(S["b11"] + 2.7, 0.5); hum(S["b11"] + 3.2, 1.2, 120, 0.05); clunk(S["b11"] + 3.25, 900, 0.15)
-clunk(S["b11"] + 3.5, 700, 0.12); clunk(S["b11"] + 3.9, 700, 0.12)
+flips(A("b11", 0.2), Dm("b11", 2.3), 26); whoosh(A("b11", 2.7), 0.5); hum(A("b11", 3.2), Dm("b11", 1.2), 120, 0.05); clunk(A("b11", 3.25), 900, 0.15)
+clunk(A("b11", 3.5), 700, 0.12); clunk(A("b11", 3.9), 700, 0.12)
 # b12 modern driver
-engine(S["b12"], 5.6, rev_at=4.4, g=0.1); murmur(S["b12"], 5.6, 0.03)
-for i in range(10): pop(S["b12"] + 0.2 + i * 0.22, 0.06)  # drumming on the wheel
-put(sfx, hp(noise(0.5), 0.5) * (rng.random(int(0.5 * SR)) > 0.7) * 0.4, S["b12"] + 2.75); ding(S["b12"] + 4.1, 988, 0.12)
+engine(A("b12", 0), Dm("b12", 5.6), rev_at=Dm("b12", 4.4), g=0.1); murmur(A("b12", 0), Dm("b12", 5.6), 0.03)
+for i in range(10): pop(A("b12", 0.2 + i * 0.22), 0.06)  # drumming on the wheel
+put(sfx, hp(noise(0.5), 0.5) * (rng.random(int(0.5 * SR)) > 0.7) * 0.4, A("b12", 2.75)); ding(A("b12", 4.1), 988, 0.12)
 # b13 end card
-whoosh(S["b13"], 0.7, 0.35); pop(S["b13"] + 0.45, 0.35); ding(S["b13"] + 0.95, 1760, 0.15); ding(S["b13"] + 1.1, 2217, 0.1)
+whoosh(A("b13", 0), 0.7, 0.35); pop(A("b13", 0.45), 0.35); ding(A("b13", 0.95), 1760, 0.15); ding(A("b13", 1.1), 2217, 0.1)
 
 # ------------------------------------------------------------------ music (original, procedural)
 BPM = 112; Q = 60 / BPM
@@ -133,13 +143,13 @@ def playful(at, dur, transpose=0, g=1.0):
         if k % 8 == 0: bell(m + transpose + 12 if m else 84, at + t, 0.05 * g)
         k += 1; t += Q / 2
 B = BEAT
-drone(S["b1"], 1.3, 36, 0.06); tremolo(S["b1"], 1.3, [60, 63, 66], 0.03)
-playful(S["b1"] + 1.9, B["b1"]["dur"] - 1.9 + B["b2"]["dur"] + B["b3"]["dur"] + B["b4"]["dur"] + B["b5"]["dur"] + B["b6"]["dur"])
-drone(S["b7"], B["b7"]["dur"] + 0.2, 33, 0.07); tremolo(S["b7"] + 0.5, B["b7"]["dur"] - 0.4, [57, 60, 63], 0.035)
-playful(S["b10"] + 0.2, B["b10"]["dur"] - 1.4, -5, 0.7)                     # curious, lower
-playful(S["b11"], B["b11"]["dur"] + B["b12"]["dur"] - 2.4, 0, 0.8)
-for i, m in enumerate([72, 76, 79, 84]): pluck(m, S["b13"] + 0.3 + i * Q / 2, 0.5, 0.22); bell(m + 12, S["b13"] + 0.3 + i * Q / 2, 0.05)
-pluck(48, S["b13"] + 0.3 + 2 * Q, 1.2, 0.35); bell(96, S["b13"] + 0.3 + 2 * Q, 0.08)
+drone(A("b1", 0), A("b1", 1.25) - A("b1", 0), 36, 0.06); tremolo(A("b1", 0), A("b1", 1.25) - A("b1", 0), [60, 63, 66], 0.03)
+playful(A("b1", 1.9), (B["b1"]["start"] + B["b1"]["dur"]) - A("b1", 1.9) + B["b2"]["dur"] + B["b3"]["dur"] + B["b4"]["dur"] + B["b5"]["dur"] + B["b6"]["dur"])
+drone(A("b7", 0), B["b7"]["dur"] + 0.2, 33, 0.07); tremolo(A("b7", 0.5), B["b7"]["dur"] - 0.4, [57, 60, 63], 0.035)
+playful(A("b10", 0.2), B["b10"]["dur"] - 1.4, -5, 0.7)                     # curious, lower
+playful(A("b11", 0), B["b11"]["dur"] + B["b12"]["dur"] - 2.4, 0, 0.8)
+for i, m in enumerate([72, 76, 79, 84]): pluck(m, A("b13", 0.3) + i * Q / 2, 0.5, 0.22); bell(m + 12, A("b13", 0.3) + i * Q / 2, 0.05)
+pluck(48, A("b13", 0.3) + 2 * Q, 1.2, 0.35); bell(96, A("b13", 0.3) + 2 * Q, 0.08)
 
 def save(name, x, peak=None):
     p = peak or max(1e-9, np.abs(x).max())
@@ -158,7 +168,7 @@ if "--voice" in sys.argv:  # narration later: one wav per beat, placed at the be
     envv = np.convolve(np.abs(voice), np.ones(int(0.15 * SR)) / int(0.15 * SR), "same")
     music *= 1 - 0.6 * np.clip(envv / (envv.max() + 1e-9) * 6, 0, 1)
 save("music.wav", music); save("sfx.wav", sfx)
-mix = 0.55 * music / (np.abs(music).max() + 1e-9) + 0.9 * sfx / (np.abs(sfx).max() + 1e-9) + (voice * 1.3 if voice.any() else 0)
+mix = 0.55 * music / (np.abs(music).max() + 1e-9) + 1.45 * sfx / (np.abs(sfx).max() + 1e-9) + (voice * 1.3 if voice.any() else 0)
 mix = np.tanh(mix * 1.1) / 1.1
 save("mix_voice.wav" if voice.any() else "mix_novoice.wav", mix)
 print("audio", round(DUR, 2), "s")
