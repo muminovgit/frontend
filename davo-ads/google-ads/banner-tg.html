@@ -60,13 +60,16 @@ p.s{font-weight:600;font-size:46px;line-height:1.3;color:#5b5670}
   <div class="abs" style="left:120px;top:262px;width:1120px">
     <h1 style="font-size:116px">Narxlarni<br><span class="tg">Telegram botda</span><br>solishtiring</h1>
     <p class="s" style="margin-top:44px">Dori narxlarini solishtirib<br>buyurtma bering</p></div>
+  <div class="abs tgonly" style="left:120px;top:858px;display:flex;align-items:center;gap:16px;background:#229ed9;color:#fff;font-weight:800;font-size:40px;padding:16px 34px 16px 22px;border-radius:99px;box-shadow:0 14px 30px rgba(34,158,217,.3)">
+    <svg width="44" height="44" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#fff"/><path d="M5.5 11.6 17.2 7c.6-.2 1 .1.8 1l-2 9.3c-.1.6-.5.8-1 .5l-3-2.2-1.5 1.4c-.2.2-.3.3-.6.3l.2-3.1 5.6-5.1c.2-.2 0-.3-.4-.1l-6.9 4.4-3-.9c-.6-.2-.6-.6.2-.9z" fill="#229ed9"/></svg>@davodelivery_bot</div>
+  <div class="abs note tgonly" style="left:120px;bottom:56px">Narxlar namuna sifatida</div>
 
   <!-- phone with a Telegram-style chat with the Davo bot -->
   <div class="phone" style="left:1290px;top:118px;transform:rotate(6deg)">
     <div class="scr">
       <div class="isl"></div>
       <div class="status"><span>9:41</span><span>●●● ▮</span></div>
-      <div class="head"><span class="back">‹</span><span id="av"></span><div><div class="nm">Davo Delivery</div><div class="sub">bot</div></div></div>
+      <div class="head"><span class="back">‹</span><span id="av"></span><div><div class="nm">Davo Delivery</div><div class="sub">@davodelivery_bot</div></div></div>
       <div class="chat">
         <div class="b out">Vitamin C 1000 mg<div class="t">9:41 ✓✓</div></div>
         <div class="b in">
@@ -97,6 +100,7 @@ document.getElementById('lg').innerHTML=LOGO(88);document.getElementById('av').i
 if(Q.get('v')==='app'){
   const ph=document.querySelector('.phone');ph.querySelector('.scr').innerHTML='<div class="isl"></div><img src="screens/home-blur.png" style="width:100%;display:block">';
   document.querySelector('.chip').remove();
+  document.querySelectorAll('.tgonly').forEach(e=>e.remove());
   const k=document.createElement('img');k.src='../assets/aidkit.png';k.style.cssText='position:absolute;left:985px;top:700px;width:340px;-webkit-mask-image:linear-gradient(180deg,#000 78%,transparent 100%);mask-image:linear-gradient(180deg,#000 78%,transparent 100%)';
   document.getElementById('stage').insertBefore(k,ph);   // behind the phone: hides the asset's cropped right edge
 }
