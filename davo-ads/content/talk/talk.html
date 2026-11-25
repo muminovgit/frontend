@@ -8,8 +8,8 @@ html,body{margin:0;background:#000}canvas{display:block}</style></head><body><ca
 <script>
 // Talking-head edit: source video (re-timed nothing) + high-res screen recording insert in a phone, Davo motion
 // callouts timed to the speech, and kinetic word-by-word Uzbek captions. seek(t) is a pure function of t.
-const W=1080,H=1920,FPS=30,NT=1945,NS=339,DUR=64.8;
-const INS=[28.5,39.8];                                   // where the source cuts to its (low-res) screen recording
+const W=1080,H=1920,FPS=30,NT=1945,NS=366,DUR=64.8;
+const INS=[27.45,39.65];                                   // where the source cuts to its (low-res) screen recording
 const Y='#ffce68',PK='#fb4669',VI='#5e3a9a',G='#01bdac',WH='#ffffff',INK='#1d1430',BLUE='#2f6bff';
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),lerp=(a,b,k)=>a+(b-a)*k,P=(t,t0,d)=>clamp((t-t0)/d);
@@ -26,7 +26,7 @@ function logo(x,y,s,a=1){ctx.save();ctx.globalAlpha*=a;ctx.translate(x,y);ctx.fi
 // ---------------------------------------------------------------- frames (loaded on demand, cached)
 const cache=new Map();function img(src){if(cache.has(src))return cache.get(src);const im=new Image();const p=new Promise(r=>{im.onload=()=>r(im);im.onerror=()=>r(null)});im.src=src;const v={im,p};cache.set(src,v);if(cache.size>60)cache.delete(cache.keys().next().value);return v}
 const pad=n=>String(n).padStart(5,'0');
-const tFrame=t=>`fr/t/${pad(clamp(Math.round(t*FPS)+1,1,NT))}.jpg`, sFrame=t=>`fr/s/${pad(clamp(Math.floor((t-INS[0])*FPS)+1,1,NS))}.jpg`;
+const tFrame=t=>`fr/t/${pad(clamp(Math.round(t*FPS)+1,1,NT))}.jpg`, sFrame=t=>`fr/s3/${pad(clamp(Math.floor((t-INS[0])*FPS)+1,1,NS))}.jpg`;
 let CAPS=window.CAPS||[];
 // ---------------------------------------------------------------- pieces
 function chip(x,y,label,bg,fg,k,rot=0,size=46){if(k<=0)return;const w=tw(label,size)+64,h=size*1.9;ctx.save();ctx.translate(x,y);ctx.rotate(rot);const s=lerp(.4,1,Math.min(1.1,k));ctx.scale(s,s);ctx.globalAlpha=clamp(k*2);
@@ -57,7 +57,7 @@ function draw(t,base,scr){ctx.clearRect(0,0,W,H);const inI=t>=INS[0]&&t<INS[1];
     ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=80;ctx.shadowOffsetY=30;ctx.fillStyle='#111';rr(-pw/2-18,-ph/2-18,pw+36,ph+36,110);ctx.fill();ctx.shadowColor='transparent';
     ctx.save();rr(-pw/2,-ph/2,pw,ph,92);ctx.clip();if(scr)ctx.drawImage(scr,-pw/2,-ph/2,pw,ph);ctx.restore();ctx.restore();
     // step callouts synced to what the recording shows
-    const st=[[INS[0]+.6,31.6,'⏰ Ichish vaqtini eslatadi',VI,WH,-.04,250],[32.2,34.6,'1 · Qidiring',BLUE,WH,.03,250],[34.8,37.1,'2 · Narxlarni solishtiring',PK,WH,-.03,250],[37.3,INS[1]-.4,'3 · Savatga qo\'shing',G,WH,.03,250]];
+    const st=[[INS[0]+.8,31.9,'⏰ Ichish vaqtini eslatadi',VI,WH,-.04,250],[32.1,35.0,'1 · Qidiring',BLUE,WH,.03,250],[35.2,38.6,'2 · Narxlarni solishtiring',PK,WH,-.03,250],[38.85,INS[1]-.2,'3 · Savatga qo\'shing',G,WH,.03,250]];
     st.forEach(([a,b,l,bg,fg,r,y])=>chip(540,y-kOut*400,l,bg,fg,inOut(t,a,b),r,48));
   }
   // brand watermark
@@ -66,7 +66,7 @@ function draw(t,base,scr){ctx.clearRect(0,0,W,H);const inI=t>=INS[0]&&t<INS[1];
   chip(540,330,'🆕 Yangi ilova — Davo Delivery',PK,WH,inOut(t,10.55,13.5),-.035,50);
   chip(300,980,'Sink',Y,INK,inOut(t,14.5,17.0),-.08,58);chip(800,960,'Biotin',G,WH,inOut(t,14.9,17.0),.07,58);
   chip(540,330,'🔎 Barcha dori vositalari',BLUE,WH,inOut(t,16.8,20.3),.03,50);
-  chip(540,330,'🛵 Uyingizgacha yetkazib berishadi',G,WH,inOut(t,24.3,27.4),-.03,46);
+  chip(540,330,'🛵 Uyingizgacha yetkazib berishadi',G,WH,inOut(t,24.3,27.1),-.03,46);
   chip(540,330,'⏱ Vaqtingizni tejang',Y,INK,inOut(t,38.3+1.6,41.8),.03,52);
   plusCard(t,43.2,47.3,1,'Uyingizgacha','yetkazib berish',G,'🛵');
   plusCard(t,50.6,60.2,2,'Ichish vaqtini','eslatib turadi',VI,'⏰');
