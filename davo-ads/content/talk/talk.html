@@ -1,0 +1,83 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Davo — talking-head edit (IMG_3293)</title><style>
+@font-face{font-family:"Montserrat";src:url(../../assets/fonts/Montserrat-800.woff2);font-weight:800}
+@font-face{font-family:"Montserrat";src:url(../../assets/fonts/Montserrat-900.woff2);font-weight:900}
+@font-face{font-family:"Inter";src:url(../../assets/fonts/Inter-600.woff2);font-weight:600}
+@font-face{font-family:"Inter";src:url(../../assets/fonts/Inter-700.woff2);font-weight:700}
+html,body{margin:0;background:#000}canvas{display:block}</style></head><body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="captions.js"></script>
+<script>
+// Talking-head edit: source video (re-timed nothing) + high-res screen recording insert in a phone, Davo motion
+// callouts timed to the speech, and kinetic word-by-word Uzbek captions. seek(t) is a pure function of t.
+const W=1080,H=1920,FPS=30,NT=1945,NS=339,DUR=64.8;
+const INS=[28.5,39.8];                                   // where the source cuts to its (low-res) screen recording
+const Y='#ffce68',PK='#fb4669',VI='#5e3a9a',G='#01bdac',WH='#ffffff',INK='#1d1430',BLUE='#2f6bff';
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),lerp=(a,b,k)=>a+(b-a)*k,P=(t,t0,d)=>clamp((t-t0)/d);
+const E={out:k=>1-Math.pow(1-k,4),in:k=>k*k*k*k,io:k=>k<.5?8*k*k*k*k:1-Math.pow(-2*k+2,4)/2};
+function spring(t,f=2.4,z=.5){if(t<=0)return 0;const w=2*Math.PI*f,wd=w*Math.sqrt(1-z*z);return 1-Math.exp(-z*w*t)*(Math.cos(wd*t)+z*w/wd*Math.sin(wd*t))}
+const F=(w,s,f='Montserrat')=>`${w} ${s}px "${f}", "Noto Color Emoji"`;
+function txt(s,x,y,size,o={}){ctx.save();ctx.globalAlpha*=o.a??1;ctx.font=F(o.w??900,size,o.f);ctx.textAlign=o.al??'center';ctx.textBaseline='middle';
+  if(o.stroke){ctx.lineJoin='round';ctx.lineWidth=o.stroke;ctx.strokeStyle=o.sc??'rgba(0,0,0,.85)';ctx.strokeText(s,x,y)}ctx.fillStyle=o.c??WH;ctx.fillText(s,x,y);ctx.restore()}
+function tw(s,size,w=900,f='Montserrat'){ctx.save();ctx.font=F(w,size,f);const v=ctx.measureText(s).width;ctx.restore();return v}
+function rr(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r)}
+function logo(x,y,s,a=1){ctx.save();ctx.globalAlpha*=a;ctx.translate(x,y);ctx.fillStyle=WH;rr(-s/2,-s/2,s,s,s*.24);ctx.fill();const u=s/131;
+  [[Y,-1,-1],[PK,1,-1],[VI,-1,1],[G,1,1]].forEach(([c,sx,sy])=>{ctx.fillStyle=c;ctx.beginPath();ctx.arc(sx*20*u,sy*20*u,28.5*u,0,7);ctx.fill()});
+  ctx.fillStyle=WH;const a2=10.5*u,b=29*u;ctx.fillRect(-a2,-b,2*a2,2*b);ctx.fillRect(-b,-a2,2*b,2*a2);ctx.restore()}
+// ---------------------------------------------------------------- frames (loaded on demand, cached)
+const cache=new Map();function img(src){if(cache.has(src))return cache.get(src);const im=new Image();const p=new Promise(r=>{im.onload=()=>r(im);im.onerror=()=>r(null)});im.src=src;const v={im,p};cache.set(src,v);if(cache.size>60)cache.delete(cache.keys().next().value);return v}
+const pad=n=>String(n).padStart(5,'0');
+const tFrame=t=>`fr/t/${pad(clamp(Math.round(t*FPS)+1,1,NT))}.jpg`, sFrame=t=>`fr/s/${pad(clamp(Math.floor((t-INS[0])*FPS)+1,1,NS))}.jpg`;
+let CAPS=window.CAPS||[];
+// ---------------------------------------------------------------- pieces
+function chip(x,y,label,bg,fg,k,rot=0,size=46){if(k<=0)return;const w=tw(label,size)+64,h=size*1.9;ctx.save();ctx.translate(x,y);ctx.rotate(rot);const s=lerp(.4,1,Math.min(1.1,k));ctx.scale(s,s);ctx.globalAlpha=clamp(k*2);
+  ctx.shadowColor='rgba(0,0,0,.35)';ctx.shadowBlur=30;ctx.shadowOffsetY=10;ctx.fillStyle=bg;rr(-w/2,-h/2,w,h,h/2);ctx.fill();ctx.shadowColor='transparent';txt(label,0,4,size,{c:fg});ctx.restore()}
+function inOut(t,a,b,f=2.4,z=.55){if(t<a||t>b+.35)return 0;const kin=spring(t-a,f,z),kout=1-E.in(P(t,b,.3));return kin*kout}
+function plusCard(t,a,b,n,line1,line2,col,emoji){const k=inOut(t,a,b,2,.6);if(k<=0)return;const y=360;ctx.save();ctx.translate(540,y);const s=lerp(.6,1,Math.min(1.08,k));ctx.scale(s,s);ctx.globalAlpha=clamp(k*2);
+  ctx.shadowColor='rgba(0,0,0,.4)';ctx.shadowBlur=40;ctx.shadowOffsetY=14;ctx.fillStyle=WH;rr(-460,-150,920,300,56);ctx.fill();ctx.shadowColor='transparent';
+  ctx.fillStyle=col;rr(-430,-120,190,240,40);ctx.fill();txt(`+${n}`,-335,-30,110,{c:WH});txt('PLUS',-335,70,38,{c:WH,w:800});
+  txt(emoji,330,0,110);txt(line1,-200,-38,50,{al:'left',c:INK});txt(line2,-200,32,50,{al:'left',c:col});ctx.restore()}
+// captions: groups of <=3 words, active word sits on a yellow box; pops in on its first word
+function captions(t,y){const c=CAPS.find(c=>t>=c.s-.04&&t<c.e+.02);if(!c)return;const size=74,gap=22;const ws=c.words.map(w=>({...w,ww:tw(w.w,size)}));
+  const tot=ws.reduce((a,w)=>a+w.ww,0)+gap*(ws.length-1);let x=540-tot/2;const k=spring(t-c.s,3,.55),s=lerp(.85,1,Math.min(1.05,k));
+  ctx.save();ctx.translate(540,y);ctx.scale(s,s);ctx.translate(-540,-y);
+  ws.forEach(w=>{const on=t>=w.s&&t<w.e+.02,cx=x+w.ww/2;if(on){ctx.fillStyle=Y;rr(x-14,y-size*.62,w.ww+28,size*1.22,18);ctx.fill()}
+    txt(w.w,cx,y+4,size,on?{c:INK}:{stroke:12});x+=w.ww+gap});ctx.restore()}
+// ---------------------------------------------------------------- frame
+function draw(t,base,scr){ctx.clearRect(0,0,W,H);const inI=t>=INS[0]&&t<INS[1];
+  // transition amounts: phone rises in over the talking head, then leaves upward (same vector both seams)
+  const kIn=E.out(P(t,INS[0]-.05,.45)),kOut=E.in(P(t,INS[1]-.35,.35));
+  if(base&&(!inI||kIn<1||kOut>0)){ctx.drawImage(base,0,0,W,H)}
+  if(t>=INS[0]-.05&&t<INS[1]){
+    const a=inI?1:kIn;ctx.save();ctx.globalAlpha=Math.min(1,kIn*1.6)*(1-kOut);
+    const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#160e2a');g.addColorStop(1,'#0b0716');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    [[Y,170,330,260],[PK,930,520,300],[G,880,1560,280],[VI,140,1450,320]].forEach(([c,x,y,r])=>{const rg=ctx.createRadialGradient(x,y,0,x,y,r);rg.addColorStop(0,c+'55');rg.addColorStop(1,c+'00');ctx.fillStyle=rg;ctx.fillRect(x-r,y-r,2*r,2*r)});
+    ctx.restore();
+    // phone
+    const pw=720,ph=1562,py=lerp(H+100,H/2+20,kIn)-kOut*(H+400),px=540;ctx.save();ctx.translate(px,py);const sc=lerp(.75,1,kIn);ctx.scale(sc,sc);ctx.rotate((1-kIn)*.06-kOut*.05);
+    ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=80;ctx.shadowOffsetY=30;ctx.fillStyle='#111';rr(-pw/2-18,-ph/2-18,pw+36,ph+36,110);ctx.fill();ctx.shadowColor='transparent';
+    ctx.save();rr(-pw/2,-ph/2,pw,ph,92);ctx.clip();if(scr)ctx.drawImage(scr,-pw/2,-ph/2,pw,ph);ctx.restore();ctx.restore();
+    // step callouts synced to what the recording shows
+    const st=[[INS[0]+.6,31.6,'⏰ Ichish vaqtini eslatadi',VI,WH,-.04,250],[32.2,34.6,'1 · Qidiring',BLUE,WH,.03,250],[34.8,37.1,'2 · Narxlarni solishtiring',PK,WH,-.03,250],[37.3,INS[1]-.4,'3 · Savatga qo\'shing',G,WH,.03,250]];
+    st.forEach(([a,b,l,bg,fg,r,y])=>chip(540,y-kOut*400,l,bg,fg,inOut(t,a,b),r,48));
+  }
+  // brand watermark
+  logo(96,150,84,.92);
+  // motion callouts over the talking head
+  chip(540,330,'🆕 Yangi ilova — Davo Delivery',PK,WH,inOut(t,10.55,13.5),-.035,50);
+  chip(300,980,'Sink',Y,INK,inOut(t,14.5,17.0),-.08,58);chip(800,960,'Biotin',G,WH,inOut(t,14.9,17.0),.07,58);
+  chip(540,330,'🔎 Barcha dori vositalari',BLUE,WH,inOut(t,16.8,20.3),.03,50);
+  chip(540,330,'🛵 Uyingizgacha yetkazib berishadi',G,WH,inOut(t,24.3,27.4),-.03,46);
+  chip(540,330,'⏱ Vaqtingizni tejang',Y,INK,inOut(t,38.3+1.6,41.8),.03,52);
+  plusCard(t,43.2,47.3,1,'Uyingizgacha','yetkazib berish',G,'🛵');
+  plusCard(t,50.6,60.2,2,'Ichish vaqtini','eslatib turadi',VI,'⏰');
+  // end card
+  const ke=spring(t-60.4,2,.6);if(t>60.4){ctx.save();ctx.globalAlpha=clamp(ke*2);const s=lerp(.6,1,Math.min(1.06,ke));ctx.translate(540,380);ctx.scale(s,s);
+    ctx.shadowColor='rgba(0,0,0,.45)';ctx.shadowBlur=40;ctx.fillStyle=WH;rr(-430,-190,860,380,60);ctx.fill();ctx.shadowColor='transparent';
+    logo(-280,-40,170);txt('Davo Delivery',90,-80,64,{c:INK});txt('Ilovani yuklab oling',90,-10,40,{c:VI,w:800});
+    ['App Store','Google Play'].forEach((n,i)=>{const x=i?220:-60;ctx.fillStyle=INK;rr(x-125,70,250,72,36);ctx.fill();txt(n,x,107,30,{f:'Inter',w:700})});ctx.restore()}
+  captions(t,inI?1835:1520);
+}
+window.ready=(async()=>{await Promise.all(['900 74px Montserrat','800 40px Montserrat','700 30px Inter','600 30px Inter','48px "Noto Color Emoji"'].map(f=>document.fonts.load(f,"Oʻ'🛵⏰🔎🆕⏱")))})();
+window.seek=async t=>{t=Math.min(Math.max(t,0),DUR);const bv=img(tFrame(t));const sv=(t>=INS[0]-.1&&t<INS[1])?img(sFrame(t)):null;const [b,s]=await Promise.all([bv.p,sv?sv.p:null]);draw(t,b,s)};
+window.DUR=DUR;
+</script></body></html>
